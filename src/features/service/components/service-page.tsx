@@ -267,7 +267,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         return false;
       }
 
-      if (activeProjectId && conversation.projectId !== activeProjectId) {
+      // "최근"은 프로젝트에 속하지 않은 일반 채팅만 보여준다.
+      if (conversation.projectId) {
         return false;
       }
 
@@ -279,7 +280,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     });
 
     return filtered.sort((left, right) => Number(Boolean(right.pinned)) - Number(Boolean(left.pinned)));
-  }, [activeProjectId, conversations, searchQuery]);
+  }, [conversations, searchQuery]);
 
   const startConversationWith = useCallback((philosopher: PhilosopherProfile) => {
     conversationIdRef.current += 1;
@@ -733,7 +734,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         key={conversation.id}
                         type="button"
                         onClick={() => {
-                          setActiveProjectId(conversation.projectId ?? null);
+                          setActiveProjectId(null);
                           setActiveConversationId(conversation.id);
                           setIsSelectingPhilosopher(false);
                         }}
