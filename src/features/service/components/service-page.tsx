@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Message = {
   id: string;
@@ -153,6 +153,7 @@ export function ServicePage() {
   const [conversations, setConversations] = useState(initialConversations);
   const [activeConversationId, setActiveConversationId] = useState(initialConversations[0]?.id ?? "");
   const [draft, setDraft] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -161,11 +162,27 @@ export function ServicePage() {
     initialConversations.reduce((count, conversation) => count + conversation.messages.length, 0),
   );
   const responseCursorRef = useRef(0);
+  const newConversationCursorRef = useRef(1);
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0],
     [activeConversationId, conversations],
   );
+  const filteredRecentConversations = useMemo(() => {
+    const normalized = searchQuery.trim().toLowerCase();
+
+    return conversations.filter((conversation) => {
+      if (!conversation.recent) {
+        return false;
+      }
+
+      if (!normalized) {
+        return true;
+      }
+
+      return conversation.title.toLowerCase().includes(normalized);
+    });
+  }, [conversations, searchQuery]);
 
   useEffect(() => {
     const scroller = scrollRef.current;
@@ -195,6 +212,7 @@ export function ServicePage() {
         conversation.id === activeConversation.id
           ? {
               ...conversation,
+              title: conversation.messages.length === 0 ? trimmed.slice(0, 32) : conversation.title,
               messages: [...conversation.messages, userMessage],
             }
           : conversation,
@@ -229,6 +247,42 @@ export function ServicePage() {
     }, 700);
   };
 
+  const createConversation = () => {
+    newConversationCursorRef.current += 1;
+    const id = `new-${newConversationCursorRef.current}`;
+    const conversation: Conversation = {
+      id,
+      title: `새 채팅 ${newConversationCursorRef.current}`,
+      recent: true,
+      messages: [],
+    };
+
+    setConversations((previous) => [conversation, ...previous]);
+    setActiveConversationId(id);
+    setDraft("");
+  };
+
+  const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== "Enter" || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    submitMessage(draft);
+  };
+
+  const copyMessage = async (text: string) => {
+    if (!navigator.clipboard) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Ignore clipboard failures in restricted browser contexts.
+    }
+  };
+
   return (
     <main className="flex h-screen w-full overflow-hidden bg-[#f7f7f7] text-[#1f1f1f]">
       <aside>
@@ -250,6 +304,7 @@ export function ServicePage() {
             {isSidebarOpen ? (
               <button
                 type="button"
+                onClick={createConversation}
                 className="rounded-md p-2 text-[#666] transition hover:bg-[#e7e7e7]"
                 aria-label="new chat"
               >
@@ -263,6 +318,7 @@ export function ServicePage() {
               <div className="px-3">
                 <button
                   type="button"
+                  onClick={createConversation}
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#333] transition hover:bg-[#e8e8e8]"
                 >
                   <IconSquarePen />
@@ -275,6 +331,14 @@ export function ServicePage() {
                   <IconSearch />
                   채팅 검색
                 </button>
+                <div className="mt-2">
+                  <input
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="대화 제목 검색"
+                    className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#2a2a2a] outline-none placeholder:text-[#9a9a9a] focus:border-[#cfcfcf]"
+                  />
+                </div>
               </div>
 
               <div className="mt-3 border-t border-[#e6e6e6] pt-3">
@@ -302,9 +366,7 @@ export function ServicePage() {
               <div className="mt-3 border-t border-[#e6e6e6] pt-3">
                 <p className="px-6 text-xs text-[#9a9a9a]">최근</p>
                 <div className="mt-1 px-2">
-                  {conversations
-                    .filter((conversation) => conversation.recent)
-                    .map((conversation) => {
+                  {filteredRecentConversations.map((conversation) => {
                       const isActive = conversation.id === activeConversation?.id;
 
                       return (
@@ -366,10 +428,20 @@ export function ServicePage() {
                       {message.text}
                     </div>
                     <div className="mt-2 flex justify-end gap-2 text-[#8b8b8b]">
-                      <button type="button" className="rounded-md p-1.5 hover:bg-[#ededed]" aria-label="copy">
+                      <button
+                        type="button"
+                        onClick={() => copyMessage(message.text)}
+                        className="rounded-md p-1.5 hover:bg-[#ededed]"
+                        aria-label="copy"
+                      >
                         <IconCopy />
                       </button>
-                      <button type="button" className="rounded-md p-1.5 hover:bg-[#ededed]" aria-label="edit">
+                      <button
+                        type="button"
+                        onClick={() => setDraft(message.text)}
+                        className="rounded-md p-1.5 hover:bg-[#ededed]"
+                        aria-label="edit"
+                      >
                         <IconEdit />
                       </button>
                     </div>
@@ -414,6 +486,7 @@ export function ServicePage() {
                 <textarea
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
+                  onKeyDown={handleComposerKeyDown}
                   placeholder="변경할 내용이 있으신가요?"
                   className="h-16 w-full resize-none bg-transparent text-[15px] leading-7 text-[#262626] outline-none placeholder:text-[#9a9a9a]"
                 />
