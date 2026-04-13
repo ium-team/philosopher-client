@@ -59,7 +59,7 @@ function IconSquarePen() {
 
 function IconSend() {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M12 5v14" />
       <path d="M6.8 10.2L12 5l5.2 5.2" />
     </svg>
@@ -77,7 +77,7 @@ function IconMic() {
 
 function IconVoiceWave() {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
+    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9">
       <path d="M6 12h0.01" strokeLinecap="round" />
       <path d="M9 9v6" strokeLinecap="round" />
       <path d="M12 7v10" strokeLinecap="round" />
