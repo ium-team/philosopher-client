@@ -164,7 +164,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const conversationIdRef = useRef(0);
   const handledSelectionRef = useRef<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
-  const recognitionBaseDraftRef = useRef("");
+  const recognitionStartDraftRef = useRef("");
   const [isListening, setIsListening] = useState(false);
 
   const activeConversation = useMemo(
@@ -370,7 +370,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         let finalTranscript = "";
         let interimTranscript = "";
 
-        for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        for (let index = 0; index < event.results.length; index += 1) {
           const result = event.results[index];
           const transcript = result[0]?.transcript ?? "";
 
@@ -382,15 +382,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           interimTranscript += transcript;
         }
 
-        const baseDraft = recognitionBaseDraftRef.current.trim();
+        const baseDraft = recognitionStartDraftRef.current;
         const currentTranscript = `${finalTranscript} ${interimTranscript}`.trim();
         const combinedDraft = currentTranscript ? `${baseDraft} ${currentTranscript}`.trim() : baseDraft;
 
         setDraft(combinedDraft);
-
-        if (finalTranscript.trim()) {
-          recognitionBaseDraftRef.current = combinedDraft;
-        }
       };
 
       recognition.onerror = () => {
@@ -404,7 +400,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       recognitionRef.current = recognition;
     }
 
-    recognitionBaseDraftRef.current = draft.trim();
+    recognitionStartDraftRef.current = draft;
 
     try {
       recognitionRef.current.start();
@@ -420,7 +416,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   const cancelVoiceInput = useCallback(() => {
     recognitionRef.current?.stop();
-    setDraft(recognitionBaseDraftRef.current);
+    setDraft(recognitionStartDraftRef.current);
     setIsListening(false);
   }, []);
 
