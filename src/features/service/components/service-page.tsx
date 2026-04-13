@@ -158,9 +158,9 @@ function IconFolderPlus() {
   );
 }
 
-function IconFolder() {
+function IconFolder({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.7">
       <path d="M3.5 7.5a2 2 0 0 1 2-2h4l1.5 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-12.5a2 2 0 0 1-2-2z" />
     </svg>
   );
@@ -982,7 +982,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     <div className="mb-6 flex items-center justify-between gap-5">
                       <div className="flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#111827]">
                         <span className="text-[#4b5563]">
-                          <IconFolder />
+                          <IconFolder className="h-6 w-6" />
                         </span>
                         {activeProject.name}
                       </div>
