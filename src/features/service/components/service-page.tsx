@@ -114,6 +114,22 @@ function IconVoiceWave() {
   );
 }
 
+function IconCheck() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M5 12.5l4.2 4.2L19 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconClose() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function IconCopy() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -397,6 +413,17 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
   }, [draft, isListening, isSelectingPhilosopher]);
 
+  const stopVoiceInput = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
+
+  const cancelVoiceInput = useCallback(() => {
+    recognitionRef.current?.stop();
+    setDraft(recognitionBaseDraftRef.current);
+    setIsListening(false);
+  }, []);
+
   const hasDraft = draft.trim().length > 0;
 
   return (
@@ -632,16 +659,26 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   className="h-11 flex-1 bg-transparent px-2 text-[15px] text-[#2f2923] outline-none placeholder:text-[#ab9987] disabled:cursor-not-allowed disabled:text-[#ab9987]"
                 />
                 <div className="flex items-center gap-2">
+                  {isListening ? (
+                    <button
+                      type="button"
+                      onClick={cancelVoiceInput}
+                      className="rounded-full p-2 text-[#7a6f64] hover:bg-[#f4eee5]"
+                      aria-label="cancel voice input"
+                    >
+                      <IconClose />
+                    </button>
+                  ) : null}
                   <button
                     type="button"
-                    onClick={handleVoiceInput}
+                    onClick={isListening ? stopVoiceInput : handleVoiceInput}
                     disabled={isSelectingPhilosopher}
                     className={`rounded-full p-2 text-[#7a6f64] hover:bg-[#f4eee5] disabled:cursor-not-allowed disabled:opacity-60 ${
                       isListening ? "bg-[#f4eee5] text-[#c2410c]" : ""
                     }`}
-                    aria-label={isListening ? "stop voice input" : "voice input"}
+                    aria-label={isListening ? "confirm voice input" : "voice input"}
                   >
-                    <IconMic />
+                    {isListening ? <IconCheck /> : <IconMic />}
                   </button>
                   <button
                     type="button"
