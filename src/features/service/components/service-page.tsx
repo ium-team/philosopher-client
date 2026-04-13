@@ -75,6 +75,18 @@ function IconMic() {
   );
 }
 
+function IconVoiceWave() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9">
+      <path d="M6 12h0.01" strokeLinecap="round" />
+      <path d="M9 9v6" strokeLinecap="round" />
+      <path d="M12 7v10" strokeLinecap="round" />
+      <path d="M15 9v6" strokeLinecap="round" />
+      <path d="M18 12h0.01" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function IconCopy() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -517,7 +529,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
                     aria-label={hasDraft ? "send message" : "voice message"}
                   >
-                    {hasDraft ? <IconSend /> : <IconMic />}
+                    {hasDraft ? <IconSend /> : <IconVoiceWave />}
                   </button>
                 </div>
               </div>
