@@ -158,6 +158,14 @@ function IconFolderPlus() {
   );
 }
 
+function IconFolder() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M3.5 7.5a2 2 0 0 1 2-2h4l1.5 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-12.5a2 2 0 0 1-2-2z" />
+    </svg>
+  );
+}
+
 function IconArrowRight() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9">
@@ -679,7 +687,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     새 프로젝트
                   </button>
                   {projects.map((project) => {
-                    const count = conversations.filter((conversation) => conversation.projectId === project.id).length;
                     const isActive = activeProjectId === project.id;
 
                     return (
@@ -687,12 +694,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         key={project.id}
                         type="button"
                         onClick={() => setActiveProjectId(project.id)}
-                        className={`mb-0.5 w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                          isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
+                        className={`mb-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
+                          isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#1f2937] hover:bg-[#f3f4f6]"
                         }`}
                       >
+                        <span className={isActive ? "text-[#ff6d00]" : "text-[#374151]"}>
+                          <IconFolder />
+                        </span>
                         <span className="block truncate">{project.name}</span>
-                        <span className="block text-xs text-[#9ca3af]">{count}개 대화</span>
                       </button>
                     );
                   })}
