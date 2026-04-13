@@ -164,7 +164,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const conversationIdRef = useRef(0);
   const handledSelectionRef = useRef<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
-  const recognitionStartDraftRef = useRef("");
   const [isListening, setIsListening] = useState(false);
 
   const activeConversation = useMemo(
@@ -382,9 +381,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           interimTranscript += transcript;
         }
 
-        const baseDraft = recognitionStartDraftRef.current;
-        const currentTranscript = `${finalTranscript} ${interimTranscript}`.trim();
-        const combinedDraft = currentTranscript ? `${baseDraft} ${currentTranscript}`.trim() : baseDraft;
+        const combinedDraft = `${finalTranscript} ${interimTranscript}`.trim();
 
         setDraft(combinedDraft);
       };
@@ -400,7 +397,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       recognitionRef.current = recognition;
     }
 
-    recognitionStartDraftRef.current = draft;
+    setDraft("");
 
     try {
       recognitionRef.current.start();
@@ -416,7 +413,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   const cancelVoiceInput = useCallback(() => {
     recognitionRef.current?.stop();
-    setDraft(recognitionStartDraftRef.current);
+    setDraft("");
     setIsListening(false);
   }, []);
 
