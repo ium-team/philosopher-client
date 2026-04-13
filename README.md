@@ -16,6 +16,12 @@ pnpm format
 
 `.env.example` 를 기준으로 `.env.local` 을 구성하면 된다.
 
+Google OAuth + Supabase 사용 시 필수 환경 변수:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_API_BASE_URL`
+
 ## Docs
 
 - `docs/project-setup.md`
