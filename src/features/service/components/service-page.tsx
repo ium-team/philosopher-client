@@ -1328,23 +1328,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         ) : null}
         {isProjectDeleteConfirmOpen && activeProject ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-[520px] rounded-2xl border border-[#d1d5db] bg-white p-6 shadow-[0_18px_50px_rgba(17,24,39,0.2)]">
-              <h3 className="text-[34px] font-semibold tracking-tight text-[#111827]">프로젝트를 삭제할까요?</h3>
-              <p className="mt-4 text-[22px] leading-8 text-[#111827]">
+            <div className="w-full max-w-[420px] rounded-2xl border border-[#d1d5db] bg-white p-5 shadow-[0_18px_50px_rgba(17,24,39,0.2)]">
+              <h3 className="text-[26px] font-semibold tracking-tight text-[#111827]">프로젝트를 삭제할까요?</h3>
+              <p className="mt-3 text-[16px] leading-6 text-[#111827]">
                 모든 프로젝트 파일과 채팅이 영구 삭제됩니다. 채팅을 저장하려면 삭제하기 전에 채팅 목록 또는 다른 프로젝트로 옮겨 주세요.
               </p>
-              <div className="mt-8 flex justify-end gap-3">
+              <div className="mt-6 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsProjectDeleteConfirmOpen(false)}
-                  className="rounded-full border border-[#d1d5db] px-5 py-2 text-[28px] text-[#374151] transition hover:bg-[#f9fafb]"
+                  className="rounded-full border border-[#d1d5db] px-4 py-2 text-base text-[#374151] transition hover:bg-[#f9fafb]"
                 >
                   취소
                 </button>
                 <button
                   type="button"
                   onClick={deleteActiveProject}
-                  className="rounded-full bg-[#dc2626] px-5 py-2 text-[28px] text-white transition hover:bg-[#b91c1c]"
+                  className="rounded-full bg-[#dc2626] px-4 py-2 text-base text-white transition hover:bg-[#b91c1c]"
                 >
                   삭제
                 </button>
