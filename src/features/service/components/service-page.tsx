@@ -502,9 +502,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div className="mt-1 px-2">
                   {filteredRecentConversations.map((conversation) => {
                     const isActive = conversation.id === activeConversation?.id;
-                    const philosopherName =
-                      philosophers.find((philosopher) => philosopher.id === conversation.philosopherId)?.name ??
-                      "Unknown";
+                    const philosopher = philosophers.find((item) => item.id === conversation.philosopherId);
+                    const philosopherName = philosopher?.name ?? "Unknown";
 
                     return (
                       <button
@@ -519,7 +518,20 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         }`}
                       >
                         <span className="block truncate">{conversation.title}</span>
-                        <span className="block truncate text-xs text-[#9ca3af]">{philosopherName}</span>
+                        <span className="mt-1 flex items-center gap-1.5 text-xs text-[#9ca3af]">
+                          {philosopher ? (
+                            <Image
+                              src={philosopher.imageSrc}
+                              alt={`${philosopherName} portrait`}
+                              width={20}
+                              height={20}
+                              className="h-4 w-4 rounded-full object-cover object-top"
+                            />
+                          ) : (
+                            <span className="h-4 w-4 rounded-full bg-[#e5e7eb]" />
+                          )}
+                          <span className="truncate">{philosopherName}</span>
+                        </span>
                       </button>
                     );
                   })}
@@ -552,8 +564,19 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           <button
             type="button"
             onClick={() => setIsSelectingPhilosopher(true)}
-            className="text-[18px] font-semibold tracking-tight text-[#111827]"
+            className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#111827]"
           >
+            {activePhilosopher ? (
+              <Image
+                src={activePhilosopher.imageSrc}
+                alt={`${activePhilosopher.name} portrait`}
+                width={40}
+                height={40}
+                className="h-8 w-8 rounded-full object-cover object-top"
+              />
+            ) : (
+              <span className="h-8 w-8 rounded-full bg-[#f3f4f6]" />
+            )}
             {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ff7f11]">▾</span>
           </button>
 
@@ -653,7 +676,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         </div>
                       </>
                     ) : (
-                      <div className="max-w-[720px] whitespace-pre-line text-[17px] leading-8 text-[#111827]">{message.text}</div>
+                      <div className="max-w-[720px]">
+                        <div className="mb-2 flex items-center gap-2 text-xs tracking-[0.14em] text-[#9ca3af] uppercase">
+                          {activePhilosopher ? (
+                            <Image
+                              src={activePhilosopher.imageSrc}
+                              alt={`${activePhilosopher.name} portrait`}
+                              width={24}
+                              height={24}
+                              className="h-5 w-5 rounded-full object-cover object-top"
+                            />
+                          ) : (
+                            <span className="h-5 w-5 rounded-full bg-[#e5e7eb]" />
+                          )}
+                          {activePhilosopher?.name ?? "Philosopher"}
+                        </div>
+                        <div className="whitespace-pre-line text-[17px] leading-8 text-[#111827]">{message.text}</div>
+                      </div>
                     )}
                   </article>
                 ))
