@@ -1,21 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fffaf5;
-  --foreground: #2f190d;
-  --surface: rgba(255, 247, 237, 0.86);
-  --surface-strong: rgba(255, 237, 213, 0.88);
-  --border: rgba(251, 146, 60, 0.18);
-  --accent: #f97316;
+  --background: #f7f7f7;
+  --foreground: #1f1f1f;
+  --surface: #ffffff;
+  --border: #e6e6e6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
-  --color-surface-strong: var(--surface-strong);
   --color-border: var(--border);
-  --color-accent: var(--accent);
   --font-sans: var(--font-app-sans);
   --font-mono: var(--font-app-mono);
 }
@@ -24,32 +20,20 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  min-height: 100%;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  min-height: 100vh;
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
-  background-image:
-    radial-gradient(
-      circle at 12% 10%,
-      rgba(251, 146, 60, 0.16),
-      transparent 24%
-    ),
-    radial-gradient(
-      circle at 88% 12%,
-      rgba(245, 158, 11, 0.12),
-      transparent 20%
-    ),
-    radial-gradient(
-      circle at 50% 55%,
-      rgba(234, 88, 12, 0.08),
-      transparent 28%
-    ),
-    linear-gradient(180deg, #fffaf5 0%, #fff7ed 55%, #fffbf7 100%);
 }
 
 a {
@@ -61,7 +45,11 @@ button {
   cursor: pointer;
 }
 
+textarea {
+  font: inherit;
+}
+
 ::selection {
-  background: rgba(249, 115, 22, 0.22);
-  color: #2f190d;
+  background: rgba(31, 31, 31, 0.12);
+  color: #111;
 }
