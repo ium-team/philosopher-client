@@ -277,10 +277,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   };
 
   return (
-    <main className="flex h-screen w-full overflow-hidden bg-[#f7f7f7] text-[#1f1f1f]">
+    <main className="flex h-screen w-full overflow-hidden bg-[#fffcf8] text-[#2a241f]">
       <aside>
         <div
-          className={`flex h-full flex-col border-r border-[#e6e6e6] bg-[#f2f2f2] transition-all duration-200 ${
+          className={`flex h-full flex-col border-r border-[#efe6da] bg-[#f8f4ed] transition-all duration-200 ${
             isSidebarOpen ? "w-[290px]" : "w-[72px]"
           }`}
         >
@@ -289,7 +289,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               type="button"
               aria-label="toggle sidebar"
               onClick={() => setIsSidebarOpen((value) => !value)}
-              className="rounded-md p-2 text-[#666] transition hover:bg-[#e7e7e7]"
+              className="rounded-md p-2 text-[#6f675f] transition hover:bg-[#efe7de]"
             >
               <IconHamburger />
             </button>
@@ -298,7 +298,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <button
                 type="button"
                 onClick={createConversation}
-                className="rounded-md p-2 text-[#666] transition hover:bg-[#e7e7e7]"
+                className="rounded-md p-2 text-[#6f675f] transition hover:bg-[#efe7de]"
                 aria-label="new chat"
               >
                 <IconSquarePen />
@@ -312,14 +312,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <button
                   type="button"
                   onClick={createConversation}
-                  className="flex w-full items-center gap-2 rounded-lg border border-[#fed7aa] bg-[#fff2e8] px-3 py-2 text-sm font-medium text-[#9a3412] transition hover:bg-[#ffe8d6]"
+                  className="flex w-full items-center gap-2 rounded-lg border border-[#fed7aa] bg-[#fff5ea] px-3 py-2 text-sm font-medium text-[#9a3412] transition hover:bg-[#ffedd8]"
                 >
                   <IconSquarePen />
                   새 채팅
                 </button>
                 <button
                   type="button"
-                  className="mt-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] transition hover:bg-[#e8e8e8]"
+                  className="mt-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#62574d] transition hover:bg-[#efe7de]"
                 >
                   <IconSearch />
                   채팅 검색
@@ -329,20 +329,20 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="대화 제목 검색"
-                    className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#2a2a2a] outline-none placeholder:text-[#9a9a9a] focus:border-[#fb923c] focus:ring-2 focus:ring-[#fed7aa]"
+                    className="w-full rounded-lg border border-[#eadfce] bg-white px-3 py-2 text-sm text-[#2f2923] outline-none placeholder:text-[#ab9987] focus:border-[#fb923c] focus:ring-2 focus:ring-[#fed7aa]"
                   />
                 </div>
               </div>
 
-              <div className="mt-3 border-t border-[#e6e6e6] pt-3">
-                <p className="px-6 text-xs text-[#9a9a9a]">프로젝트</p>
+              <div className="mt-3 border-t border-[#efe6da] pt-3">
+                <p className="px-6 text-xs text-[#ab9987]">프로젝트</p>
                 <div className="mt-1 px-2">
-                  <p className="rounded-lg px-3 py-2 text-sm text-[#8b8b8b]">프로젝트가 없습니다.</p>
+                  <p className="rounded-lg px-3 py-2 text-sm text-[#958476]">프로젝트가 없습니다.</p>
                 </div>
               </div>
 
-              <div className="mt-3 border-t border-[#e6e6e6] pt-3">
-                <p className="px-6 text-xs text-[#9a9a9a]">최근</p>
+              <div className="mt-3 border-t border-[#efe6da] pt-3">
+                <p className="px-6 text-xs text-[#ab9987]">최근</p>
                 <div className="mt-1 px-2">
                   {filteredRecentConversations.map((conversation) => {
                     const isActive = conversation.id === activeConversation?.id;
@@ -359,53 +359,53 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           setIsSelectingPhilosopher(false);
                         }}
                         className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                          isActive ? "bg-[#fff1dc] text-[#9a3412]" : "text-[#555] hover:bg-[#e8e8e8]"
+                          isActive ? "bg-[#fff1dc] text-[#9a3412]" : "text-[#62574d] hover:bg-[#efe7de]"
                         }`}
                       >
                         <span className="block truncate">{conversation.title}</span>
-                        <span className="block truncate text-xs text-[#a3a3a3]">{philosopherName}</span>
+                        <span className="block truncate text-xs text-[#ab9884]">{philosopherName}</span>
                       </button>
                     );
                   })}
                   {filteredRecentConversations.length === 0 ? (
-                    <p className="rounded-lg px-3 py-2 text-sm text-[#8b8b8b]">최근 대화가 없습니다.</p>
+                    <p className="rounded-lg px-3 py-2 text-sm text-[#958476]">최근 대화가 없습니다.</p>
                   ) : null}
                 </div>
               </div>
 
-              <div className="mt-auto border-t border-[#e6e6e6] p-3">
+              <div className="mt-auto border-t border-[#efe6da] p-3">
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#555] hover:bg-[#e8e8e8]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#62574d] hover:bg-[#efe7de]"
                 >
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#d9d9d9] text-xs text-[#4d4d4d]">이</span>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#e6d9ca] text-xs text-[#5a4e42]">이</span>
                   이 건희
                 </button>
               </div>
             </>
           ) : (
-            <div className="mt-auto border-t border-[#e6e6e6] p-3">
-              <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#d9d9d9] text-xs text-[#4d4d4d]">이</span>
+            <div className="mt-auto border-t border-[#efe6da] p-3">
+              <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#e6d9ca] text-xs text-[#5a4e42]">이</span>
             </div>
           )}
         </div>
       </aside>
 
       <section className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-[#ececec] bg-[#f7f7f7] px-4 md:px-6">
+        <header className="flex h-14 items-center justify-between border-b border-[#f0e7dc] bg-[#fffcf8] px-4 md:px-6">
           <button
             type="button"
             onClick={() => setIsSelectingPhilosopher(true)}
-            className="text-[18px] font-semibold tracking-tight text-[#2f2f2f]"
+            className="text-[18px] font-semibold tracking-tight text-[#2f2720]"
           >
             {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ea580c]">▾</span>
           </button>
 
-          <div className="flex items-center gap-3 text-sm text-[#666]">
-            <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#ededed]">
+          <div className="flex items-center gap-3 text-sm text-[#6f675f]">
+            <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#f4eee5]">
               공유하기
             </button>
-            <button type="button" className="rounded-md px-2 py-1.5 hover:bg-[#ededed]" aria-label="more options">
+            <button type="button" className="rounded-md px-2 py-1.5 hover:bg-[#f4eee5]" aria-label="more options">
               •••
             </button>
           </div>
@@ -416,30 +416,30 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             {isSelectingPhilosopher ? (
               <>
                 <header className="mb-6">
-                  <p className="text-xs tracking-[0.18em] text-[#9a9a9a] uppercase">New Conversation</p>
-                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#2f2f2f]">대화할 철학자를 선택하세요</h1>
-                  <p className="mt-2 text-sm text-[#7a7a7a]">선택 후 바로 같은 화면에서 대화가 시작됩니다.</p>
+                  <p className="text-xs tracking-[0.18em] text-[#a3917f] uppercase">New Conversation</p>
+                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#2f2720]">대화할 철학자를 선택하세요</h1>
+                  <p className="mt-2 text-sm text-[#7f7369]">선택 후 바로 같은 화면에서 대화가 시작됩니다.</p>
                 </header>
 
                 <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {philosophers.map((philosopher) => (
                     <article
                       key={philosopher.id}
-                      className="rounded-2xl border border-[#e6e6e6] bg-white p-5 shadow-[0_8px_24px_rgba(0,0,0,0.04)]"
+                      className="rounded-2xl border border-[#efe6da] bg-white p-5 shadow-[0_10px_26px_rgba(125,79,25,0.08)]"
                     >
-                      <p className="text-xs text-[#9a9a9a]">{philosopher.era}</p>
-                      <h2 className="mt-1 text-xl font-semibold text-[#272727]">{philosopher.name}</h2>
-                      <p className="mt-2 text-xs text-[#b2b2b2]">{philosopher.school}</p>
+                      <p className="text-xs text-[#a3917f]">{philosopher.era}</p>
+                      <h2 className="mt-1 text-xl font-semibold text-[#2f2720]">{philosopher.name}</h2>
+                      <p className="mt-2 text-xs text-[#c0ab96]">{philosopher.school}</p>
 
-                      <p className="mt-4 text-sm leading-6 text-[#5f5f5f]">{philosopher.summary}</p>
+                      <p className="mt-4 text-sm leading-6 text-[#685c51]">{philosopher.summary}</p>
 
-                      <p className="mt-4 text-xs font-medium text-[#a3a3a3]">대화 톤</p>
-                      <p className="mt-1 text-sm text-[#555]">{philosopher.tone}</p>
+                      <p className="mt-4 text-xs font-medium text-[#ab9884]">대화 톤</p>
+                      <p className="mt-1 text-sm text-[#62574d]">{philosopher.tone}</p>
 
                       <button
                         type="button"
                         onClick={() => startConversationWith(philosopher)}
-                        className="mt-5 w-full rounded-xl border border-[#fed7aa] bg-[#fff2e8] px-4 py-2.5 text-sm font-semibold text-[#9a3412] transition hover:bg-[#ffe8d6]"
+                        className="mt-5 w-full rounded-xl border border-[#fed7aa] bg-[#fff5ea] px-4 py-2.5 text-sm font-semibold text-[#9a3412] transition hover:bg-[#ffedd8]"
                       >
                         선택하기
                       </button>
@@ -450,7 +450,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             ) : null}
 
             {!isSelectingPhilosopher && !activeConversation ? (
-              <div className="py-20 text-center text-[#7a7a7a]">
+              <div className="py-20 text-center text-[#7f7369]">
                 <p className="text-xl font-medium text-[#c2410c]">새 대화를 시작하세요</p>
                 <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 누르거나 상단 철학자 메뉴를 눌러 대화를 시작할 수 있습니다.</p>
               </div>
@@ -464,14 +464,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   >
                     {message.role === "user" ? (
                       <>
-                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff4e6] px-5 py-4 text-[15px] leading-7 text-[#7c2d12]">
+                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff7ed] px-5 py-4 text-[15px] leading-7 text-[#7c2d12]">
                           {message.text}
                         </div>
-                        <div className="mt-2 flex justify-end gap-2 text-[#8b8b8b]">
+                        <div className="mt-2 flex justify-end gap-2 text-[#9d8d7f]">
                           <button
                             type="button"
                             onClick={() => copyMessage(message.text)}
-                            className="rounded-md p-1.5 hover:bg-[#ededed]"
+                            className="rounded-md p-1.5 hover:bg-[#f4eee5]"
                             aria-label="copy"
                           >
                             <IconCopy />
@@ -479,7 +479,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           <button
                             type="button"
                             onClick={() => setDraft(message.text)}
-                            className="rounded-md p-1.5 hover:bg-[#ededed]"
+                            className="rounded-md p-1.5 hover:bg-[#f4eee5]"
                             aria-label="edit"
                           >
                             <IconEdit />
@@ -487,18 +487,18 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         </div>
                       </>
                     ) : (
-                      <div className="max-w-[720px] whitespace-pre-line text-[17px] leading-8 text-[#202020]">{message.text}</div>
+                      <div className="max-w-[720px] whitespace-pre-line text-[17px] leading-8 text-[#2f2923]">{message.text}</div>
                     )}
                   </article>
                 ))
               : null}
-            {!isSelectingPhilosopher && isResponding ? <div className="mb-6 text-sm text-[#a3a3a3]">답변 작성 중...</div> : null}
+            {!isSelectingPhilosopher && isResponding ? <div className="mb-6 text-sm text-[#ab9884]">답변 작성 중...</div> : null}
           </div>
         </div>
 
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
           <div className="pointer-events-auto w-full max-w-[860px]">
-            <div className="rounded-[26px] border border-[#dedede] bg-white shadow-[0_-1px_0_rgba(0,0,0,0.04),0_10px_28px_rgba(0,0,0,0.07)]">
+            <div className="rounded-[26px] border border-[#eadfce] bg-white shadow-[0_-1px_0_rgba(125,79,25,0.06),0_10px_30px_rgba(125,79,25,0.12)]">
               <div className="min-h-[86px] px-4 pt-3">
                 <textarea
                   value={draft}
@@ -506,18 +506,18 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   onKeyDown={handleComposerKeyDown}
                   placeholder={isSelectingPhilosopher ? "먼저 철학자를 선택해주세요." : "변경할 내용이 있으신가요?"}
                   disabled={isSelectingPhilosopher}
-                  className="h-16 w-full resize-none bg-transparent text-[15px] leading-7 text-[#262626] outline-none placeholder:text-[#9a9a9a] disabled:cursor-not-allowed disabled:text-[#9a9a9a]"
+                  className="h-16 w-full resize-none bg-transparent text-[15px] leading-7 text-[#2f2923] outline-none placeholder:text-[#ab9987] disabled:cursor-not-allowed disabled:text-[#ab9987]"
                 />
               </div>
 
               <div className="flex items-center justify-between px-3 pb-3">
-                <div className="flex items-center gap-1 text-[#6f6f6f]">
-                  <button type="button" className="rounded-full p-2 hover:bg-[#efefef]" aria-label="attach file">
+                <div className="flex items-center gap-1 text-[#7a6f64]">
+                  <button type="button" className="rounded-full p-2 hover:bg-[#f4eee5]" aria-label="attach file">
                     <IconClip />
                   </button>
                   <button
                     type="button"
-                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#efefef]"
+                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#f4eee5]"
                     aria-label="insert command"
                   >
                     {"\\"}
@@ -525,7 +525,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   <button
                     type="button"
                     onClick={() => setDraft("")}
-                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#efefef]"
+                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#f4eee5]"
                     aria-label="clear input"
                   >
                     ×
@@ -535,7 +535,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="rounded-full p-2 text-[#6f6f6f] hover:bg-[#efefef]"
+                    className="rounded-full p-2 text-[#7a6f64] hover:bg-[#f4eee5]"
                     aria-label="voice input"
                   >
                     <IconMic />
@@ -552,7 +552,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 </div>
               </div>
             </div>
-            <p className="mt-2 text-center text-xs text-[#9a9a9a]">
+            <p className="mt-2 text-center text-xs text-[#ab9987]">
               ChatGPT는 실수를 할 수 있습니다. 중요한 정보는 재차 확인하세요.
             </p>
           </div>
