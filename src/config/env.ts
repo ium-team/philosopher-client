@@ -6,8 +6,8 @@ const clientEnvSchema = z.object({
     .enum(["local", "development", "staging", "production"])
     .default("local"),
   NEXT_PUBLIC_API_BASE_URL: z.string().url().optional(),
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
 });
 
 export const env = clientEnvSchema.parse({

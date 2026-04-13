@@ -2,20 +2,25 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { getSupabaseClient } from "@/lib/supabase/client";
+import { getSupabaseClient, getSupabaseConfigError } from "@/lib/supabase/client";
 
 type UseAuthSessionResult = {
   isLoading: boolean;
   session: Session | null;
+  authError: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
 export function useAuthSession(): UseAuthSessionResult {
+  const authError = getSupabaseConfigError();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
+    if (authError) {
+      return;
+    }
     const supabase = getSupabaseClient();
 
     supabase.auth
@@ -31,7 +36,7 @@ export function useAuthSession(): UseAuthSessionResult {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [authError]);
 
   const signInWithGoogle = useCallback(async () => {
     const supabase = getSupabaseClient();
@@ -48,5 +53,5 @@ export function useAuthSession(): UseAuthSessionResult {
     await supabase.auth.signOut();
   }, []);
 
-  return { isLoading, session, signInWithGoogle, signOut };
+  return { isLoading: authError ? false : isLoading, session, authError, signInWithGoogle, signOut };
 }

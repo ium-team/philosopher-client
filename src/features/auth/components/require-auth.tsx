@@ -8,7 +8,7 @@ type RequireAuthProps = {
 };
 
 export function RequireAuth({ children }: RequireAuthProps) {
-  const { isLoading, session, signInWithGoogle, signOut } = useAuthSession();
+  const { isLoading, session, authError, signInWithGoogle, signOut } = useAuthSession();
 
   if (isLoading) {
     return (
@@ -29,6 +29,11 @@ export function RequireAuth({ children }: RequireAuthProps) {
           <p className="mt-3 text-sm leading-6 text-[#6c6157]">
             대화 기록/사용자별 기능을 위해 로그인이 필요합니다.
           </p>
+          {authError ? (
+            <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              {authError}
+            </p>
+          ) : null}
           <button
             type="button"
             onClick={signInWithGoogle}
