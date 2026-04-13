@@ -694,11 +694,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         key={project.id}
                         type="button"
                         onClick={() => setActiveProjectId(project.id)}
-                        className={`mb-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
-                          isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#1f2937] hover:bg-[#f3f4f6]"
+                        className={`mb-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[#1f2937] transition ${
+                          isActive ? "bg-[#fff3e0]" : "hover:bg-[#f3f4f6]"
                         }`}
                       >
-                        <span className={isActive ? "text-[#ff6d00]" : "text-[#374151]"}>
+                        <span className="text-[#374151]">
                           <IconFolder />
                         </span>
                         <span className="block truncate">{project.name}</span>
