@@ -213,6 +213,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
   const [isMoveMenuOpen, setIsMoveMenuOpen] = useState(false);
   const [isProjectMoveMenuOpen, setIsProjectMoveMenuOpen] = useState(false);
+  const [isProjectSettingsOpen, setIsProjectSettingsOpen] = useState(false);
+  const [projectSettingsName, setProjectSettingsName] = useState("");
+  const [projectSettingsGuideline, setProjectSettingsGuideline] = useState(
+    "내가 분야를 말하면 그 분야의 cs 지식에 대한 질문을 던져주는데 일단 너의 형식을 알려주자면 질문주고나서 내가 답변을 하면 너는 그 답을 평가해줘.",
+  );
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
@@ -517,32 +522,47 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setActiveConversationId("");
     setIsSelectingPhilosopher(true);
   };
+  const closeProjectSettings = () => {
+    if (!activeProject) {
+      setIsProjectSettingsOpen(false);
+      return;
+    }
+
+    const trimmed = projectSettingsName.trim();
+    if (trimmed) {
+      setProjects((previous) =>
+        previous.map((project) =>
+          project.id === activeProject.id
+            ? {
+                ...project,
+                name: trimmed.slice(0, 30),
+              }
+            : project,
+        ),
+      );
+    }
+
+    setIsProjectSettingsOpen(false);
+  };
   const openProjectSettings = () => {
     if (!activeProject) {
       return;
     }
 
-    const input = window.prompt("프로젝트 이름을 수정하세요.", activeProject.name);
-    if (!input) {
-      return;
-    }
-
-    const name = input.trim();
-    if (!name) {
-      return;
-    }
-
-    setProjects((previous) =>
-      previous.map((project) =>
-        project.id === activeProject.id
-          ? {
-              ...project,
-              name: name.slice(0, 30),
-            }
-          : project,
-      ),
-    );
+    setProjectSettingsName(activeProject.name);
     setIsMoveMenuOpen(false);
+    setIsProjectSettingsOpen(true);
+  };
+  const deleteActiveProject = () => {
+    if (!activeProject) {
+      return;
+    }
+
+    setProjects((previous) => previous.filter((project) => project.id !== activeProject.id));
+    setConversations((previous) => previous.filter((conversation) => conversation.projectId !== activeProject.id));
+    setActiveProjectId(null);
+    setActiveConversationId("");
+    setIsProjectSettingsOpen(false);
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -1202,6 +1222,75 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <p className="mt-2 text-center text-xs text-[#9ca3af]">
                 ChatGPT는 실수를 할 수 있습니다. 중요한 정보는 재차 확인하세요.
               </p>
+            </div>
+          </div>
+        ) : null}
+        {isProjectSettingsOpen && activeProject ? (
+          <div
+            className="absolute inset-0 z-40 flex items-center justify-center bg-black/20 p-4"
+            onClick={closeProjectSettings}
+          >
+            <div
+              className="w-full max-w-[640px] rounded-2xl border border-[#d1d5db] bg-white p-5 shadow-[0_18px_50px_rgba(17,24,39,0.2)]"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="mb-5 flex items-center justify-between">
+                <h2 className="text-[30px] font-semibold tracking-tight text-[#111827]">프로젝트 설정</h2>
+                <button
+                  type="button"
+                  onClick={closeProjectSettings}
+                  className="rounded-xl border border-[#111827] p-2 text-[#111827] hover:bg-[#f3f4f6]"
+                  aria-label="close project settings"
+                >
+                  <IconClose />
+                </button>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <p className="mb-2 text-sm font-medium text-[#1f2937]">프로젝트 이름</p>
+                  <input
+                    value={projectSettingsName}
+                    onChange={(event) => setProjectSettingsName(event.target.value)}
+                    className="w-full rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-base text-[#111827] outline-none focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ffb74d]"
+                  />
+                </div>
+
+                <div>
+                  <p className="mb-2 text-sm font-medium text-[#1f2937]">지침</p>
+                  <p className="mb-2 text-sm text-[#9ca3af]">
+                    컨텍스트를 설정하고 프로젝트 내에서 ChatGPT가 응답하는 방식을 맞춤 설정하세요.
+                  </p>
+                  <textarea
+                    value={projectSettingsGuideline}
+                    onChange={(event) => setProjectSettingsGuideline(event.target.value)}
+                    rows={5}
+                    className="w-full resize-y rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#ff8a3d] focus:ring-2 focus:ring-[#ffb74d]"
+                  />
+                </div>
+
+                <div>
+                  <p className="mb-2 text-sm font-medium text-[#1f2937]">메모리</p>
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-left text-base text-[#6b7280]"
+                  >
+                    <span>기본값</span>
+                    <span className="text-[#9ca3af]">▾</span>
+                  </button>
+                  <p className="mt-2 text-sm text-[#9ca3af]">
+                    프로젝트가 외부 채팅에서 메모리에 액세스할 수 있으며 그 반대도 가능합니다. 이는 변경할 수 없습니다.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={deleteActiveProject}
+                  className="rounded-full border border-[#ef4444] px-4 py-2 text-base text-[#ef4444] transition hover:bg-[#fff1f2]"
+                >
+                  프로젝트 삭제
+                </button>
+              </div>
             </div>
           </div>
         ) : null}
