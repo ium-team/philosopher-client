@@ -148,6 +148,15 @@ function IconEdit() {
   );
 }
 
+function IconMove() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M7 7h10M13 3l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17 17H7M11 21l-4-4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function IconFolderPlus() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -276,6 +285,50 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setProjects((previous) => [project, ...previous]);
     setActiveProjectId(projectId);
     setIsSelectingPhilosopher(true);
+  };
+
+  const moveConversation = (conversationId: string) => {
+    const conversation = conversations.find((item) => item.id === conversationId);
+    if (!conversation) {
+      return;
+    }
+
+    const targets: Array<{ projectId: string | null; label: string }> = [
+      { projectId: null, label: "일반" },
+      ...projects.map((project) => ({ projectId: project.id, label: project.name })),
+    ];
+
+    const currentLabel = conversation.projectId
+      ? projects.find((project) => project.id === conversation.projectId)?.name ?? "일반"
+      : "일반";
+    const options = targets.map((target, index) => `${index}: ${target.label}`).join("\n");
+    const input = window.prompt(
+      `대화를 이동할 위치 번호를 입력하세요.\n현재: ${currentLabel}\n\n${options}`,
+      "0",
+    );
+
+    if (input === null) {
+      return;
+    }
+
+    const targetIndex = Number.parseInt(input.trim(), 10);
+    if (Number.isNaN(targetIndex) || targetIndex < 0 || targetIndex >= targets.length) {
+      window.alert("유효한 번호를 입력해주세요.");
+      return;
+    }
+
+    const target = targets[targetIndex];
+
+    setConversations((previous) =>
+      previous.map((item) =>
+        item.id === conversationId
+          ? {
+              ...item,
+              projectId: target.projectId ?? undefined,
+            }
+          : item,
+      ),
+    );
   };
 
   useEffect(() => {
@@ -607,37 +660,52 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     const isActive = conversation.id === activeConversation?.id;
                     const philosopher = philosophers.find((item) => item.id === conversation.philosopherId);
                     const philosopherName = philosopher?.name ?? "Unknown";
+                    const projectName = conversation.projectId
+                      ? projects.find((project) => project.id === conversation.projectId)?.name ?? "일반"
+                      : "일반";
 
                     return (
-                      <button
-                        key={conversation.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveConversationId(conversation.id);
-                          setIsSelectingPhilosopher(false);
-                        }}
-                        className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                          isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
-                        }`}
-                      >
-                        <span className="block truncate">{conversation.title}</span>
-                        <span className="mt-1 flex items-center gap-1.5 text-xs text-[#9ca3af]">
-                          {philosopher ? (
-                            <span className="relative flex h-4 w-4 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
-                              <Image
-                                src={philosopher.imageSrc}
-                                alt={`${philosopherName} portrait`}
-                                width={20}
-                                height={20}
-                                className="h-full w-full scale-125 object-contain object-bottom"
-                              />
+                      <div key={conversation.id} className="mb-0.5 flex items-stretch gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveConversationId(conversation.id);
+                            setIsSelectingPhilosopher(false);
+                          }}
+                          className={`min-w-0 flex-1 truncate rounded-lg px-3 py-2 text-left text-sm transition ${
+                            isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
+                          }`}
+                        >
+                          <span className="block truncate">{conversation.title}</span>
+                          <span className="mt-1 flex items-center gap-1.5 text-xs text-[#9ca3af]">
+                            {philosopher ? (
+                              <span className="relative flex h-4 w-4 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                                <Image
+                                  src={philosopher.imageSrc}
+                                  alt={`${philosopherName} portrait`}
+                                  width={20}
+                                  height={20}
+                                  className="h-full w-full scale-125 object-contain object-bottom"
+                                />
+                              </span>
+                            ) : (
+                              <span className="h-4 w-4 rounded-full bg-[#e5e7eb]" />
+                            )}
+                            <span className="truncate">
+                              {philosopherName} · {projectName}
                             </span>
-                          ) : (
-                            <span className="h-4 w-4 rounded-full bg-[#e5e7eb]" />
-                          )}
-                          <span className="truncate">{philosopherName}</span>
-                        </span>
-                      </button>
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveConversation(conversation.id)}
+                          className="shrink-0 rounded-lg px-2 text-[#9ca3af] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
+                          aria-label="move conversation"
+                          title="대화 이동"
+                        >
+                          <IconMove />
+                        </button>
+                      </div>
                     );
                   })}
                   {filteredRecentConversations.length === 0 ? (
