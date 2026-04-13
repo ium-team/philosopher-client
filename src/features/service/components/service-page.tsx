@@ -397,7 +397,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         </div>
       </aside>
 
-      <section className="flex min-w-0 flex-1 flex-col">
+      <section className="relative flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b border-[#f0e7dc] bg-[#fffcf8] px-4 md:px-6">
           <button
             type="button"
@@ -502,7 +502,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           </div>
         </div>
 
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
           <div className="pointer-events-auto w-full max-w-[860px]">
             <div className="rounded-[26px] border border-[#eadfce] bg-white px-3 py-2 shadow-[0_-1px_0_rgba(125,79,25,0.06),0_10px_30px_rgba(125,79,25,0.12)]">
               <div className="flex items-center gap-2">
