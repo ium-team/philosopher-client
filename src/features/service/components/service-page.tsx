@@ -444,7 +444,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               type="button"
               aria-label="toggle sidebar"
               onClick={() => setIsSidebarOpen((value) => !value)}
-              className="rounded-md p-2 text-[#4b5563] transition hover:bg-[#fff7ed]"
+              className="rounded-md p-2 text-[#4b5563] transition hover:bg-[#eff6ff]"
             >
               <IconHamburger />
             </button>
@@ -453,7 +453,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <button
                 type="button"
                 onClick={createConversation}
-                className="rounded-md p-2 text-[#4b5563] transition hover:bg-[#fff7ed]"
+                className="rounded-md p-2 text-[#4b5563] transition hover:bg-[#eff6ff]"
                 aria-label="new chat"
               >
                 <IconSquarePen />
@@ -467,14 +467,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <button
                   type="button"
                   onClick={createConversation}
-                  className="flex w-full items-center gap-2 rounded-lg border border-[#fdba74] bg-[#fff7ed] px-3 py-2 text-sm font-medium text-[#c2410c] transition hover:bg-[#ffedd5]"
+                  className="flex w-full items-center gap-2 rounded-lg border border-[#93c5fd] bg-[#eff6ff] px-3 py-2 text-sm font-medium text-[#1d4ed8] transition hover:bg-[#dbeafe]"
                 >
                   <IconSquarePen />
                   새 채팅
                 </button>
                 <button
                   type="button"
-                  className="mt-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#374151] transition hover:bg-[#fff7ed]"
+                  className="mt-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#374151] transition hover:bg-[#eff6ff]"
                 >
                   <IconSearch />
                   채팅 검색
@@ -484,7 +484,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="대화 제목 검색"
-                    className="w-full rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#fb923c] focus:ring-2 focus:ring-[#fdba74]"
+                    className="w-full rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#60a5fa] focus:ring-2 focus:ring-[#93c5fd]"
                   />
                 </div>
               </div>
@@ -514,7 +514,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           setIsSelectingPhilosopher(false);
                         }}
                         className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                          isActive ? "bg-[#fff7ed] text-[#c2410c]" : "text-[#374151] hover:bg-[#fff7ed]"
+                          isActive ? "bg-[#eff6ff] text-[#1d4ed8]" : "text-[#374151] hover:bg-[#eff6ff]"
                         }`}
                       >
                         <span className="block truncate">{conversation.title}</span>
@@ -531,7 +531,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <div className="mt-auto border-t border-[#e5e7eb] p-3">
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#374151] hover:bg-[#fff7ed]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#374151] hover:bg-[#eff6ff]"
                 >
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f3f4f6] text-xs text-[#374151]">이</span>
                   이 건희
@@ -553,14 +553,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             onClick={() => setIsSelectingPhilosopher(true)}
             className="text-[18px] font-semibold tracking-tight text-[#111827]"
           >
-            {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ea580c]">▾</span>
+            {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#2563eb]">▾</span>
           </button>
 
           <div className="flex items-center gap-3 text-sm text-[#4b5563]">
-            <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#fff7ed]">
+            <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#eff6ff]">
               공유하기
             </button>
-            <button type="button" className="rounded-md px-2 py-1.5 hover:bg-[#fff7ed]" aria-label="more options">
+            <button type="button" className="rounded-md px-2 py-1.5 hover:bg-[#eff6ff]" aria-label="more options">
               •••
             </button>
           </div>
@@ -594,7 +594,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <button
                         type="button"
                         onClick={() => startConversationWith(philosopher)}
-                        className="mt-5 w-full rounded-xl border border-[#fdba74] bg-[#fff7ed] px-4 py-2.5 text-sm font-semibold text-[#c2410c] transition hover:bg-[#ffedd5]"
+                        className="mt-5 w-full rounded-xl border border-[#93c5fd] bg-[#eff6ff] px-4 py-2.5 text-sm font-semibold text-[#1d4ed8] transition hover:bg-[#dbeafe]"
                       >
                         선택하기
                       </button>
@@ -606,7 +606,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
             {!isSelectingPhilosopher && !activeConversation ? (
               <div className="py-20 text-center text-[#6b7280]">
-                <p className="text-xl font-medium text-[#c2410c]">새 대화를 시작하세요</p>
+                <p className="text-xl font-medium text-[#1d4ed8]">새 대화를 시작하세요</p>
                 <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 누르거나 상단 철학자 메뉴를 눌러 대화를 시작할 수 있습니다.</p>
               </div>
             ) : null}
@@ -619,14 +619,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   >
                     {message.role === "user" ? (
                       <>
-                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff7ed] px-5 py-4 text-[15px] leading-7 text-[#7c2d12]">
+                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#eff6ff] px-5 py-4 text-[15px] leading-7 text-[#1e3a8a]">
                           {message.text}
                         </div>
                         <div className="mt-2 flex justify-end gap-2 text-[#9ca3af]">
                           <button
                             type="button"
                             onClick={() => copyMessage(message.text)}
-                            className="rounded-md p-1.5 hover:bg-[#fff7ed]"
+                            className="rounded-md p-1.5 hover:bg-[#eff6ff]"
                             aria-label="copy"
                           >
                             <IconCopy />
@@ -634,7 +634,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           <button
                             type="button"
                             onClick={() => setDraft(message.text)}
-                            className="rounded-md p-1.5 hover:bg-[#fff7ed]"
+                            className="rounded-md p-1.5 hover:bg-[#eff6ff]"
                             aria-label="edit"
                           >
                             <IconEdit />
@@ -668,7 +668,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     <button
                       type="button"
                       onClick={cancelVoiceInput}
-                      className="rounded-full p-2 text-[#4b5563] hover:bg-[#fff7ed]"
+                      className="rounded-full p-2 text-[#4b5563] hover:bg-[#eff6ff]"
                       aria-label="cancel voice input"
                     >
                       <IconClose />
@@ -678,8 +678,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     type="button"
                     onClick={isListening ? stopVoiceInput : handleVoiceInput}
                     disabled={isSelectingPhilosopher}
-                    className={`rounded-full p-2 text-[#4b5563] hover:bg-[#fff7ed] disabled:cursor-not-allowed disabled:opacity-60 ${
-                      isListening ? "bg-[#fff7ed] text-[#c2410c]" : ""
+                    className={`rounded-full p-2 text-[#4b5563] hover:bg-[#eff6ff] disabled:cursor-not-allowed disabled:opacity-60 ${
+                      isListening ? "bg-[#eff6ff] text-[#1d4ed8]" : ""
                     }`}
                     aria-label={isListening ? "confirm voice input" : "voice input"}
                   >
@@ -689,7 +689,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     type="button"
                     onClick={() => submitMessage(draft)}
                     disabled={!hasDraft || !activeConversation || isResponding || isSelectingPhilosopher}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white transition hover:from-[#3b82f6] hover:to-[#2563eb] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
                     aria-label={hasDraft ? "send message" : "voice message"}
                   >
                     {hasDraft ? <IconSend /> : <IconVoiceWave />}
