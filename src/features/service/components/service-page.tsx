@@ -342,7 +342,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     setProjects((previous) => [project, ...previous]);
     setActiveProjectId(projectId);
-    setIsSelectingPhilosopher(true);
+    setActiveConversationId("");
+    setIsSelectingPhilosopher(false);
   };
 
   const moveConversationTo = (targetProjectId: string | null) => {
