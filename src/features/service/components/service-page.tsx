@@ -268,6 +268,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
   };
 
+  const hasDraft = draft.trim().length > 0;
+
   return (
     <main className="flex h-screen w-full overflow-hidden bg-[#fffcf8] text-[#2a241f]">
       <aside>
@@ -511,11 +513,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   <button
                     type="button"
                     onClick={() => submitMessage(draft)}
-                    disabled={draft.trim().length === 0 || !activeConversation || isResponding || isSelectingPhilosopher}
+                    disabled={!hasDraft || !activeConversation || isResponding || isSelectingPhilosopher}
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
-                    aria-label="send message"
+                    aria-label={hasDraft ? "send message" : "voice message"}
                   >
-                    <IconSend />
+                    {hasDraft ? <IconSend /> : <IconMic />}
                   </button>
                 </div>
               </div>
