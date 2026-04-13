@@ -1008,39 +1008,52 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   </p>
                 </header>
 
-                <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                   {philosophers.map((philosopher) => (
                     <article
                       key={philosopher.id}
-                      className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_10px_26px_rgba(17,24,39,0.08)]"
+                      className="group relative overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-[0_12px_30px_rgba(17,24,39,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(17,24,39,0.12)]"
                     >
-                      <div className="relative mb-4 h-56 overflow-hidden rounded-2xl border border-[#ebeef2] bg-[radial-gradient(circle_at_50%_20%,#fbfdff_0%,#edf2f7_74%)]">
-                        <div className="absolute inset-x-5 bottom-3 h-8 rounded-full bg-[#334155]/20 blur-md" />
+                      <div className="relative h-56 overflow-hidden border-b border-[#edf1f5] bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#f5f8fb_74%)]">
+                        <div className="absolute inset-x-8 bottom-3 h-8 rounded-full bg-[#64748b]/20 blur-md" />
+                        <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#fff3e0]" />
                         <Image
                           src={philosopher.imageSrc}
                           alt={`${philosopher.name} portrait`}
                           width={1024}
                           height={1536}
-                          className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-2 py-1 drop-shadow-[0_12px_20px_rgba(17,24,39,0.28)]"
+                          className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-3 py-2 drop-shadow-[0_12px_20px_rgba(17,24,39,0.25)]"
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                         />
                       </div>
-                      <p className="text-xs text-[#9ca3af]">{philosopher.era}</p>
-                      <h2 className="mt-1 text-xl font-semibold text-[#111827]">{philosopher.name}</h2>
-                      <p className="mt-2 text-xs text-[#9ca3af]">{philosopher.school}</p>
+                      <div className="space-y-4 p-5">
+                        <div>
+                          <h2 className="text-[22px] font-semibold tracking-tight text-[#111827]">{philosopher.name}</h2>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <span className="inline-flex rounded-full border border-[#e5e7eb] bg-[#f8fafc] px-2.5 py-1 text-[11px] text-[#64748b]">
+                              {philosopher.era}
+                            </span>
+                            <span className="inline-flex rounded-full border border-[#ffe0b2] bg-[#fff7ed] px-2.5 py-1 text-[11px] text-[#ea580c]">
+                              {philosopher.school}
+                            </span>
+                          </div>
+                        </div>
 
-                      <p className="mt-4 text-sm leading-6 text-[#4b5563]">{philosopher.summary}</p>
+                        <p className="text-sm leading-6 text-[#4b5563]">{philosopher.summary}</p>
 
-                      <p className="mt-4 text-xs font-medium text-[#9ca3af]">대화 톤</p>
-                      <p className="mt-1 text-sm text-[#374151]">{philosopher.tone}</p>
+                        <div className="rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2">
+                          <p className="text-[11px] font-semibold tracking-[0.12em] text-[#94a3b8] uppercase">대화 톤</p>
+                          <p className="mt-1 text-sm text-[#334155]">{philosopher.tone}</p>
+                        </div>
 
-                      <button
-                        type="button"
-                        onClick={() => startConversationWith(philosopher)}
-                        className="mt-5 w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition hover:bg-[#ffe0b2]"
-                      >
-                        선택하기
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => startConversationWith(philosopher)}
+                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
+                        >
+                          이 철학자로 시작하기
+                        </button>
+                      </div>
                     </article>
                   ))}
                 </section>
