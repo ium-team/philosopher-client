@@ -3,6 +3,7 @@
 import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
 import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
 
 type Message = {
@@ -201,6 +202,28 @@ function IconFolderMove() {
 
 export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const router = useRouter();
+  const { session } = useAuthSession();
+
+  const profileName = useMemo(() => {
+    const fullName = session?.user.user_metadata?.full_name;
+    if (typeof fullName === "string" && fullName.trim().length > 0) {
+      return fullName.trim();
+    }
+
+    const name = session?.user.user_metadata?.name;
+    if (typeof name === "string" && name.trim().length > 0) {
+      return name.trim();
+    }
+
+    const emailId = session?.user.email?.split("@")[0]?.trim();
+    if (emailId) {
+      return emailId;
+    }
+
+    return "로그인 사용자";
+  }, [session]);
+  const profileEmail = session?.user.email ?? "";
+  const profileInitial = (profileName[0] ?? "U").toUpperCase();
 
   const [projects, setProjects] = useState(initialProjects);
   const [conversations, setConversations] = useState(initialConversations);
@@ -850,14 +873,21 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   type="button"
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#374151] hover:bg-[#fff3e0]"
                 >
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f3f4f6] text-xs text-[#374151]">이</span>
-                  이 건희
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f3f4f6] text-xs text-[#374151]">
+                    {profileInitial}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm text-[#374151]">{profileName}</span>
+                    <span className="block truncate text-xs text-[#9ca3af]">{profileEmail}</span>
+                  </span>
                 </button>
               </div>
             </>
           ) : (
             <div className="mt-auto border-t border-[#e5e7eb] p-3">
-              <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#f3f4f6] text-xs text-[#374151]">이</span>
+              <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#f3f4f6] text-xs text-[#374151]">
+                {profileInitial}
+              </span>
             </div>
           )}
         </div>
