@@ -1,0 +1,140 @@
+import { env } from "@/config/env";
+
+export type ApiPhilosopher = "socrates" | "nietzsche" | "hannah_arendt";
+export type ApiMessageRole = "user" | "assistant";
+
+export type ApiProject = {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+};
+
+export type ApiConversation = {
+  id: string;
+  project_id: string;
+  philosopher: ApiPhilosopher;
+  title: string | null;
+  created_at: string;
+};
+
+export type ApiMessage = {
+  id: string;
+  role: ApiMessageRole;
+  content: string;
+  created_at: string;
+};
+
+export type ApiMessageExchange = {
+  user_message: ApiMessage;
+  assistant_message: ApiMessage;
+};
+
+function getApiBaseUrl(): string {
+  const baseUrl = env.NEXT_PUBLIC_API_BASE_URL;
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is missing");
+  }
+  return baseUrl.replace(/\/+$/, "");
+}
+
+async function request<T>(
+  path: string,
+  accessToken: string,
+  options?: {
+    method?: "GET" | "POST";
+    body?: unknown;
+  },
+): Promise<T> {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+    method: options?.method ?? "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: options?.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  if (!response.ok) {
+    const fallbackMessage = `API request failed (${response.status})`;
+    const payload = (await response.json().catch(() => null)) as
+      | {
+          detail?: string;
+        }
+      | null;
+
+    throw new Error(payload?.detail ?? fallbackMessage);
+  }
+
+  return (await response.json()) as T;
+}
+
+export function listProjects(accessToken: string): Promise<ApiProject[]> {
+  return request<ApiProject[]>("/api/v1/chat/projects", accessToken);
+}
+
+export function createProject(
+  accessToken: string,
+  payload: {
+    name: string;
+    description?: string;
+  },
+): Promise<ApiProject> {
+  return request<ApiProject>("/api/v1/chat/projects", accessToken, {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export function listConversations(
+  accessToken: string,
+  projectId: string,
+): Promise<ApiConversation[]> {
+  return request<ApiConversation[]>(
+    `/api/v1/chat/projects/${projectId}/conversations`,
+    accessToken,
+  );
+}
+
+export function createConversation(
+  accessToken: string,
+  projectId: string,
+  payload: {
+    philosopher: ApiPhilosopher;
+    title?: string;
+  },
+): Promise<ApiConversation> {
+  return request<ApiConversation>(
+    `/api/v1/chat/projects/${projectId}/conversations`,
+    accessToken,
+    {
+      method: "POST",
+      body: payload,
+    },
+  );
+}
+
+export function listMessages(
+  accessToken: string,
+  conversationId: string,
+): Promise<ApiMessage[]> {
+  return request<ApiMessage[]>(
+    `/api/v1/chat/conversations/${conversationId}/messages`,
+    accessToken,
+  );
+}
+
+export function sendMessage(
+  accessToken: string,
+  conversationId: string,
+  content: string,
+): Promise<ApiMessageExchange> {
+  return request<ApiMessageExchange>(
+    `/api/v1/chat/conversations/${conversationId}/messages`,
+    accessToken,
+    {
+      method: "POST",
+      body: { content },
+    },
+  );
+}
