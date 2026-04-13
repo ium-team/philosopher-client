@@ -225,22 +225,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const isCancellingVoiceRef = useRef(false);
   const [isListening, setIsListening] = useState(false);
 
-  const scopedConversations = useMemo(
-    () =>
-      conversations.filter((conversation) =>
-        activeProjectId ? conversation.projectId === activeProjectId : true,
-      ),
-    [activeProjectId, conversations],
-  );
-
   const activeConversation = useMemo(() => {
-    const selected = conversations.find((conversation) => conversation.id === activeConversationId);
-    if (selected && (activeProjectId ? selected.projectId === activeProjectId : true)) {
-      return selected;
+    if (!activeConversationId) {
+      return null;
     }
 
-    return scopedConversations[0] ?? null;
-  }, [activeConversationId, activeProjectId, conversations, scopedConversations]);
+    const selected = conversations.find((conversation) => conversation.id === activeConversationId);
+    if (!selected) {
+      return null;
+    }
+
+    if (activeProjectId && selected.projectId !== activeProjectId) {
+      return null;
+    }
+
+    return selected;
+  }, [activeConversationId, activeProjectId, conversations]);
 
   const activeProject = useMemo(
     () => projects.find((project) => project.id === activeProjectId) ?? null,
@@ -496,6 +496,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   };
 
   const createConversation = () => {
+    // Sidebar "새 채팅"은 항상 일반 채팅에서 시작한다.
+    setActiveProjectId(null);
+    setActiveConversationId("");
     setIsSelectingPhilosopher(true);
   };
 
@@ -694,7 +697,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <button
                         key={project.id}
                         type="button"
-                        onClick={() => setActiveProjectId(project.id)}
+                        onClick={() => {
+                          setActiveProjectId(project.id);
+                          setActiveConversationId("");
+                          setIsSelectingPhilosopher(false);
+                        }}
                         className={`mb-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[#1f2937] transition ${
                           isActive ? "bg-[#fff3e0]" : "hover:bg-[#f3f4f6]"
                         }`}
