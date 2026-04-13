@@ -148,15 +148,6 @@ function IconEdit() {
   );
 }
 
-function IconMove() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M7 7h10M13 3l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M17 17H7M11 21l-4-4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function IconFolderPlus() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -178,9 +169,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isResponding, setIsResponding] = useState(false);
   const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
+  const [isMoveMenuOpen, setIsMoveMenuOpen] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
+  const moveMenuRef = useRef<HTMLDivElement | null>(null);
   const messageIdRef = useRef(0);
   const projectIdRef = useRef(0);
   const conversationIdRef = useRef(0);
@@ -209,6 +202,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const activeProject = useMemo(
     () => projects.find((project) => project.id === activeProjectId) ?? null,
     [activeProjectId, projects],
+  );
+  const moveTargetProjects = useMemo(
+    () => projects.filter((project) => project.id !== activeConversation?.projectId),
+    [activeConversation?.projectId, projects],
   );
 
   const activePhilosopher = useMemo(() => {
@@ -287,48 +284,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setIsSelectingPhilosopher(true);
   };
 
-  const moveConversation = (conversationId: string) => {
-    const conversation = conversations.find((item) => item.id === conversationId);
-    if (!conversation) {
+  const moveConversationTo = (targetProjectId: string | null) => {
+    if (!activeConversation) {
       return;
     }
-
-    const targets: Array<{ projectId: string | null; label: string }> = [
-      { projectId: null, label: "일반" },
-      ...projects.map((project) => ({ projectId: project.id, label: project.name })),
-    ];
-
-    const currentLabel = conversation.projectId
-      ? projects.find((project) => project.id === conversation.projectId)?.name ?? "일반"
-      : "일반";
-    const options = targets.map((target, index) => `${index}: ${target.label}`).join("\n");
-    const input = window.prompt(
-      `대화를 이동할 위치 번호를 입력하세요.\n현재: ${currentLabel}\n\n${options}`,
-      "0",
-    );
-
-    if (input === null) {
-      return;
-    }
-
-    const targetIndex = Number.parseInt(input.trim(), 10);
-    if (Number.isNaN(targetIndex) || targetIndex < 0 || targetIndex >= targets.length) {
-      window.alert("유효한 번호를 입력해주세요.");
-      return;
-    }
-
-    const target = targets[targetIndex];
 
     setConversations((previous) =>
       previous.map((item) =>
-        item.id === conversationId
+        item.id === activeConversation.id
           ? {
               ...item,
-              projectId: target.projectId ?? undefined,
+              projectId: targetProjectId ?? undefined,
             }
           : item,
       ),
     );
+    setActiveProjectId(targetProjectId);
+    setIsMoveMenuOpen(false);
   };
 
   useEffect(() => {
@@ -376,6 +348,24 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       recognitionRef.current?.stop();
     };
   }, []);
+
+  useEffect(() => {
+    if (!isMoveMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!moveMenuRef.current?.contains(event.target as Node)) {
+        setIsMoveMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("mousedown", handlePointerDown);
+
+    return () => {
+      window.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, [isMoveMenuOpen]);
 
   const submitMessage = (messageText: string) => {
     const trimmed = messageText.trim();
@@ -660,52 +650,40 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     const isActive = conversation.id === activeConversation?.id;
                     const philosopher = philosophers.find((item) => item.id === conversation.philosopherId);
                     const philosopherName = philosopher?.name ?? "Unknown";
-                    const projectName = conversation.projectId
-                      ? projects.find((project) => project.id === conversation.projectId)?.name ?? "일반"
-                      : "일반";
+                    const projectName = conversation.projectId ? "프로젝트" : "일반";
 
                     return (
-                      <div key={conversation.id} className="mb-0.5 flex items-stretch gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setActiveConversationId(conversation.id);
-                            setIsSelectingPhilosopher(false);
-                          }}
-                          className={`min-w-0 flex-1 truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                            isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
-                          }`}
-                        >
-                          <span className="block truncate">{conversation.title}</span>
-                          <span className="mt-1 flex items-center gap-1.5 text-xs text-[#9ca3af]">
-                            {philosopher ? (
-                              <span className="relative flex h-4 w-4 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
-                                <Image
-                                  src={philosopher.imageSrc}
-                                  alt={`${philosopherName} portrait`}
-                                  width={20}
-                                  height={20}
-                                  className="h-full w-full scale-125 object-contain object-bottom"
-                                />
-                              </span>
-                            ) : (
-                              <span className="h-4 w-4 rounded-full bg-[#e5e7eb]" />
-                            )}
-                            <span className="truncate">
-                              {philosopherName} · {projectName}
+                      <button
+                        key={conversation.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveConversationId(conversation.id);
+                          setIsSelectingPhilosopher(false);
+                        }}
+                        className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
+                          isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
+                        }`}
+                      >
+                        <span className="block truncate">{conversation.title}</span>
+                        <span className="mt-1 flex items-center gap-1.5 text-xs text-[#9ca3af]">
+                          {philosopher ? (
+                            <span className="relative flex h-4 w-4 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                              <Image
+                                src={philosopher.imageSrc}
+                                alt={`${philosopherName} portrait`}
+                                width={20}
+                                height={20}
+                                className="h-full w-full scale-125 object-contain object-bottom"
+                              />
                             </span>
+                          ) : (
+                            <span className="h-4 w-4 rounded-full bg-[#e5e7eb]" />
+                          )}
+                          <span className="truncate">
+                            {philosopherName} · {projectName}
                           </span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveConversation(conversation.id)}
-                          className="shrink-0 rounded-lg px-2 text-[#9ca3af] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
-                          aria-label="move conversation"
-                          title="대화 이동"
-                        >
-                          <IconMove />
-                        </button>
-                      </div>
+                        </span>
+                      </button>
                     );
                   })}
                   {filteredRecentConversations.length === 0 ? (
@@ -757,13 +735,52 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ff7f11]">▾</span>
           </button>
 
-          <div className="flex items-center gap-3 text-sm text-[#4b5563]">
+          <div ref={moveMenuRef} className="relative flex items-center gap-3 text-sm text-[#4b5563]">
             <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#fff3e0]">
               공유하기
             </button>
-            <button type="button" className="rounded-md px-2 py-1.5 hover:bg-[#fff3e0]" aria-label="more options">
+            <button
+              type="button"
+              onClick={() => setIsMoveMenuOpen((value) => !value)}
+              disabled={!activeConversation}
+              className="rounded-md px-2 py-1.5 hover:bg-[#fff3e0] disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="more options"
+            >
               •••
             </button>
+            {isMoveMenuOpen && activeConversation ? (
+              <div className="absolute right-0 top-11 z-20 w-56 rounded-xl border border-[#e5e7eb] bg-white p-1.5 shadow-[0_10px_30px_rgba(17,24,39,0.18)]">
+                {activeConversation.projectId ? (
+                  <button
+                    type="button"
+                    onMouseEnter={() => moveConversationTo(null)}
+                    onClick={() => moveConversationTo(null)}
+                    className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#374151] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
+                  >
+                    메인으로 이동
+                  </button>
+                ) : null}
+                {moveTargetProjects.length > 0 ? (
+                  <>
+                    <p className="px-3 py-1 text-xs text-[#9ca3af]">프로젝트로 이동</p>
+                    {moveTargetProjects.map((project) => (
+                      <button
+                        key={project.id}
+                        type="button"
+                        onMouseEnter={() => moveConversationTo(project.id)}
+                        onClick={() => moveConversationTo(project.id)}
+                        className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#374151] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
+                      >
+                        {project.name}
+                      </button>
+                    ))}
+                  </>
+                ) : null}
+                {!activeConversation.projectId && moveTargetProjects.length === 0 ? (
+                  <p className="px-3 py-2 text-sm text-[#9ca3af]">이동할 프로젝트가 없습니다.</p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </header>
 
