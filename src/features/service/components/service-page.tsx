@@ -671,7 +671,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   <button
                     type="button"
                     onClick={createProject}
-                    className="mb-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[17px] font-semibold text-[#1f2937] transition hover:bg-[#f3f4f6]"
+                    className="mb-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[#1f2937] transition hover:bg-[#f3f4f6]"
                   >
                     <span className="text-[#374151]">
                       <IconFolderPlus />
