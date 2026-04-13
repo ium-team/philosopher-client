@@ -17,6 +17,7 @@ type Conversation = {
   title: string;
   philosopherId: string;
   projectId?: string;
+  pinned?: boolean;
   recent?: boolean;
   messages: Message[];
 };
@@ -219,7 +220,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
 
-    return conversations.filter((conversation) => {
+    const filtered = conversations.filter((conversation) => {
       if (!conversation.recent) {
         return false;
       }
@@ -234,6 +235,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
       return conversation.title.toLowerCase().includes(normalized);
     });
+
+    return filtered.sort((left, right) => Number(Boolean(right.pinned)) - Number(Boolean(left.pinned)));
   }, [activeProjectId, conversations, searchQuery]);
 
   const startConversationWith = useCallback((philosopher: PhilosopherProfile) => {
@@ -300,6 +303,35 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       ),
     );
     setActiveProjectId(targetProjectId);
+    setIsMoveMenuOpen(false);
+  };
+
+  const togglePinActiveConversation = () => {
+    if (!activeConversation) {
+      return;
+    }
+
+    setConversations((previous) =>
+      previous.map((conversation) =>
+        conversation.id === activeConversation.id
+          ? {
+              ...conversation,
+              pinned: !conversation.pinned,
+            }
+          : conversation,
+      ),
+    );
+    setIsMoveMenuOpen(false);
+  };
+
+  const deleteActiveConversation = () => {
+    if (!activeConversation) {
+      return;
+    }
+
+    setConversations((previous) => previous.filter((conversation) => conversation.id !== activeConversation.id));
+    setActiveConversationId("");
+    setIsSelectingPhilosopher(false);
     setIsMoveMenuOpen(false);
   };
 
@@ -682,6 +714,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           <span className="truncate">
                             {philosopherName} · {projectName}
                           </span>
+                          {conversation.pinned ? <span className="rounded bg-[#fff3e0] px-1.5 py-0.5 text-[10px] text-[#ff6d00]">고정</span> : null}
                         </span>
                       </button>
                     );
@@ -750,6 +783,13 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             </button>
             {isMoveMenuOpen && activeConversation ? (
               <div className="absolute right-0 top-11 z-20 w-56 rounded-xl border border-[#e5e7eb] bg-white p-1.5 shadow-[0_10px_30px_rgba(17,24,39,0.18)]">
+                <button
+                  type="button"
+                  onClick={togglePinActiveConversation}
+                  className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#374151] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
+                >
+                  {activeConversation.pinned ? "채팅 고정 해제" : "채팅 고정"}
+                </button>
                 {activeConversation.projectId ? (
                   <button
                     type="button"
@@ -779,6 +819,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 {!activeConversation.projectId && moveTargetProjects.length === 0 ? (
                   <p className="px-3 py-2 text-sm text-[#9ca3af]">이동할 프로젝트가 없습니다.</p>
                 ) : null}
+                <div className="my-1 h-px bg-[#f1f5f9]" />
+                <button
+                  type="button"
+                  onClick={deleteActiveConversation}
+                  className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#b91c1c] transition hover:bg-[#fef2f2]"
+                >
+                  채팅 삭제
+                </button>
               </div>
             ) : null}
           </div>
