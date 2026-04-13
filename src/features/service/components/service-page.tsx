@@ -1,6 +1,8 @@
 "use client";
 
 import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
 
 type Message = {
   id: string;
@@ -12,11 +14,18 @@ type Message = {
 type Conversation = {
   id: string;
   title: string;
+  philosopherId: string;
   recent?: boolean;
   messages: Message[];
 };
 
 const initialConversations: Conversation[] = [];
+
+function buildAssistantReply(philosopher: PhilosopherProfile, question: string) {
+  const condensed = question.replace(/\s+/g, " ").trim().slice(0, 80);
+
+  return `${philosopher.name}의 관점에서 보면, "${condensed}"라는 질문은 스스로의 근거를 더 명료하게 점검하라는 요청입니다. ${philosopher.tone} 방식으로 다음 질문을 이어가 보세요.`;
+}
 
 function IconHamburger() {
   return (
@@ -89,20 +98,33 @@ function IconEdit() {
 }
 
 export function ServicePage() {
+  const router = useRouter();
+
   const [conversations, setConversations] = useState(initialConversations);
   const [activeConversationId, setActiveConversationId] = useState("");
   const [draft, setDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isResponding, setIsResponding] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const messageIdRef = useRef(0);
-  const newConversationCursorRef = useRef(1);
+  const conversationIdRef = useRef(0);
+  const handledSelectionRef = useRef<string | null>(null);
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0],
     [activeConversationId, conversations],
   );
+
+  const activePhilosopher = useMemo(() => {
+    if (!activeConversation) {
+      return null;
+    }
+
+    return philosophers.find((philosopher) => philosopher.id === activeConversation.philosopherId) ?? null;
+  }, [activeConversation]);
+
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
 
@@ -126,11 +148,51 @@ export function ServicePage() {
     }
 
     scroller.scrollTop = scroller.scrollHeight;
-  }, [activeConversation?.messages.length]);
+  }, [activeConversation?.messages.length, isResponding]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const philosopherId = params.get("philosopher");
+    const shouldCreate = params.get("new") === "1";
+    const marker = `${philosopherId ?? "none"}-${shouldCreate ? "1" : "0"}`;
+
+    if (!philosopherId || !shouldCreate || handledSelectionRef.current === marker) {
+      return;
+    }
+
+    const philosopher = philosophers.find((item) => item.id === philosopherId);
+    if (!philosopher) {
+      return;
+    }
+
+    handledSelectionRef.current = marker;
+    conversationIdRef.current += 1;
+    const conversationId = `conv-${conversationIdRef.current}`;
+
+    const seededMessage: Message = {
+      id: `msg-${conversationIdRef.current}-seed`,
+      role: "assistant",
+      text: `${philosopher.name}와의 대화가 시작되었습니다. ${philosopher.summary}`,
+      timestamp: "방금",
+    };
+
+    const conversation: Conversation = {
+      id: conversationId,
+      title: `${philosopher.name} 대화`,
+      philosopherId: philosopher.id,
+      recent: true,
+      messages: [seededMessage],
+    };
+
+    setConversations((previous) => [conversation, ...previous]);
+    setActiveConversationId(conversationId);
+    setDraft("");
+    router.replace(`/service?conversation=${conversationId}`);
+  }, [router]);
 
   const submitMessage = (messageText: string) => {
     const trimmed = messageText.trim();
-    if (!trimmed || !activeConversation) {
+    if (!trimmed || !activeConversation || !activePhilosopher || isResponding) {
       return;
     }
 
@@ -147,28 +209,40 @@ export function ServicePage() {
         conversation.id === activeConversation.id
           ? {
               ...conversation,
-              title: conversation.messages.length === 0 ? trimmed.slice(0, 32) : conversation.title,
+              title: conversation.messages.length <= 1 ? trimmed.slice(0, 32) : conversation.title,
               messages: [...conversation.messages, userMessage],
             }
           : conversation,
       ),
     );
     setDraft("");
+    setIsResponding(true);
+
+    window.setTimeout(() => {
+      messageIdRef.current += 1;
+      const assistantMessage: Message = {
+        id: `msg-${messageIdRef.current}-a`,
+        role: "assistant",
+        text: buildAssistantReply(activePhilosopher, trimmed),
+        timestamp: "방금",
+      };
+
+      setConversations((previous) =>
+        previous.map((conversation) =>
+          conversation.id === activeConversation.id
+            ? {
+                ...conversation,
+                messages: [...conversation.messages, assistantMessage],
+              }
+            : conversation,
+        ),
+      );
+      setIsResponding(false);
+    }, 500);
   };
 
   const createConversation = () => {
-    newConversationCursorRef.current += 1;
-    const id = `new-${newConversationCursorRef.current}`;
-    const conversation: Conversation = {
-      id,
-      title: `새 채팅 ${newConversationCursorRef.current}`,
-      recent: true,
-      messages: [],
-    };
-
-    setConversations((previous) => [conversation, ...previous]);
-    setActiveConversationId(id);
-    setDraft("");
+    router.push("/service/new");
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -228,7 +302,7 @@ export function ServicePage() {
                 <button
                   type="button"
                   onClick={createConversation}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#333] transition hover:bg-[#e8e8e8]"
+                  className="flex w-full items-center gap-2 rounded-lg border border-[#fed7aa] bg-[#fff2e8] px-3 py-2 text-sm font-medium text-[#9a3412] transition hover:bg-[#ffe8d6]"
                 >
                   <IconSquarePen />
                   새 채팅
@@ -245,7 +319,7 @@ export function ServicePage() {
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="대화 제목 검색"
-                    className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#2a2a2a] outline-none placeholder:text-[#9a9a9a] focus:border-[#cfcfcf]"
+                    className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#2a2a2a] outline-none placeholder:text-[#9a9a9a] focus:border-[#fb923c] focus:ring-2 focus:ring-[#fed7aa]"
                   />
                 </div>
               </div>
@@ -261,23 +335,25 @@ export function ServicePage() {
                 <p className="px-6 text-xs text-[#9a9a9a]">최근</p>
                 <div className="mt-1 px-2">
                   {filteredRecentConversations.map((conversation) => {
-                      const isActive = conversation.id === activeConversation?.id;
+                    const isActive = conversation.id === activeConversation?.id;
+                    const philosopherName =
+                      philosophers.find((philosopher) => philosopher.id === conversation.philosopherId)?.name ??
+                      "Unknown";
 
-                      return (
-                        <button
-                          key={conversation.id}
-                          type="button"
-                          onClick={() => setActiveConversationId(conversation.id)}
-                          className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                            isActive
-                              ? "bg-[#e6e6e6] text-[#1f1f1f]"
-                              : "text-[#555] hover:bg-[#e8e8e8]"
-                          }`}
-                        >
-                          {conversation.title}
-                        </button>
-                      );
-                    })}
+                    return (
+                      <button
+                        key={conversation.id}
+                        type="button"
+                        onClick={() => setActiveConversationId(conversation.id)}
+                        className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
+                          isActive ? "bg-[#fff1dc] text-[#9a3412]" : "text-[#555] hover:bg-[#e8e8e8]"
+                        }`}
+                      >
+                        <span className="block truncate">{conversation.title}</span>
+                        <span className="block truncate text-xs text-[#a3a3a3]">{philosopherName}</span>
+                      </button>
+                    );
+                  })}
                   {filteredRecentConversations.length === 0 ? (
                     <p className="rounded-lg px-3 py-2 text-sm text-[#8b8b8b]">최근 대화가 없습니다.</p>
                   ) : null}
@@ -285,7 +361,10 @@ export function ServicePage() {
               </div>
 
               <div className="mt-auto border-t border-[#e6e6e6] p-3">
-                <button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#555] hover:bg-[#e8e8e8]">
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#555] hover:bg-[#e8e8e8]"
+                >
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#d9d9d9] text-xs text-[#4d4d4d]">이</span>
                   이 건희
                 </button>
@@ -302,7 +381,7 @@ export function ServicePage() {
       <section className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b border-[#ececec] bg-[#f7f7f7] px-4 md:px-6">
           <button type="button" className="text-[18px] font-semibold tracking-tight text-[#2f2f2f]">
-            ChatGPT <span className="ml-1 text-sm text-[#8a8a8a]">▾</span>
+            {activePhilosopher?.name ?? "ChatGPT"} <span className="ml-1 text-sm text-[#ea580c]">▾</span>
           </button>
 
           <div className="flex items-center gap-3 text-sm text-[#666]">
@@ -319,15 +398,18 @@ export function ServicePage() {
           <div className="mx-auto w-full max-w-[820px] px-5 pb-36 pt-8 md:px-8">
             {activeConversation ? null : (
               <div className="py-20 text-center text-[#7a7a7a]">
-                <p className="text-xl font-medium text-[#4a4a4a]">새 대화를 시작하세요</p>
-                <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 눌러 대화를 생성할 수 있습니다.</p>
+                <p className="text-xl font-medium text-[#c2410c]">새 대화를 시작하세요</p>
+                <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 눌러 철학자를 선택하면 대화를 시작할 수 있습니다.</p>
               </div>
             )}
             {activeConversation?.messages.map((message) => (
-              <article key={message.id} className={`mb-7 ${message.role === "user" ? "ml-auto max-w-[90%]" : "mr-auto w-full"}`}>
+              <article
+                key={message.id}
+                className={`mb-7 ${message.role === "user" ? "ml-auto max-w-[90%]" : "mr-auto w-full"}`}
+              >
                 {message.role === "user" ? (
                   <>
-                    <div className="ml-auto max-w-[620px] rounded-3xl bg-[#ececec] px-5 py-4 text-[15px] leading-7 text-[#2d2d2d]">
+                    <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff4e6] px-5 py-4 text-[15px] leading-7 text-[#7c2d12]">
                       {message.text}
                     </div>
                     <div className="mt-2 flex justify-end gap-2 text-[#8b8b8b]">
@@ -354,6 +436,9 @@ export function ServicePage() {
                 )}
               </article>
             ))}
+            {isResponding ? (
+              <div className="mb-6 text-sm text-[#a3a3a3]">답변 작성 중...</div>
+            ) : null}
           </div>
         </div>
 
@@ -375,7 +460,11 @@ export function ServicePage() {
                   <button type="button" className="rounded-full p-2 hover:bg-[#efefef]" aria-label="attach file">
                     <IconClip />
                   </button>
-                  <button type="button" className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#efefef]" aria-label="insert command">
+                  <button
+                    type="button"
+                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#efefef]"
+                    aria-label="insert command"
+                  >
                     {"\\"}
                   </button>
                   <button
@@ -389,14 +478,18 @@ export function ServicePage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button type="button" className="rounded-full p-2 text-[#6f6f6f] hover:bg-[#efefef]" aria-label="voice input">
+                  <button
+                    type="button"
+                    className="rounded-full p-2 text-[#6f6f6f] hover:bg-[#efefef]"
+                    aria-label="voice input"
+                  >
                     <IconMic />
                   </button>
                   <button
                     type="button"
                     onClick={() => submitMessage(draft)}
-                    disabled={draft.trim().length === 0}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#121212] text-white transition hover:bg-[#2b2b2b] disabled:cursor-not-allowed disabled:bg-[#b9b9b9]"
+                    disabled={draft.trim().length === 0 || !activeConversation || isResponding}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
                     aria-label="send message"
                   >
                     <IconSend />
