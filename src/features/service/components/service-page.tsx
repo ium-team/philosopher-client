@@ -68,15 +68,6 @@ function IconHamburger() {
   );
 }
 
-function IconSearch() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
-      <circle cx="11" cy="11" r="6" />
-      <path d="M20 20l-4.2-4.2" />
-    </svg>
-  );
-}
-
 function IconSquarePen() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -490,13 +481,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 >
                   <IconSquarePen />
                   새 채팅
-                </button>
-                <button
-                  type="button"
-                  className="mt-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#374151] transition hover:bg-[#fff3e0]"
-                >
-                  <IconSearch />
-                  채팅 검색
                 </button>
                 <div className="mt-2">
                   <input
