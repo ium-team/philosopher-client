@@ -75,14 +75,6 @@ function IconMic() {
   );
 }
 
-function IconClip() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
-      <path d="M8.5 12.5l6-6a3.2 3.2 0 114.5 4.5l-8.3 8.3a5.5 5.5 0 11-7.8-7.8l8-8" />
-    </svg>
-  );
-}
-
 function IconCopy() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -255,8 +247,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setIsSelectingPhilosopher(true);
   };
 
-  const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key !== "Enter" || event.shiftKey) {
+  const handleComposerKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") {
       return;
     }
 
@@ -498,40 +490,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
           <div className="pointer-events-auto w-full max-w-[860px]">
-            <div className="rounded-[26px] border border-[#eadfce] bg-white shadow-[0_-1px_0_rgba(125,79,25,0.06),0_10px_30px_rgba(125,79,25,0.12)]">
-              <div className="min-h-[86px] px-4 pt-3">
-                <textarea
+            <div className="rounded-[26px] border border-[#eadfce] bg-white px-3 py-2 shadow-[0_-1px_0_rgba(125,79,25,0.06),0_10px_30px_rgba(125,79,25,0.12)]">
+              <div className="flex items-center gap-2">
+                <input
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
                   placeholder={isSelectingPhilosopher ? "먼저 철학자를 선택해주세요." : "변경할 내용이 있으신가요?"}
                   disabled={isSelectingPhilosopher}
-                  className="h-16 w-full resize-none bg-transparent text-[15px] leading-7 text-[#2f2923] outline-none placeholder:text-[#ab9987] disabled:cursor-not-allowed disabled:text-[#ab9987]"
+                  className="h-11 flex-1 bg-transparent px-2 text-[15px] text-[#2f2923] outline-none placeholder:text-[#ab9987] disabled:cursor-not-allowed disabled:text-[#ab9987]"
                 />
-              </div>
-
-              <div className="flex items-center justify-between px-3 pb-3">
-                <div className="flex items-center gap-1 text-[#7a6f64]">
-                  <button type="button" className="rounded-full p-2 hover:bg-[#f4eee5]" aria-label="attach file">
-                    <IconClip />
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#f4eee5]"
-                    aria-label="insert command"
-                  >
-                    {"\\"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDraft("")}
-                    className="rounded-full px-2.5 py-1.5 text-sm hover:bg-[#f4eee5]"
-                    aria-label="clear input"
-                  >
-                    ×
-                  </button>
-                </div>
-
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
