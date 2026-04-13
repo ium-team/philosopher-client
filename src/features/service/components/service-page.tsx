@@ -509,13 +509,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               </div>
 
               <div className="mt-3 border-t border-[#e5e7eb] pt-3">
-                <p className="px-6 text-xs text-[#9ca3af]">프로젝트</p>
-                <div className="mt-1 px-2">
-                  <p className="rounded-lg px-3 py-2 text-sm text-[#9ca3af]">프로젝트가 없습니다.</p>
-                </div>
-              </div>
-
-              <div className="mt-3 border-t border-[#e5e7eb] pt-3">
                 <p className="px-6 text-xs text-[#9ca3af]">최근</p>
                 <div className="mt-1 px-2">
                   {filteredRecentConversations.map((conversation) => {
