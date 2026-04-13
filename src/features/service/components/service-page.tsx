@@ -23,6 +23,7 @@ type Conversation = {
 type ServicePageProps = {
   startInSelection?: boolean;
 };
+const COMPOSER_MAX_HEIGHT_PX = 220;
 
 type SpeechRecognitionEventLike = {
   resultIndex: number;
@@ -161,6 +162,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const messageIdRef = useRef(0);
   const conversationIdRef = useRef(0);
   const handledSelectionRef = useRef<string | null>(null);
@@ -231,6 +233,18 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     scroller.scrollTop = scroller.scrollHeight;
   }, [activeConversation?.messages.length, isResponding, isSelectingPhilosopher]);
+
+  useEffect(() => {
+    const composer = composerRef.current;
+    if (!composer) {
+      return;
+    }
+
+    composer.style.height = "auto";
+    const nextHeight = Math.min(composer.scrollHeight, COMPOSER_MAX_HEIGHT_PX);
+    composer.style.height = `${nextHeight}px`;
+    composer.style.overflowY = composer.scrollHeight > COMPOSER_MAX_HEIGHT_PX ? "auto" : "hidden";
+  }, [draft, isSelectingPhilosopher]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -312,8 +326,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setIsSelectingPhilosopher(true);
   };
 
-  const handleComposerKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key !== "Enter") {
+      return;
+    }
+
+    if (event.shiftKey) {
       return;
     }
 
@@ -711,14 +729,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
           <div className="pointer-events-auto w-full max-w-[860px]">
             <div className="rounded-[26px] border border-[#e5e7eb] bg-white px-3 py-2 shadow-[0_-1px_0_rgba(17,24,39,0.06),0_10px_30px_rgba(17,24,39,0.12)]">
-              <div className="flex items-center gap-2">
-                <input
+              <div className="flex items-end gap-2">
+                <textarea
+                  ref={composerRef}
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
                   placeholder={isSelectingPhilosopher ? "먼저 철학자를 선택해주세요." : "변경할 내용이 있으신가요?"}
                   disabled={isSelectingPhilosopher}
-                  className="h-11 flex-1 bg-transparent px-2 text-[15px] text-[#111827] outline-none placeholder:text-[#9ca3af] disabled:cursor-not-allowed disabled:text-[#9ca3af]"
+                  rows={1}
+                  className="max-h-[220px] min-h-11 flex-1 resize-none bg-transparent px-2 py-2 text-[15px] leading-6 text-[#111827] outline-none placeholder:text-[#9ca3af] disabled:cursor-not-allowed disabled:text-[#9ca3af]"
                 />
                 <div className="flex items-center gap-2">
                   {isListening ? (
