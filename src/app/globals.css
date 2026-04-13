@@ -5,6 +5,8 @@
   --foreground: #1f1f1f;
   --surface: #ffffff;
   --border: #e6e6e6;
+  --accent-orange: #f97316;
+  --accent-yellow: #facc15;
 }
 
 @theme inline {
@@ -50,6 +52,6 @@ textarea {
 }
 
 ::selection {
-  background: rgba(31, 31, 31, 0.12);
+  background: rgba(249, 115, 22, 0.22);
   color: #111;
 }
