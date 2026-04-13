@@ -16,8 +16,14 @@ type Conversation = {
   id: string;
   title: string;
   philosopherId: string;
+  projectId?: string;
   recent?: boolean;
   messages: Message[];
+};
+
+type Project = {
+  id: string;
+  name: string;
 };
 
 type ServicePageProps = {
@@ -53,6 +59,7 @@ type SpeechRecognitionLike = {
 type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 
 const initialConversations: Conversation[] = [];
+const initialProjects: Project[] = [];
 
 function buildAssistantReply(philosopher: PhilosopherProfile, question: string) {
   const condensed = question.replace(/\s+/g, " ").trim().slice(0, 80);
@@ -141,10 +148,21 @@ function IconEdit() {
   );
 }
 
+function IconFolderPlus() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M3.5 7.5a2 2 0 0 1 2-2h4l1.5 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-12.5a2 2 0 0 1-2-2z" />
+      <path d="M12 11v5M9.5 13.5h5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const router = useRouter();
 
+  const [projects, setProjects] = useState(initialProjects);
   const [conversations, setConversations] = useState(initialConversations);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeConversationId, setActiveConversationId] = useState("");
   const [draft, setDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -155,15 +173,33 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const messageIdRef = useRef(0);
+  const projectIdRef = useRef(0);
   const conversationIdRef = useRef(0);
   const handledSelectionRef = useRef<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const isCancellingVoiceRef = useRef(false);
   const [isListening, setIsListening] = useState(false);
 
-  const activeConversation = useMemo(
-    () => conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0],
-    [activeConversationId, conversations],
+  const scopedConversations = useMemo(
+    () =>
+      conversations.filter((conversation) =>
+        activeProjectId ? conversation.projectId === activeProjectId : true,
+      ),
+    [activeProjectId, conversations],
+  );
+
+  const activeConversation = useMemo(() => {
+    const selected = conversations.find((conversation) => conversation.id === activeConversationId);
+    if (selected && (activeProjectId ? selected.projectId === activeProjectId : true)) {
+      return selected;
+    }
+
+    return scopedConversations[0] ?? null;
+  }, [activeConversationId, activeProjectId, conversations, scopedConversations]);
+
+  const activeProject = useMemo(
+    () => projects.find((project) => project.id === activeProjectId) ?? null,
+    [activeProjectId, projects],
   );
 
   const activePhilosopher = useMemo(() => {
@@ -182,13 +218,17 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         return false;
       }
 
+      if (activeProjectId && conversation.projectId !== activeProjectId) {
+        return false;
+      }
+
       if (!normalized) {
         return true;
       }
 
       return conversation.title.toLowerCase().includes(normalized);
     });
-  }, [conversations, searchQuery]);
+  }, [activeProjectId, conversations, searchQuery]);
 
   const startConversationWith = useCallback((philosopher: PhilosopherProfile) => {
     conversationIdRef.current += 1;
@@ -205,6 +245,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       id: conversationId,
       title: `${philosopher.name} 대화`,
       philosopherId: philosopher.id,
+      projectId: activeProjectId ?? undefined,
       recent: true,
       messages: [seededMessage],
     };
@@ -214,7 +255,28 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setDraft("");
     setIsSelectingPhilosopher(false);
     router.replace(`/service?conversation=${conversationId}`);
-  }, [router]);
+  }, [activeProjectId, router]);
+
+  const createProject = () => {
+    const defaultName = `프로젝트 ${projects.length + 1}`;
+    const input = window.prompt("새 프로젝트 이름을 입력하세요.", defaultName);
+    if (!input) {
+      return;
+    }
+
+    const name = input.trim();
+    if (!name) {
+      return;
+    }
+
+    projectIdRef.current += 1;
+    const projectId = `project-${projectIdRef.current}`;
+    const project: Project = { id: projectId, name: name.slice(0, 30) };
+
+    setProjects((previous) => [project, ...previous]);
+    setActiveProjectId(projectId);
+    setIsSelectingPhilosopher(true);
+  };
 
   useEffect(() => {
     const scroller = scrollRef.current;
@@ -497,11 +559,44 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div className="mt-1 px-2">
                   <button
                     type="button"
-                    className="mb-1.5 flex w-full items-center justify-center rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-2 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
+                    onClick={createProject}
+                    className="mb-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[17px] font-semibold text-[#1f2937] transition hover:bg-[#f3f4f6]"
                   >
-                    새 프로젝트 만들기
+                    <span className="text-[#374151]">
+                      <IconFolderPlus />
+                    </span>
+                    새 프로젝트
                   </button>
-                  <p className="rounded-lg px-3 py-2 text-sm text-[#9ca3af]">프로젝트가 없습니다.</p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveProjectId(null)}
+                    className={`mb-0.5 w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
+                      activeProjectId === null ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
+                    }`}
+                  >
+                    전체 대화
+                  </button>
+                  {projects.map((project) => {
+                    const count = conversations.filter((conversation) => conversation.projectId === project.id).length;
+                    const isActive = activeProjectId === project.id;
+
+                    return (
+                      <button
+                        key={project.id}
+                        type="button"
+                        onClick={() => setActiveProjectId(project.id)}
+                        className={`mb-0.5 w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
+                          isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
+                        }`}
+                      >
+                        <span className="block truncate">{project.name}</span>
+                        <span className="block text-xs text-[#9ca3af]">{count}개 대화</span>
+                      </button>
+                    );
+                  })}
+                  {projects.length === 0 ? (
+                    <p className="rounded-lg px-3 py-2 text-sm text-[#9ca3af]">프로젝트가 없습니다.</p>
+                  ) : null}
                 </div>
               </div>
 
@@ -546,7 +641,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     );
                   })}
                   {filteredRecentConversations.length === 0 ? (
-                    <p className="rounded-lg px-3 py-2 text-sm text-[#9ca3af]">최근 대화가 없습니다.</p>
+                    <p className="rounded-lg px-3 py-2 text-sm text-[#9ca3af]">
+                      {activeProject ? "이 프로젝트에 대화가 없습니다." : "최근 대화가 없습니다."}
+                    </p>
                   ) : null}
                 </div>
               </div>
@@ -609,7 +706,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <header className="mb-6">
                   <p className="text-xs tracking-[0.18em] text-[#9ca3af] uppercase">New Conversation</p>
                   <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#111827]">대화할 철학자를 선택하세요</h1>
-                  <p className="mt-2 text-sm text-[#6b7280]">선택 후 바로 같은 화면에서 대화가 시작됩니다.</p>
+                  <p className="mt-2 text-sm text-[#6b7280]">
+                    선택 후 바로 같은 화면에서 대화가 시작됩니다.
+                    {activeProject ? ` 현재 프로젝트: ${activeProject.name}` : ""}
+                  </p>
                 </header>
 
                 <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
