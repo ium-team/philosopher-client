@@ -978,7 +978,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             {!isSelectingPhilosopher && !activeConversation ? (
               activeProject ? (
                 <div className="py-4">
-                  <div className="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+                  <div>
                     <div className="mb-5 flex items-center justify-between gap-4">
                       <div className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#111827]">
                         <span className="text-[#4b5563]">
@@ -995,13 +995,13 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       </button>
                     </div>
                     <div className="mb-3 text-sm font-medium text-[#6b7280]">채팅</div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {projectConversations.map((conversation) => (
                         <button
                           key={conversation.id}
                           type="button"
                           onClick={() => setActiveConversationId(conversation.id)}
-                          className="flex w-full items-start justify-between gap-4 rounded-xl border border-[#e5e7eb] bg-white px-4 py-3 text-left transition hover:border-[#d1d5db] hover:bg-[#fafafa]"
+                          className="flex w-full items-start justify-between gap-4 rounded-lg px-3 py-2 text-left transition hover:bg-[#f7f7f7]"
                         >
                           <div className="min-w-0">
                             <p className="truncate text-base font-semibold text-[#1f2937]">{conversation.title}</p>
@@ -1015,7 +1015,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         </button>
                       ))}
                       {projectConversations.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#d1d5db] px-4 py-14 text-center">
+                        <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
                           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#f3f4f6] text-[#6b7280]">
                             <IconFolder />
                           </div>
