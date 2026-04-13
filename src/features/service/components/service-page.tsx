@@ -59,7 +59,7 @@ function IconSquarePen() {
 
 function IconSend() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M12 5v14" />
       <path d="M6.8 10.2L12 5l5.2 5.2" />
     </svg>
@@ -68,7 +68,7 @@ function IconSend() {
 
 function IconMic() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7">
       <rect x="9" y="3" width="6" height="12" rx="3" />
       <path d="M6 11.5a6 6 0 0012 0M12 18v3" />
     </svg>
@@ -77,7 +77,7 @@ function IconMic() {
 
 function IconVoiceWave() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9">
       <path d="M6 12h0.01" strokeLinecap="round" />
       <path d="M9 9v6" strokeLinecap="round" />
       <path d="M12 7v10" strokeLinecap="round" />
@@ -526,7 +526,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     type="button"
                     onClick={() => submitMessage(draft)}
                     disabled={!hasDraft || !activeConversation || isResponding || isSelectingPhilosopher}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
                     aria-label={hasDraft ? "send message" : "voice message"}
                   >
                     {hasDraft ? <IconSend /> : <IconVoiceWave />}
