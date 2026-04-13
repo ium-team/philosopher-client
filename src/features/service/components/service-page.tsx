@@ -979,8 +979,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               activeProject ? (
                 <div className="py-4">
                   <div>
-                    <div className="mb-5 flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#111827]">
+                    <div className="mb-6 flex items-center justify-between gap-5">
+                      <div className="flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#111827]">
                         <span className="text-[#4b5563]">
                           <IconFolder />
                         </span>
@@ -989,7 +989,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <button
                         type="button"
                         onClick={createProjectConversation}
-                        className="rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-1.5 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
+                        className="rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2 text-base font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
                       >
                         새 채팅
                       </button>
