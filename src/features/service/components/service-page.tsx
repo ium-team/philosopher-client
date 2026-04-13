@@ -61,7 +61,6 @@ type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 
 const initialConversations: Conversation[] = [];
 const initialProjects: Project[] = [];
-const DEFAULT_PROJECT_ICON = "📁";
 
 function buildAssistantReply(philosopher: PhilosopherProfile, question: string) {
   const condensed = question.replace(/\s+/g, " ").trim().slice(0, 80);
@@ -772,8 +771,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           isActive ? "bg-[#fff3e0]" : "hover:bg-[#f3f4f6]"
                         }`}
                       >
-                        <span className="inline-flex h-5 w-5 items-center justify-center text-base leading-none text-[#374151]">
-                          {DEFAULT_PROJECT_ICON}
+                        <span className="inline-flex h-5 w-5 items-center justify-center text-[#9ca3af]">
+                          <IconFolder className="h-4 w-4" />
                         </span>
                         <span className="block truncate">{project.name}</span>
                       </button>
@@ -1054,8 +1053,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   <div>
                     <div className="mb-6 flex items-center justify-between gap-5">
                       <div className="flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#111827]">
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3f4f6] text-[22px] leading-none text-[#4b5563]">
-                          {DEFAULT_PROJECT_ICON}
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3f4f6] text-[#9ca3af]">
+                          <IconFolder className="h-5 w-5" />
                         </span>
                         {activeProject.name}
                       </div>
