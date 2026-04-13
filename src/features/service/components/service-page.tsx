@@ -25,7 +25,6 @@ type Conversation = {
 type Project = {
   id: string;
   name: string;
-  icon: string;
 };
 
 type ServicePageProps = {
@@ -63,7 +62,6 @@ type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 const initialConversations: Conversation[] = [];
 const initialProjects: Project[] = [];
 const DEFAULT_PROJECT_ICON = "📁";
-const PROJECT_ICON_OPTIONS = ["📁", "🧠", "📚", "💡", "🧪", "⚙️", "🎯", "🚀"];
 
 function buildAssistantReply(philosopher: PhilosopherProfile, question: string) {
   const condensed = question.replace(/\s+/g, " ").trim().slice(0, 80);
@@ -219,7 +217,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isProjectSettingsOpen, setIsProjectSettingsOpen] = useState(false);
   const [isProjectDeleteConfirmOpen, setIsProjectDeleteConfirmOpen] = useState(false);
   const [projectSettingsName, setProjectSettingsName] = useState("");
-  const [projectSettingsIcon, setProjectSettingsIcon] = useState(DEFAULT_PROJECT_ICON);
   const [projectSettingsGuideline, setProjectSettingsGuideline] = useState(
     "내가 분야를 말하면 그 분야의 cs 지식에 대한 질문을 던져주는데 일단 너의 형식을 알려주자면 질문주고나서 내가 답변을 하면 너는 그 답을 평가해줘.",
   );
@@ -341,7 +338,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     projectIdRef.current += 1;
     const projectId = `project-${projectIdRef.current}`;
-    const project: Project = { id: projectId, name: name.slice(0, 30), icon: DEFAULT_PROJECT_ICON };
+    const project: Project = { id: projectId, name: name.slice(0, 30) };
 
     setProjects((previous) => [project, ...previous]);
     setActiveProjectId(projectId);
@@ -540,7 +537,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           ? {
               ...project,
               name: trimmed ? trimmed.slice(0, 30) : project.name,
-              icon: projectSettingsIcon || DEFAULT_PROJECT_ICON,
             }
           : project,
       ),
@@ -555,7 +551,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     setProjectSettingsName(activeProject.name);
-    setProjectSettingsIcon(activeProject.icon || DEFAULT_PROJECT_ICON);
     setIsMoveMenuOpen(false);
     setIsProjectSettingsOpen(true);
   };
@@ -777,7 +772,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         }`}
                       >
                         <span className="inline-flex h-5 w-5 items-center justify-center text-base leading-none text-[#374151]">
-                          {project.icon || DEFAULT_PROJECT_ICON}
+                          {DEFAULT_PROJECT_ICON}
                         </span>
                         <span className="block truncate">{project.name}</span>
                       </button>
@@ -1059,7 +1054,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     <div className="mb-6 flex items-center justify-between gap-5">
                       <div className="flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#111827]">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3f4f6] text-[22px] leading-none text-[#4b5563]">
-                          {activeProject.icon || DEFAULT_PROJECT_ICON}
+                          {DEFAULT_PROJECT_ICON}
                         </span>
                         {activeProject.name}
                       </div>
@@ -1269,26 +1264,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
                 <div>
                   <p className="mb-2 text-sm font-medium text-[#1f2937]">아이콘</p>
-                  <div className="flex flex-wrap gap-2">
-                    {PROJECT_ICON_OPTIONS.map((icon) => {
-                      const isSelected = projectSettingsIcon === icon;
-
-                      return (
-                        <button
-                          key={icon}
-                          type="button"
-                          onClick={() => setProjectSettingsIcon(icon)}
-                          className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border text-xl leading-none transition ${
-                            isSelected
-                              ? "border-[#ff8a3d] bg-[#fff3e0]"
-                              : "border-[#d1d5db] bg-white hover:bg-[#f9fafb]"
-                          }`}
-                          aria-label={`project icon ${icon}`}
-                        >
-                          {icon}
-                        </button>
-                      );
-                    })}
+                  <div className="flex items-center gap-3 rounded-xl border border-[#d1d5db] bg-[#f9fafb] px-3 py-2">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xl leading-none">
+                      {DEFAULT_PROJECT_ICON}
+                    </span>
+                    <span className="text-sm text-[#6b7280]">프로젝트 아이콘 (고정)</span>
                   </div>
                 </div>
 
