@@ -1051,7 +1051,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           onClick={() => startConversationWith(philosopher)}
                           className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
                         >
-                          이 철학자로 시작하기
+                          {philosopher.name}와 대화하기
                         </button>
                       </div>
                     </article>
