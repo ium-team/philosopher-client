@@ -23,6 +23,33 @@ type ServicePageProps = {
   startInSelection?: boolean;
 };
 
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: {
+      isFinal: boolean;
+      0: {
+        transcript: string;
+      };
+    };
+  };
+};
+
+type SpeechRecognitionLike = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
+
 const initialConversations: Conversation[] = [];
 
 function buildAssistantReply(philosopher: PhilosopherProfile, question: string) {
@@ -120,6 +147,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const messageIdRef = useRef(0);
   const conversationIdRef = useRef(0);
   const handledSelectionRef = useRef<string | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const recognitionBaseDraftRef = useRef("");
+  const [isListening, setIsListening] = useState(false);
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0],
@@ -204,6 +234,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     startConversationWith(philosopher);
   }, [startConversationWith]);
 
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
   const submitMessage = (messageText: string) => {
     const trimmed = messageText.trim();
     if (!trimmed || !activeConversation || !activePhilosopher || isResponding || isSelectingPhilosopher) {
@@ -279,6 +315,87 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       // Ignore clipboard failures in restricted browser contexts.
     }
   };
+
+  const handleVoiceInput = useCallback(() => {
+    if (isSelectingPhilosopher) {
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const speechRecognitionConstructor =
+      (window as Window & {
+        SpeechRecognition?: SpeechRecognitionConstructorLike;
+        webkitSpeechRecognition?: SpeechRecognitionConstructorLike;
+      }).SpeechRecognition ??
+      (window as Window & {
+        SpeechRecognition?: SpeechRecognitionConstructorLike;
+        webkitSpeechRecognition?: SpeechRecognitionConstructorLike;
+      }).webkitSpeechRecognition;
+
+    if (!speechRecognitionConstructor) {
+      return;
+    }
+
+    if (!recognitionRef.current) {
+      const recognition = new speechRecognitionConstructor();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "ko-KR";
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        let finalTranscript = "";
+        let interimTranscript = "";
+
+        for (let index = event.resultIndex; index < event.results.length; index += 1) {
+          const result = event.results[index];
+          const transcript = result[0]?.transcript ?? "";
+
+          if (result.isFinal) {
+            finalTranscript += transcript;
+            continue;
+          }
+
+          interimTranscript += transcript;
+        }
+
+        const baseDraft = recognitionBaseDraftRef.current.trim();
+        const currentTranscript = `${finalTranscript} ${interimTranscript}`.trim();
+        const combinedDraft = currentTranscript ? `${baseDraft} ${currentTranscript}`.trim() : baseDraft;
+
+        setDraft(combinedDraft);
+
+        if (finalTranscript.trim()) {
+          recognitionBaseDraftRef.current = combinedDraft;
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    recognitionBaseDraftRef.current = draft.trim();
+
+    try {
+      recognitionRef.current.start();
+    } catch {
+      setIsListening(false);
+    }
+  }, [draft, isListening, isSelectingPhilosopher]);
 
   const hasDraft = draft.trim().length > 0;
 
@@ -517,8 +634,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="rounded-full p-2 text-[#7a6f64] hover:bg-[#f4eee5]"
-                    aria-label="voice input"
+                    onClick={handleVoiceInput}
+                    disabled={isSelectingPhilosopher}
+                    className={`rounded-full p-2 text-[#7a6f64] hover:bg-[#f4eee5] disabled:cursor-not-allowed disabled:opacity-60 ${
+                      isListening ? "bg-[#f4eee5] text-[#c2410c]" : ""
+                    }`}
+                    aria-label={isListening ? "stop voice input" : "voice input"}
                   >
                     <IconMic />
                   </button>
