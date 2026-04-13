@@ -15,7 +15,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "socrates",
     name: "Socrates",
-    imageSrc: "/philosophers/Socrates.png?v=cutout-20260413",
+    imageSrc: "/philosophers/Socrates-cutout-v2.png",
     era: "Ancient Greece",
     school: "Dialectic",
     tone: "질문으로 사고를 파고드는 대화형",
@@ -31,7 +31,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "nietzsche",
     name: "Nietzsche",
-    imageSrc: "/philosophers/Nietzsche.png?v=cutout-20260413",
+    imageSrc: "/philosophers/Nietzsche-cutout-v2.png",
     era: "19th Century",
     school: "Existential Critique",
     tone: "강렬하고 도발적인 문장으로 각성을 유도",
@@ -51,7 +51,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "arendt",
     name: "Hannah Arendt",
-    imageSrc: "/philosophers/Hannah Arendt.png?v=cutout-20260413",
+    imageSrc: "/philosophers/Hannah Arendt-cutout-v2.png",
     era: "20th Century",
     school: "Political Thought",
     tone: "정치와 책임의 관점에서 현실을 분석",
