@@ -989,7 +989,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <button
                         type="button"
                         onClick={createProjectConversation}
-                        className="rounded-lg border border-[#d1d5db] bg-white px-3 py-1.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                        className="rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-1.5 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
                       >
                         새 채팅
                       </button>
@@ -1024,7 +1024,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           <button
                             type="button"
                             onClick={createProjectConversation}
-                            className="mt-6 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                            className="mt-6 rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-4 py-2 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
                           >
                             새 채팅
                           </button>
