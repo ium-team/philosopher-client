@@ -724,6 +724,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         key={conversation.id}
                         type="button"
                         onClick={() => {
+                          setActiveProjectId(conversation.projectId ?? null);
                           setActiveConversationId(conversation.id);
                           setIsSelectingPhilosopher(false);
                         }}
