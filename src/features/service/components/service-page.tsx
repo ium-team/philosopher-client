@@ -246,6 +246,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     () => projects.find((project) => project.id === activeProjectId) ?? null,
     [activeProjectId, projects],
   );
+  const isProjectHome = Boolean(activeProject && !activeConversationId && !isSelectingPhilosopher);
   const moveTargetProjects = useMemo(
     () => projects.filter((project) => project.id !== activeConversation?.projectId),
     [activeConversation?.projectId, projects],
@@ -515,6 +516,33 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     setActiveConversationId("");
     setIsSelectingPhilosopher(true);
+  };
+  const openProjectSettings = () => {
+    if (!activeProject) {
+      return;
+    }
+
+    const input = window.prompt("프로젝트 이름을 수정하세요.", activeProject.name);
+    if (!input) {
+      return;
+    }
+
+    const name = input.trim();
+    if (!name) {
+      return;
+    }
+
+    setProjects((previous) =>
+      previous.map((project) =>
+        project.id === activeProject.id
+          ? {
+              ...project,
+              name: name.slice(0, 30),
+            }
+          : project,
+      ),
+    );
+    setIsMoveMenuOpen(false);
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -843,15 +871,27 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             <button
               type="button"
               onClick={() => setIsMoveMenuOpen((value) => !value)}
-              disabled={!activeConversation}
+              disabled={!activeConversation && !isProjectHome}
               className="rounded-md px-2 py-1.5 hover:bg-[#fff3e0] disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="more options"
             >
               •••
             </button>
-            {isMoveMenuOpen && activeConversation ? (
+            {isMoveMenuOpen && (activeConversation || isProjectHome) ? (
               <div className="absolute right-0 top-11 z-20 w-56 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
-                {moveTargetProjects.length > 0 ? (
+                {isProjectHome ? (
+                  <button
+                    type="button"
+                    onClick={openProjectSettings}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                  >
+                    <span className="text-[#374151]">
+                      <IconEdit />
+                    </span>
+                    프로젝트 설정
+                  </button>
+                ) : null}
+                {!isProjectHome && moveTargetProjects.length > 0 ? (
                   <div className="relative">
                     <button
                       type="button"
@@ -884,17 +924,19 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     ) : null}
                   </div>
                 ) : null}
-                <button
-                  type="button"
-                  onClick={togglePinActiveConversation}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
-                >
-                  <span className="text-[#374151]">
-                    <IconPin />
-                  </span>
-                  {activeConversation.pinned ? "채팅 고정 해제" : "채팅 고정"}
-                </button>
-                {activeConversation.projectId ? (
+                {!isProjectHome && activeConversation ? (
+                  <button
+                    type="button"
+                    onClick={togglePinActiveConversation}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                  >
+                    <span className="text-[#374151]">
+                      <IconPin />
+                    </span>
+                    {activeConversation.pinned ? "채팅 고정 해제" : "채팅 고정"}
+                  </button>
+                ) : null}
+                {!isProjectHome && activeConversation?.projectId ? (
                   <button
                     type="button"
                     onMouseEnter={() => moveConversationTo(null)}
@@ -907,17 +949,21 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     메인으로 이동
                   </button>
                 ) : null}
-                <div className="my-1 h-px bg-[#f1f5f9]" />
-                <button
-                  type="button"
-                  onClick={deleteActiveConversation}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#dc2626] transition hover:bg-white"
-                >
-                  <span>
-                    <IconTrash />
-                  </span>
-                  채팅 삭제
-                </button>
+                {!isProjectHome && activeConversation ? (
+                  <>
+                    <div className="my-1 h-px bg-[#f1f5f9]" />
+                    <button
+                      type="button"
+                      onClick={deleteActiveConversation}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#dc2626] transition hover:bg-white"
+                    >
+                      <span>
+                        <IconTrash />
+                      </span>
+                      채팅 삭제
+                    </button>
+                  </>
+                ) : null}
               </div>
             ) : null}
           </div>
