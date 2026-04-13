@@ -214,6 +214,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isMoveMenuOpen, setIsMoveMenuOpen] = useState(false);
   const [isProjectMoveMenuOpen, setIsProjectMoveMenuOpen] = useState(false);
   const [isProjectSettingsOpen, setIsProjectSettingsOpen] = useState(false);
+  const [isProjectDeleteConfirmOpen, setIsProjectDeleteConfirmOpen] = useState(false);
   const [projectSettingsName, setProjectSettingsName] = useState("");
   const [projectSettingsGuideline, setProjectSettingsGuideline] = useState(
     "내가 분야를 말하면 그 분야의 cs 지식에 대한 질문을 던져주는데 일단 너의 형식을 알려주자면 질문주고나서 내가 답변을 하면 너는 그 답을 평가해줘.",
@@ -543,6 +544,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     setIsProjectSettingsOpen(false);
+    setIsProjectDeleteConfirmOpen(false);
   };
   const openProjectSettings = () => {
     if (!activeProject) {
@@ -563,6 +565,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setActiveProjectId(null);
     setActiveConversationId("");
     setIsProjectSettingsOpen(false);
+    setIsProjectDeleteConfirmOpen(false);
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -1285,10 +1288,36 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
                 <button
                   type="button"
-                  onClick={deleteActiveProject}
+                  onClick={() => setIsProjectDeleteConfirmOpen(true)}
                   className="rounded-full border border-[#ef4444] px-4 py-2 text-base text-[#ef4444] transition hover:bg-[#fff1f2]"
                 >
                   프로젝트 삭제
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {isProjectDeleteConfirmOpen && activeProject ? (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+            <div className="w-full max-w-[520px] rounded-2xl border border-[#d1d5db] bg-white p-6 shadow-[0_18px_50px_rgba(17,24,39,0.2)]">
+              <h3 className="text-[34px] font-semibold tracking-tight text-[#111827]">프로젝트를 삭제할까요?</h3>
+              <p className="mt-4 text-[22px] leading-8 text-[#111827]">
+                모든 프로젝트 파일과 채팅이 영구 삭제됩니다. 채팅을 저장하려면 삭제하기 전에 채팅 목록 또는 다른 프로젝트로 옮겨 주세요.
+              </p>
+              <div className="mt-8 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsProjectDeleteConfirmOpen(false)}
+                  className="rounded-full border border-[#d1d5db] px-5 py-2 text-[28px] text-[#374151] transition hover:bg-[#f9fafb]"
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={deleteActiveProject}
+                  className="rounded-full bg-[#dc2626] px-5 py-2 text-[28px] text-white transition hover:bg-[#b91c1c]"
+                >
+                  삭제
                 </button>
               </div>
             </div>
