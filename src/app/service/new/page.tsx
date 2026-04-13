@@ -1,5 +1,5 @@
-import { PhilosopherSelectPage } from "@/features/service/components/philosopher-select-page";
+import { ServicePage } from "@/features/service/components/service-page";
 
 export default function ServiceNewRoute() {
-  return <PhilosopherSelectPage />;
+  return <ServicePage startInSelection />;
 }

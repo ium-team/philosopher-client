@@ -1,6 +1,6 @@
 "use client";
 
-import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
 
@@ -17,6 +17,10 @@ type Conversation = {
   philosopherId: string;
   recent?: boolean;
   messages: Message[];
+};
+
+type ServicePageProps = {
+  startInSelection?: boolean;
 };
 
 const initialConversations: Conversation[] = [];
@@ -97,7 +101,7 @@ function IconEdit() {
   );
 }
 
-export function ServicePage() {
+export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const router = useRouter();
 
   const [conversations, setConversations] = useState(initialConversations);
@@ -106,6 +110,7 @@ export function ServicePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isResponding, setIsResponding] = useState(false);
+  const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const messageIdRef = useRef(0);
@@ -141,31 +146,7 @@ export function ServicePage() {
     });
   }, [conversations, searchQuery]);
 
-  useEffect(() => {
-    const scroller = scrollRef.current;
-    if (!scroller) {
-      return;
-    }
-
-    scroller.scrollTop = scroller.scrollHeight;
-  }, [activeConversation?.messages.length, isResponding]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const philosopherId = params.get("philosopher");
-    const shouldCreate = params.get("new") === "1";
-    const marker = `${philosopherId ?? "none"}-${shouldCreate ? "1" : "0"}`;
-
-    if (!philosopherId || !shouldCreate || handledSelectionRef.current === marker) {
-      return;
-    }
-
-    const philosopher = philosophers.find((item) => item.id === philosopherId);
-    if (!philosopher) {
-      return;
-    }
-
-    handledSelectionRef.current = marker;
+  const startConversationWith = useCallback((philosopher: PhilosopherProfile) => {
     conversationIdRef.current += 1;
     const conversationId = `conv-${conversationIdRef.current}`;
 
@@ -187,12 +168,41 @@ export function ServicePage() {
     setConversations((previous) => [conversation, ...previous]);
     setActiveConversationId(conversationId);
     setDraft("");
+    setIsSelectingPhilosopher(false);
     router.replace(`/service?conversation=${conversationId}`);
   }, [router]);
 
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) {
+      return;
+    }
+
+    scroller.scrollTop = scroller.scrollHeight;
+  }, [activeConversation?.messages.length, isResponding, isSelectingPhilosopher]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const philosopherId = params.get("philosopher");
+    const shouldCreate = params.get("new") === "1";
+    const marker = `${philosopherId ?? "none"}-${shouldCreate ? "1" : "0"}`;
+
+    if (!philosopherId || !shouldCreate || handledSelectionRef.current === marker) {
+      return;
+    }
+
+    const philosopher = philosophers.find((item) => item.id === philosopherId);
+    if (!philosopher) {
+      return;
+    }
+
+    handledSelectionRef.current = marker;
+    startConversationWith(philosopher);
+  }, [startConversationWith]);
+
   const submitMessage = (messageText: string) => {
     const trimmed = messageText.trim();
-    if (!trimmed || !activeConversation || !activePhilosopher || isResponding) {
+    if (!trimmed || !activeConversation || !activePhilosopher || isResponding || isSelectingPhilosopher) {
       return;
     }
 
@@ -242,7 +252,7 @@ export function ServicePage() {
   };
 
   const createConversation = () => {
-    router.push("/service/new");
+    setIsSelectingPhilosopher(true);
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -344,7 +354,10 @@ export function ServicePage() {
                       <button
                         key={conversation.id}
                         type="button"
-                        onClick={() => setActiveConversationId(conversation.id)}
+                        onClick={() => {
+                          setActiveConversationId(conversation.id);
+                          setIsSelectingPhilosopher(false);
+                        }}
                         className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
                           isActive ? "bg-[#fff1dc] text-[#9a3412]" : "text-[#555] hover:bg-[#e8e8e8]"
                         }`}
@@ -380,8 +393,12 @@ export function ServicePage() {
 
       <section className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b border-[#ececec] bg-[#f7f7f7] px-4 md:px-6">
-          <button type="button" className="text-[18px] font-semibold tracking-tight text-[#2f2f2f]">
-            {activePhilosopher?.name ?? "ChatGPT"} <span className="ml-1 text-sm text-[#ea580c]">▾</span>
+          <button
+            type="button"
+            onClick={() => setIsSelectingPhilosopher(true)}
+            className="text-[18px] font-semibold tracking-tight text-[#2f2f2f]"
+          >
+            {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ea580c]">▾</span>
           </button>
 
           <div className="flex items-center gap-3 text-sm text-[#666]">
@@ -395,50 +412,87 @@ export function ServicePage() {
         </header>
 
         <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="mx-auto w-full max-w-[820px] px-5 pb-36 pt-8 md:px-8">
-            {activeConversation ? null : (
+          <div className="mx-auto w-full max-w-[920px] px-5 pb-36 pt-8 md:px-8">
+            {isSelectingPhilosopher ? (
+              <>
+                <header className="mb-6">
+                  <p className="text-xs tracking-[0.18em] text-[#9a9a9a] uppercase">New Conversation</p>
+                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#2f2f2f]">대화할 철학자를 선택하세요</h1>
+                  <p className="mt-2 text-sm text-[#7a7a7a]">선택 후 바로 같은 화면에서 대화가 시작됩니다.</p>
+                </header>
+
+                <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {philosophers.map((philosopher) => (
+                    <article
+                      key={philosopher.id}
+                      className="rounded-2xl border border-[#e6e6e6] bg-white p-5 shadow-[0_8px_24px_rgba(0,0,0,0.04)]"
+                    >
+                      <p className="text-xs text-[#9a9a9a]">{philosopher.era}</p>
+                      <h2 className="mt-1 text-xl font-semibold text-[#272727]">{philosopher.name}</h2>
+                      <p className="mt-2 text-xs text-[#b2b2b2]">{philosopher.school}</p>
+
+                      <p className="mt-4 text-sm leading-6 text-[#5f5f5f]">{philosopher.summary}</p>
+
+                      <p className="mt-4 text-xs font-medium text-[#a3a3a3]">대화 톤</p>
+                      <p className="mt-1 text-sm text-[#555]">{philosopher.tone}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => startConversationWith(philosopher)}
+                        className="mt-5 w-full rounded-xl border border-[#fed7aa] bg-[#fff2e8] px-4 py-2.5 text-sm font-semibold text-[#9a3412] transition hover:bg-[#ffe8d6]"
+                      >
+                        선택하기
+                      </button>
+                    </article>
+                  ))}
+                </section>
+              </>
+            ) : null}
+
+            {!isSelectingPhilosopher && !activeConversation ? (
               <div className="py-20 text-center text-[#7a7a7a]">
                 <p className="text-xl font-medium text-[#c2410c]">새 대화를 시작하세요</p>
-                <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 눌러 철학자를 선택하면 대화를 시작할 수 있습니다.</p>
+                <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 누르거나 상단 철학자 메뉴를 눌러 대화를 시작할 수 있습니다.</p>
               </div>
-            )}
-            {activeConversation?.messages.map((message) => (
-              <article
-                key={message.id}
-                className={`mb-7 ${message.role === "user" ? "ml-auto max-w-[90%]" : "mr-auto w-full"}`}
-              >
-                {message.role === "user" ? (
-                  <>
-                    <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff4e6] px-5 py-4 text-[15px] leading-7 text-[#7c2d12]">
-                      {message.text}
-                    </div>
-                    <div className="mt-2 flex justify-end gap-2 text-[#8b8b8b]">
-                      <button
-                        type="button"
-                        onClick={() => copyMessage(message.text)}
-                        className="rounded-md p-1.5 hover:bg-[#ededed]"
-                        aria-label="copy"
-                      >
-                        <IconCopy />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDraft(message.text)}
-                        className="rounded-md p-1.5 hover:bg-[#ededed]"
-                        aria-label="edit"
-                      >
-                        <IconEdit />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="max-w-[720px] whitespace-pre-line text-[17px] leading-8 text-[#202020]">{message.text}</div>
-                )}
-              </article>
-            ))}
-            {isResponding ? (
-              <div className="mb-6 text-sm text-[#a3a3a3]">답변 작성 중...</div>
             ) : null}
+
+            {!isSelectingPhilosopher
+              ? activeConversation?.messages.map((message) => (
+                  <article
+                    key={message.id}
+                    className={`mb-7 ${message.role === "user" ? "ml-auto max-w-[90%]" : "mr-auto w-full"}`}
+                  >
+                    {message.role === "user" ? (
+                      <>
+                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff4e6] px-5 py-4 text-[15px] leading-7 text-[#7c2d12]">
+                          {message.text}
+                        </div>
+                        <div className="mt-2 flex justify-end gap-2 text-[#8b8b8b]">
+                          <button
+                            type="button"
+                            onClick={() => copyMessage(message.text)}
+                            className="rounded-md p-1.5 hover:bg-[#ededed]"
+                            aria-label="copy"
+                          >
+                            <IconCopy />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDraft(message.text)}
+                            className="rounded-md p-1.5 hover:bg-[#ededed]"
+                            aria-label="edit"
+                          >
+                            <IconEdit />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="max-w-[720px] whitespace-pre-line text-[17px] leading-8 text-[#202020]">{message.text}</div>
+                    )}
+                  </article>
+                ))
+              : null}
+            {!isSelectingPhilosopher && isResponding ? <div className="mb-6 text-sm text-[#a3a3a3]">답변 작성 중...</div> : null}
           </div>
         </div>
 
@@ -450,8 +504,9 @@ export function ServicePage() {
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={handleComposerKeyDown}
-                  placeholder="변경할 내용이 있으신가요?"
-                  className="h-16 w-full resize-none bg-transparent text-[15px] leading-7 text-[#262626] outline-none placeholder:text-[#9a9a9a]"
+                  placeholder={isSelectingPhilosopher ? "먼저 철학자를 선택해주세요." : "변경할 내용이 있으신가요?"}
+                  disabled={isSelectingPhilosopher}
+                  className="h-16 w-full resize-none bg-transparent text-[15px] leading-7 text-[#262626] outline-none placeholder:text-[#9a9a9a] disabled:cursor-not-allowed disabled:text-[#9a9a9a]"
                 />
               </div>
 
@@ -488,7 +543,7 @@ export function ServicePage() {
                   <button
                     type="button"
                     onClick={() => submitMessage(draft)}
-                    disabled={draft.trim().length === 0 || !activeConversation || isResponding}
+                    disabled={draft.trim().length === 0 || !activeConversation || isResponding || isSelectingPhilosopher}
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f59e0b] to-[#f97316] text-white transition hover:from-[#facc15] hover:to-[#ea580c] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
                     aria-label="send message"
                   >
