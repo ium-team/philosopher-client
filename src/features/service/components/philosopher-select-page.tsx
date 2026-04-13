@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { philosophers } from "@/data/philosophers";
 
@@ -29,6 +30,16 @@ export function PhilosopherSelectPage() {
               key={philosopher.id}
               className="rounded-2xl border border-[#efe6da] bg-white p-5 shadow-[0_10px_26px_rgba(125,79,25,0.08)]"
             >
+              <div className="relative mb-4 overflow-hidden rounded-xl bg-[#f8f4ef]">
+                <Image
+                  src={philosopher.imageSrc}
+                  alt={`${philosopher.name} portrait`}
+                  width={1024}
+                  height={1536}
+                  className="h-52 w-full object-cover object-top"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
               <p className="text-xs text-[#a3917f]">{philosopher.era}</p>
               <h2 className="mt-1 text-xl font-semibold text-[#2f2720]">{philosopher.name}</h2>
               <p className="mt-2 text-xs text-[#c0ab96]">{philosopher.school}</p>

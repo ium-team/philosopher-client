@@ -1,6 +1,7 @@
 "use client";
 
 import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
 
@@ -582,6 +583,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       key={philosopher.id}
                       className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_10px_26px_rgba(17,24,39,0.08)]"
                     >
+                      <div className="relative mb-4 overflow-hidden rounded-xl bg-[#f3f4f6]">
+                        <Image
+                          src={philosopher.imageSrc}
+                          alt={`${philosopher.name} portrait`}
+                          width={1024}
+                          height={1536}
+                          className="h-52 w-full object-cover object-top"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        />
+                      </div>
                       <p className="text-xs text-[#9ca3af]">{philosopher.era}</p>
                       <h2 className="mt-1 text-xl font-semibold text-[#111827]">{philosopher.name}</h2>
                       <p className="mt-2 text-xs text-[#9ca3af]">{philosopher.school}</p>
