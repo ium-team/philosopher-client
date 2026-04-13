@@ -1234,7 +1234,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         ) : null}
         {isProjectSettingsOpen && activeProject ? (
           <div
-            className="absolute inset-0 z-40 flex items-center justify-center bg-black/20 p-4"
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
             onClick={closeProjectSettings}
           >
             <div
@@ -1327,7 +1327,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           </div>
         ) : null}
         {isProjectDeleteConfirmOpen && activeProject ? (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
             <div className="w-full max-w-[520px] rounded-2xl border border-[#d1d5db] bg-white p-6 shadow-[0_18px_50px_rgba(17,24,39,0.2)]">
               <h3 className="text-[34px] font-semibold tracking-tight text-[#111827]">프로젝트를 삭제할까요?</h3>
               <p className="mt-4 text-[22px] leading-8 text-[#111827]">
