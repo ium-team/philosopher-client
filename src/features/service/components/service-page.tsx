@@ -1263,16 +1263,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-medium text-[#1f2937]">아이콘</p>
-                  <div className="flex items-center gap-3 rounded-xl border border-[#d1d5db] bg-[#f9fafb] px-3 py-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xl leading-none">
-                      {DEFAULT_PROJECT_ICON}
-                    </span>
-                    <span className="text-sm text-[#6b7280]">프로젝트 아이콘 (고정)</span>
-                  </div>
-                </div>
-
-                <div>
                   <p className="mb-2 text-sm font-medium text-[#1f2937]">지침</p>
                   <p className="mb-2 text-sm text-[#9ca3af]">
                     컨텍스트를 설정하고 프로젝트 내에서 ChatGPT가 응답하는 방식을 맞춤 설정하세요.
