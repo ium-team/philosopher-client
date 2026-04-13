@@ -12,72 +12,11 @@ type Message = {
 type Conversation = {
   id: string;
   title: string;
-  project?: string;
   recent?: boolean;
   messages: Message[];
 };
 
-const initialConversations: Conversation[] = [
-  {
-    id: "philosopher-service",
-    title: "철학자 AI 서비스",
-    recent: true,
-    messages: [
-      {
-        id: "m1",
-        role: "user",
-        text: "내가 만들려는 서비스가 있는데 철학자들의 이야기를 책으로 완벽히 이해해서 그 철학자가 된 AI를 만들고 그 AI랑 이야기할 수 있는 서비스야",
-        timestamp: "오후 2:12",
-      },
-      {
-        id: "m2",
-        role: "assistant",
-        text: `좋아요. 이건 꽤 강한 서비스 아이디어예요.\n\n핵심은 단순 "철학 지식 챗봇"이 아니라, "특정 철학자의 사유 방식과 말하기 방식까지 재현한 대화형 인격 인터페이스"라는 점이에요.\n\n다만 여기서 제일 중요한 건 하나예요.\n\n"그 철학자가 된 AI"는 기술적으로 가능해 보여도, 실제로는 "완벽한 이해"보다 "해석된 재구성"에 가깝다는 점입니다.\n\n이걸 잘 설계하면 서비스가 살아나고, 못 하면 그냥 철학자 이름 붙인 RAG 챗봇이 됩니다.\n\n이 서비스의 진짜 매력\n사용자는 보통 철학 책을 이렇게 읽기 어려워해요.\n• 문장이 어렵다\n• 개념이 추상적이다\n• 시대 배경이 없다\n• "그래서 지금 내 삶에 무슨 의미냐"가 안 잡힌다\n\n당신 서비스는 이걸 이렇게 바꿔줄 수 있어요.\n• 플라톤에게 직접 정의란 무엇인지 묻는다\n• 니체에게 내 허무감에 대해 상담받는다\n• 칸트에게 거짓말의 윤리를 따진다\n• 한나 아렌트에게 현대 정치 문제를 묻는다\n\n이건 단순 검색보다 훨씬 몰입감이 있어요.\n잘 만들면 교육, 콘텐츠, 청년기 동반자 경험, 토론 훈련까지 확장돼요.\n\n제일 먼저 정리해야 할 문제\n1) 실제 철학자 원문과 2차 해설의 경계\n2) 모델의 환각과 시대착오 표현 제어\n3) 대화형 UX에서 신뢰와 몰입의 균형\n\n원하면 다음으로, 이걸 MVP 제품 구조로 바로 쪼개서 화면/기능/데이터 파이프라인까지 제안해줄게요.`,
-        timestamp: "오후 2:12",
-      },
-    ],
-  },
-  {
-    id: "education-software",
-    title: "교육 시스템 소프트웨어 해결책",
-    recent: true,
-    messages: [
-      {
-        id: "m3",
-        role: "assistant",
-        text: "학습자의 개별 페이스를 추적하는 대시보드가 핵심입니다. 우선 학습 이벤트 수집부터 설계합시다.",
-        timestamp: "오전 11:10",
-      },
-    ],
-  },
-  {
-    id: "codex-install",
-    title: "Codex 설치 에러 해결",
-    recent: true,
-    messages: [
-      {
-        id: "m4",
-        role: "assistant",
-        text: "환경변수 충돌을 먼저 점검하면 빠르게 원인을 좁힐 수 있습니다.",
-        timestamp: "오전 09:41",
-      },
-    ],
-  },
-];
-
-const projectItems = ["새 프로젝트", "ium", "면접", "ai를 잘 쓰는 방법", "인생을 갈아버리자", "객체지향과 아키텍처와 디자인"];
-
-const promptSuggestions = [
-  "사용자 신뢰를 잃지 않으면서 몰입을 유지하려면?",
-  "철학자 페르소나별 시스템 프롬프트 뼈대를 만들어줘",
-  "MVP 4주 로드맵으로 쪼개줘",
-];
-
-const syntheticResponses = [
-  "좋습니다. 먼저 페르소나 품질 기준부터 정의해야 해요. 정확도, 문체 일관성, 시대 맥락 반영을 각각 별도 지표로 분리합시다.",
-  "이 질문은 제품 신뢰성과 직결됩니다. '원문 근거 보기'와 '해석 레이어 표기'를 UI에 같이 두면 환각 체감이 크게 줄어요.",
-  "다음 단계로 넘어가려면 학습 데이터 계층을 정리해야 합니다. 원전, 주석서, 현대 해설을 분리 저장하는 구조를 권장해요.",
-];
+const initialConversations: Conversation[] = [];
 
 function IconHamburger() {
   return (
@@ -151,17 +90,13 @@ function IconEdit() {
 
 export function ServicePage() {
   const [conversations, setConversations] = useState(initialConversations);
-  const [activeConversationId, setActiveConversationId] = useState(initialConversations[0]?.id ?? "");
+  const [activeConversationId, setActiveConversationId] = useState("");
   const [draft, setDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const messageIdRef = useRef(
-    initialConversations.reduce((count, conversation) => count + conversation.messages.length, 0),
-  );
-  const responseCursorRef = useRef(0);
+  const messageIdRef = useRef(0);
   const newConversationCursorRef = useRef(1);
 
   const activeConversation = useMemo(
@@ -191,7 +126,7 @@ export function ServicePage() {
     }
 
     scroller.scrollTop = scroller.scrollHeight;
-  }, [activeConversation?.messages.length, isGenerating]);
+  }, [activeConversation?.messages.length]);
 
   const submitMessage = (messageText: string) => {
     const trimmed = messageText.trim();
@@ -219,32 +154,6 @@ export function ServicePage() {
       ),
     );
     setDraft("");
-    setIsGenerating(true);
-
-    window.setTimeout(() => {
-      messageIdRef.current += 1;
-      const response = syntheticResponses[responseCursorRef.current % syntheticResponses.length] ?? syntheticResponses[0];
-      responseCursorRef.current += 1;
-
-      const assistantMessage: Message = {
-        id: `msg-${messageIdRef.current}-a`,
-        role: "assistant",
-        text: response,
-        timestamp: "방금",
-      };
-
-      setConversations((previous) =>
-        previous.map((conversation) =>
-          conversation.id === activeConversation.id
-            ? {
-                ...conversation,
-                messages: [...conversation.messages, assistantMessage],
-              }
-            : conversation,
-        ),
-      );
-      setIsGenerating(false);
-    }, 700);
   };
 
   const createConversation = () => {
@@ -344,22 +253,7 @@ export function ServicePage() {
               <div className="mt-3 border-t border-[#e6e6e6] pt-3">
                 <p className="px-6 text-xs text-[#9a9a9a]">프로젝트</p>
                 <div className="mt-1 px-2">
-                  {projectItems.map((item, index) => (
-                    <button
-                      key={item}
-                      type="button"
-                      className={`block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                        index === 0
-                          ? "text-[#333] hover:bg-[#e8e8e8]"
-                          : "text-[#555] hover:bg-[#e8e8e8]"
-                      }`}
-                    >
-                      {index === 0 ? `+ ${item}` : item}
-                    </button>
-                  ))}
-                  <button type="button" className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm text-[#555] hover:bg-[#e8e8e8]">
-                    ... 더 보기
-                  </button>
+                  <p className="rounded-lg px-3 py-2 text-sm text-[#8b8b8b]">프로젝트가 없습니다.</p>
                 </div>
               </div>
 
@@ -384,6 +278,9 @@ export function ServicePage() {
                         </button>
                       );
                     })}
+                  {filteredRecentConversations.length === 0 ? (
+                    <p className="rounded-lg px-3 py-2 text-sm text-[#8b8b8b]">최근 대화가 없습니다.</p>
+                  ) : null}
                 </div>
               </div>
 
@@ -420,6 +317,12 @@ export function ServicePage() {
 
         <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div className="mx-auto w-full max-w-[820px] px-5 pb-36 pt-8 md:px-8">
+            {activeConversation ? null : (
+              <div className="py-20 text-center text-[#7a7a7a]">
+                <p className="text-xl font-medium text-[#4a4a4a]">새 대화를 시작하세요</p>
+                <p className="mt-2 text-sm">왼쪽에서 `새 채팅`을 눌러 대화를 생성할 수 있습니다.</p>
+              </div>
+            )}
             {activeConversation?.messages.map((message) => (
               <article key={message.id} className={`mb-7 ${message.role === "user" ? "ml-auto max-w-[90%]" : "mr-auto w-full"}`}>
                 {message.role === "user" ? (
@@ -451,31 +354,6 @@ export function ServicePage() {
                 )}
               </article>
             ))}
-
-            {isGenerating ? (
-              <article className="mr-auto mb-7">
-                <div className="flex items-center gap-2 text-sm text-[#777]">
-                  <span className="inline-flex h-2 w-2 animate-pulse rounded-full bg-[#8a8a8a]" />
-                  답변 생성 중
-                </div>
-              </article>
-            ) : null}
-
-            <div className="mt-8">
-              <p className="mb-3 text-sm font-medium text-[#6c6c6c]">추천 질문</p>
-              <div className="flex flex-wrap gap-2">
-                {promptSuggestions.map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    onClick={() => submitMessage(suggestion)}
-                    className="rounded-full border border-[#dddddd] bg-white px-4 py-2 text-sm text-[#3d3d3d] transition hover:bg-[#f4f4f4]"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
@@ -517,7 +395,7 @@ export function ServicePage() {
                   <button
                     type="button"
                     onClick={() => submitMessage(draft)}
-                    disabled={draft.trim().length === 0 || isGenerating}
+                    disabled={draft.trim().length === 0}
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#121212] text-white transition hover:bg-[#2b2b2b] disabled:cursor-not-allowed disabled:bg-[#b9b9b9]"
                     aria-label="send message"
                   >
