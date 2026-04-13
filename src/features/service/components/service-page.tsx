@@ -994,7 +994,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         새 채팅
                       </button>
                     </div>
-                    <div className="mb-3 text-sm font-medium text-[#6b7280]">채팅</div>
+                    <div className="mb-3">
+                      <span className="inline-flex rounded-full bg-[#f3f4f6] px-4 py-1 text-sm font-semibold text-[#1f2937]">
+                        채팅
+                      </span>
+                    </div>
                     <div className="space-y-1">
                       {projectConversations.map((conversation) => (
                         <button
