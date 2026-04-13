@@ -495,6 +495,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <div className="mt-3 border-t border-[#e5e7eb] pt-3">
                 <p className="px-6 text-xs text-[#9ca3af]">프로젝트</p>
                 <div className="mt-1 px-2">
+                  <button
+                    type="button"
+                    className="mb-1.5 flex w-full items-center justify-center rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-2 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
+                  >
+                    새 프로젝트 만들기
+                  </button>
                   <p className="rounded-lg px-3 py-2 text-sm text-[#9ca3af]">프로젝트가 없습니다.</p>
                 </div>
               </div>
