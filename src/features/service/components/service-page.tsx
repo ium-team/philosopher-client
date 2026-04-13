@@ -158,6 +158,39 @@ function IconFolderPlus() {
   );
 }
 
+function IconArrowRight() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9">
+      <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconPin() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M14 3l7 7-3 1-3 6-2-2-6 3-1-1 3-6-2-2 6-3z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconTrash() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 7h16M9 7V5h6v2M8 7l.7 12h6.6L16 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconFolderMove() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M3.5 7.5a2 2 0 0 1 2-2h4l1.5 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-12.5a2 2 0 0 1-2-2z" />
+      <path d="M11 13h6M15 10l3 3-3 3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const router = useRouter();
 
@@ -171,6 +204,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isResponding, setIsResponding] = useState(false);
   const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
   const [isMoveMenuOpen, setIsMoveMenuOpen] = useState(false);
+  const [isProjectMoveMenuOpen, setIsProjectMoveMenuOpen] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
@@ -304,6 +338,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     );
     setActiveProjectId(targetProjectId);
     setIsMoveMenuOpen(false);
+    setIsProjectMoveMenuOpen(false);
   };
 
   const togglePinActiveConversation = () => {
@@ -396,6 +431,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     return () => {
       window.removeEventListener("mousedown", handlePointerDown);
+      setIsProjectMoveMenuOpen(false);
     };
   }, [isMoveMenuOpen]);
 
@@ -782,12 +818,48 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               •••
             </button>
             {isMoveMenuOpen && activeConversation ? (
-              <div className="absolute right-0 top-11 z-20 w-56 rounded-xl border border-[#e5e7eb] bg-white p-1.5 shadow-[0_10px_30px_rgba(17,24,39,0.18)]">
+              <div className="absolute right-0 top-11 z-20 w-56 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+                {moveTargetProjects.length > 0 ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onMouseEnter={() => setIsProjectMoveMenuOpen(true)}
+                      onClick={() => setIsProjectMoveMenuOpen((value) => !value)}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                    >
+                      <span className="text-[#374151]">
+                        <IconFolderMove />
+                      </span>
+                      <span className="flex-1">프로젝트로 이동</span>
+                      <span className="text-[#6b7280]">
+                        <IconArrowRight />
+                      </span>
+                    </button>
+                    {isProjectMoveMenuOpen ? (
+                      <div className="absolute left-[100%] top-0 z-30 ml-1 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+                        {moveTargetProjects.map((project) => (
+                          <button
+                            key={project.id}
+                            type="button"
+                            onMouseEnter={() => moveConversationTo(project.id)}
+                            onClick={() => moveConversationTo(project.id)}
+                            className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                          >
+                            {project.name}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
                 <button
                   type="button"
                   onClick={togglePinActiveConversation}
-                  className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#374151] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
                 >
+                  <span className="text-[#374151]">
+                    <IconPin />
+                  </span>
                   {activeConversation.pinned ? "채팅 고정 해제" : "채팅 고정"}
                 </button>
                 {activeConversation.projectId ? (
@@ -795,36 +867,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     type="button"
                     onMouseEnter={() => moveConversationTo(null)}
                     onClick={() => moveConversationTo(null)}
-                    className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#374151] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
                   >
+                    <span className="text-[#374151]">
+                      <IconFolderMove />
+                    </span>
                     메인으로 이동
                   </button>
-                ) : null}
-                {moveTargetProjects.length > 0 ? (
-                  <>
-                    <p className="px-3 py-1 text-xs text-[#9ca3af]">프로젝트로 이동</p>
-                    {moveTargetProjects.map((project) => (
-                      <button
-                        key={project.id}
-                        type="button"
-                        onMouseEnter={() => moveConversationTo(project.id)}
-                        onClick={() => moveConversationTo(project.id)}
-                        className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#374151] transition hover:bg-[#fff3e0] hover:text-[#ff6d00]"
-                      >
-                        {project.name}
-                      </button>
-                    ))}
-                  </>
-                ) : null}
-                {!activeConversation.projectId && moveTargetProjects.length === 0 ? (
-                  <p className="px-3 py-2 text-sm text-[#9ca3af]">이동할 프로젝트가 없습니다.</p>
                 ) : null}
                 <div className="my-1 h-px bg-[#f1f5f9]" />
                 <button
                   type="button"
                   onClick={deleteActiveConversation}
-                  className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#b91c1c] transition hover:bg-[#fef2f2]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#dc2626] transition hover:bg-white"
                 >
+                  <span>
+                    <IconTrash />
+                  </span>
                   채팅 삭제
                 </button>
               </div>
