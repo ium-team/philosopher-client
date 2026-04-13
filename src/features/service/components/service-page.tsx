@@ -1342,29 +1342,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-1 flex-col space-y-4 p-5">
-                        <div className="relative">
-                          <p
-                            className="text-sm leading-6 text-[#4b5563]"
-                            style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
-                          >
-                            {philosopher.summary}
-                          </p>
-                          <div className="pointer-events-none absolute inset-0 z-20 rounded-xl border border-[#e5e7eb] bg-white/95 p-3 text-sm leading-6 text-[#334155] opacity-0 shadow-[0_14px_28px_rgba(17,24,39,0.15)] backdrop-blur-sm transition duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-                            <p className="text-[11px] font-semibold tracking-[0.12em] text-[#94a3b8] uppercase">자세한 설명</p>
-                            <p className="mt-1">{philosopher.summary}</p>
-                          </div>
-                        </div>
-
-                        <div className="rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2">
-                          <p className="text-[11px] font-semibold tracking-[0.12em] text-[#94a3b8] uppercase">대화 톤</p>
-                          <p className="mt-1 text-sm text-[#334155]">{philosopher.tone}</p>
-                        </div>
-
+                      <div className="p-5">
                         <button
                           type="button"
                           onClick={() => void startConversationWith(philosopher)}
-                          className="mt-auto w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
+                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
                         >
                           {philosopher.name}와 대화하기
                         </button>
