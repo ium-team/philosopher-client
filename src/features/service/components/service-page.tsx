@@ -520,13 +520,15 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         <span className="block truncate">{conversation.title}</span>
                         <span className="mt-1 flex items-center gap-1.5 text-xs text-[#9ca3af]">
                           {philosopher ? (
-                            <Image
-                              src={philosopher.imageSrc}
-                              alt={`${philosopherName} portrait`}
-                              width={20}
-                              height={20}
-                              className="h-4 w-4 rounded-full object-cover object-top"
-                            />
+                            <span className="relative flex h-4 w-4 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                              <Image
+                                src={philosopher.imageSrc}
+                                alt={`${philosopherName} portrait`}
+                                width={20}
+                                height={20}
+                                className="h-full w-full scale-125 object-contain object-bottom"
+                              />
+                            </span>
                           ) : (
                             <span className="h-4 w-4 rounded-full bg-[#e5e7eb]" />
                           )}
@@ -567,13 +569,15 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#111827]"
           >
             {activePhilosopher ? (
-              <Image
-                src={activePhilosopher.imageSrc}
-                alt={`${activePhilosopher.name} portrait`}
-                width={40}
-                height={40}
-                className="h-8 w-8 rounded-full object-cover object-top"
-              />
+              <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                <Image
+                  src={activePhilosopher.imageSrc}
+                  alt={`${activePhilosopher.name} portrait`}
+                  width={40}
+                  height={40}
+                  className="h-full w-full scale-125 object-contain object-bottom"
+                />
+              </span>
             ) : (
               <span className="h-8 w-8 rounded-full bg-[#f3f4f6]" />
             )}
@@ -606,13 +610,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       key={philosopher.id}
                       className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_10px_26px_rgba(17,24,39,0.08)]"
                     >
-                      <div className="relative mb-4 overflow-hidden rounded-xl bg-[#f3f4f6]">
+                      <div className="relative mb-4 h-56 overflow-hidden rounded-2xl border border-[#ebeef2] bg-[radial-gradient(circle_at_50%_20%,#fbfdff_0%,#edf2f7_74%)]">
+                        <div className="absolute inset-x-5 bottom-3 h-8 rounded-full bg-[#334155]/20 blur-md" />
                         <Image
                           src={philosopher.imageSrc}
                           alt={`${philosopher.name} portrait`}
                           width={1024}
                           height={1536}
-                          className="h-52 w-full object-cover object-top"
+                          className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-2 py-1 drop-shadow-[0_12px_20px_rgba(17,24,39,0.28)]"
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                         />
                       </div>
@@ -679,13 +684,15 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <div className="max-w-[720px]">
                         <div className="mb-2 flex items-center gap-2 text-xs tracking-[0.14em] text-[#9ca3af] uppercase">
                           {activePhilosopher ? (
-                            <Image
-                              src={activePhilosopher.imageSrc}
-                              alt={`${activePhilosopher.name} portrait`}
-                              width={24}
-                              height={24}
-                              className="h-5 w-5 rounded-full object-cover object-top"
-                            />
+                            <span className="relative flex h-5 w-5 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                              <Image
+                                src={activePhilosopher.imageSrc}
+                                alt={`${activePhilosopher.name} portrait`}
+                                width={24}
+                                height={24}
+                                className="h-full w-full scale-125 object-contain object-bottom"
+                              />
+                            </span>
                           ) : (
                             <span className="h-5 w-5 rounded-full bg-[#e5e7eb]" />
                           )}

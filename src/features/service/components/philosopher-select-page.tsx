@@ -30,13 +30,14 @@ export function PhilosopherSelectPage() {
               key={philosopher.id}
               className="rounded-2xl border border-[#efe6da] bg-white p-5 shadow-[0_10px_26px_rgba(125,79,25,0.08)]"
             >
-              <div className="relative mb-4 overflow-hidden rounded-xl bg-[#f8f4ef]">
+              <div className="relative mb-4 h-56 overflow-hidden rounded-2xl border border-[#f2e9de] bg-[radial-gradient(circle_at_50%_20%,#fffaf3_0%,#f5ece2_75%)]">
+                <div className="absolute inset-x-5 bottom-3 h-8 rounded-full bg-[#7c5b3f]/20 blur-md" />
                 <Image
                   src={philosopher.imageSrc}
                   alt={`${philosopher.name} portrait`}
                   width={1024}
                   height={1536}
-                  className="h-52 w-full object-cover object-top"
+                  className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-2 py-1 drop-shadow-[0_12px_20px_rgba(54,35,19,0.24)]"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
