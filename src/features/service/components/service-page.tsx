@@ -815,132 +815,112 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
       <section className="relative flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b border-[#e5e7eb] bg-[#ffffff] px-4 md:px-6">
-          {activeProject && !activeConversation && !isSelectingPhilosopher ? (
-            <>
-              <div className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#111827]">
-                <span className="text-[#374151]">
-                  <IconFolder />
-                </span>
-                {activeProject.name}
-              </div>
-              <button
-                type="button"
-                onClick={createProjectConversation}
-                className="rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-1.5 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
-              >
-                새 채팅
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => setIsSelectingPhilosopher(true)}
-                className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#111827]"
-              >
-                {activePhilosopher ? (
-                  <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
-                    <Image
-                      src={activePhilosopher.imageSrc}
-                      alt={`${activePhilosopher.name} portrait`}
-                      width={40}
-                      height={40}
-                      className="h-full w-full scale-125 object-contain object-bottom"
-                    />
-                  </span>
-                ) : (
-                  <span className="h-8 w-8 rounded-full bg-[#f3f4f6]" />
-                )}
-                {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ff7f11]">▾</span>
-              </button>
+          <button
+            type="button"
+            onClick={() => setIsSelectingPhilosopher(true)}
+            className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#111827]"
+          >
+            {activePhilosopher ? (
+              <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                <Image
+                  src={activePhilosopher.imageSrc}
+                  alt={`${activePhilosopher.name} portrait`}
+                  width={40}
+                  height={40}
+                  className="h-full w-full scale-125 object-contain object-bottom"
+                />
+              </span>
+            ) : (
+              <span className="h-8 w-8 rounded-full bg-[#f3f4f6]" />
+            )}
+            {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ff7f11]">▾</span>
+          </button>
 
-              <div ref={moveMenuRef} className="relative flex items-center gap-3 text-sm text-[#4b5563]">
-                <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#fff3e0]">
-                  공유하기
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsMoveMenuOpen((value) => !value)}
-                  disabled={!activeConversation}
-                  className="rounded-md px-2 py-1.5 hover:bg-[#fff3e0] disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label="more options"
-                >
-                  •••
-                </button>
-                {isMoveMenuOpen && activeConversation ? (
-                  <div className="absolute right-0 top-11 z-20 w-56 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
-                    {moveTargetProjects.length > 0 ? (
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onMouseEnter={() => setIsProjectMoveMenuOpen(true)}
-                          onClick={() => setIsProjectMoveMenuOpen((value) => !value)}
-                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
-                        >
-                          <span className="text-[#374151]">
-                            <IconFolderMove />
-                          </span>
-                          <span className="flex-1">프로젝트로 이동</span>
-                          <span className="text-[#6b7280]">
-                            <IconArrowRight />
-                          </span>
-                        </button>
-                        {isProjectMoveMenuOpen ? (
-                          <div className="absolute top-0 right-[100%] z-30 mr-1 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
-                            {moveTargetProjects.map((project) => (
-                              <button
-                                key={project.id}
-                                type="button"
-                                onMouseEnter={() => moveConversationTo(project.id)}
-                                onClick={() => moveConversationTo(project.id)}
-                                className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
-                              >
-                                {project.name}
-                              </button>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
+          <div ref={moveMenuRef} className="relative flex items-center gap-3 text-sm text-[#4b5563]">
+            <button type="button" className="rounded-md px-2.5 py-1.5 hover:bg-[#fff3e0]">
+              공유하기
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsMoveMenuOpen((value) => !value)}
+              disabled={!activeConversation}
+              className="rounded-md px-2 py-1.5 hover:bg-[#fff3e0] disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="more options"
+            >
+              •••
+            </button>
+            {isMoveMenuOpen && activeConversation ? (
+              <div className="absolute right-0 top-11 z-20 w-56 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+                {moveTargetProjects.length > 0 ? (
+                  <div className="relative">
                     <button
                       type="button"
-                      onClick={togglePinActiveConversation}
+                      onMouseEnter={() => setIsProjectMoveMenuOpen(true)}
+                      onClick={() => setIsProjectMoveMenuOpen((value) => !value)}
                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
                     >
                       <span className="text-[#374151]">
-                        <IconPin />
+                        <IconFolderMove />
                       </span>
-                      {activeConversation.pinned ? "채팅 고정 해제" : "채팅 고정"}
+                      <span className="flex-1">프로젝트로 이동</span>
+                      <span className="text-[#6b7280]">
+                        <IconArrowRight />
+                      </span>
                     </button>
-                    {activeConversation.projectId ? (
-                      <button
-                        type="button"
-                        onMouseEnter={() => moveConversationTo(null)}
-                        onClick={() => moveConversationTo(null)}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
-                      >
-                        <span className="text-[#374151]">
-                          <IconFolderMove />
-                        </span>
-                        메인으로 이동
-                      </button>
+                    {isProjectMoveMenuOpen ? (
+                      <div className="absolute top-0 right-[100%] z-30 mr-1 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+                        {moveTargetProjects.map((project) => (
+                          <button
+                            key={project.id}
+                            type="button"
+                            onMouseEnter={() => moveConversationTo(project.id)}
+                            onClick={() => moveConversationTo(project.id)}
+                            className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                          >
+                            {project.name}
+                          </button>
+                        ))}
+                      </div>
                     ) : null}
-                    <div className="my-1 h-px bg-[#f1f5f9]" />
-                    <button
-                      type="button"
-                      onClick={deleteActiveConversation}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#dc2626] transition hover:bg-white"
-                    >
-                      <span>
-                        <IconTrash />
-                      </span>
-                      채팅 삭제
-                    </button>
                   </div>
                 ) : null}
+                <button
+                  type="button"
+                  onClick={togglePinActiveConversation}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                >
+                  <span className="text-[#374151]">
+                    <IconPin />
+                  </span>
+                  {activeConversation.pinned ? "채팅 고정 해제" : "채팅 고정"}
+                </button>
+                {activeConversation.projectId ? (
+                  <button
+                    type="button"
+                    onMouseEnter={() => moveConversationTo(null)}
+                    onClick={() => moveConversationTo(null)}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                  >
+                    <span className="text-[#374151]">
+                      <IconFolderMove />
+                    </span>
+                    메인으로 이동
+                  </button>
+                ) : null}
+                <div className="my-1 h-px bg-[#f1f5f9]" />
+                <button
+                  type="button"
+                  onClick={deleteActiveConversation}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#dc2626] transition hover:bg-white"
+                >
+                  <span>
+                    <IconTrash />
+                  </span>
+                  채팅 삭제
+                </button>
               </div>
-            </>
-          )}
+            ) : null}
+          </div>
         </header>
 
         <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -999,6 +979,21 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               activeProject ? (
                 <div className="py-3">
                   <div className="mt-2">
+                    <div className="mb-6 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2 text-[34px] font-semibold tracking-tight text-[#111827]">
+                        <span className="text-[#374151]">
+                          <IconFolder />
+                        </span>
+                        {activeProject.name}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={createProjectConversation}
+                        className="rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-1.5 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
+                      >
+                        새 채팅
+                      </button>
+                    </div>
                     <div className="mb-4 flex items-center gap-5 px-1">
                       <span className="inline-flex rounded-full bg-[#f3f4f6] px-4 py-1 text-sm font-semibold text-[#1f2937]">채팅</span>
                       <span className="text-sm text-[#9ca3af]">소스</span>
