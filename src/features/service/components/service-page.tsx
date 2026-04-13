@@ -1012,9 +1012,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   {philosophers.map((philosopher) => (
                     <article
                       key={philosopher.id}
-                      className="group relative overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-[0_12px_30px_rgba(17,24,39,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(17,24,39,0.12)]"
+                      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-[0_12px_30px_rgba(17,24,39,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(17,24,39,0.12)]"
                     >
-                      <div className="relative h-56 overflow-hidden border-b border-[#edf1f5] bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#f5f8fb_74%)]">
+                      <div className="relative h-72 overflow-hidden border-b border-[#edf1f5] bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#f5f8fb_74%)]">
+                        <div className="absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-[#0f172a]/70 to-transparent" />
                         <div className="absolute inset-x-8 bottom-3 h-8 rounded-full bg-[#64748b]/20 blur-md" />
                         <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#fff3e0]" />
                         <Image
@@ -1022,24 +1023,28 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           alt={`${philosopher.name} portrait`}
                           width={1024}
                           height={1536}
-                          className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-3 py-2 drop-shadow-[0_12px_20px_rgba(17,24,39,0.25)]"
+                          className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-3 py-2 drop-shadow-[0_12px_20px_rgba(17,24,39,0.25)] transition duration-300 group-hover:scale-105"
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                         />
-                      </div>
-                      <div className="space-y-4 p-5">
-                        <div>
-                          <h2 className="text-[22px] font-semibold tracking-tight text-[#111827]">{philosopher.name}</h2>
+                        <div className="absolute inset-x-4 bottom-3 z-30">
+                          <h2 className="text-[22px] font-semibold tracking-tight text-white">{philosopher.name}</h2>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <span className="inline-flex rounded-full border border-[#e5e7eb] bg-[#f8fafc] px-2.5 py-1 text-[11px] text-[#64748b]">
+                            <span className="inline-flex rounded-full border border-white/20 bg-black/20 px-2.5 py-1 text-[11px] text-white/90 backdrop-blur-sm">
                               {philosopher.era}
                             </span>
-                            <span className="inline-flex rounded-full border border-[#ffe0b2] bg-[#fff7ed] px-2.5 py-1 text-[11px] text-[#ea580c]">
+                            <span className="inline-flex rounded-full border border-[#ffe0b2]/70 bg-[#ffedd5]/90 px-2.5 py-1 text-[11px] text-[#9a3412]">
                               {philosopher.school}
                             </span>
                           </div>
                         </div>
-
-                        <p className="text-sm leading-6 text-[#4b5563]">{philosopher.summary}</p>
+                      </div>
+                      <div className="flex flex-1 flex-col space-y-4 p-5">
+                        <p
+                          className="text-sm leading-6 text-[#4b5563]"
+                          style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+                        >
+                          {philosopher.summary}
+                        </p>
 
                         <div className="rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2">
                           <p className="text-[11px] font-semibold tracking-[0.12em] text-[#94a3b8] uppercase">대화 톤</p>
@@ -1049,7 +1054,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         <button
                           type="button"
                           onClick={() => startConversationWith(philosopher)}
-                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
+                          className="mt-auto w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
                         >
                           {philosopher.name}와 대화하기
                         </button>
