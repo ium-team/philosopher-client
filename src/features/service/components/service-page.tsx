@@ -836,7 +836,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       </span>
                     </button>
                     {isProjectMoveMenuOpen ? (
-                      <div className="absolute left-[100%] top-0 z-30 ml-1 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+                      <div className="absolute top-0 right-[100%] z-30 mr-1 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
                         {moveTargetProjects.map((project) => (
                           <button
                             key={project.id}
