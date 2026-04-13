@@ -901,12 +901,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               •••
             </button>
             {isMoveMenuOpen && (activeConversation || isProjectHome) ? (
-              <div className="absolute right-0 top-11 z-20 w-56 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+              <div className="absolute right-0 top-11 z-20 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
                 {isProjectHome ? (
                   <button
                     type="button"
                     onClick={openProjectSettings}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                   >
                     <span className="text-[#374151]">
                       <IconEdit />
@@ -920,7 +920,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       type="button"
                       onMouseEnter={() => setIsProjectMoveMenuOpen(true)}
                       onClick={() => setIsProjectMoveMenuOpen((value) => !value)}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                     >
                       <span className="text-[#374151]">
                         <IconFolderMove />
@@ -931,14 +931,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       </span>
                     </button>
                     {isProjectMoveMenuOpen ? (
-                      <div className="absolute top-0 right-[100%] z-30 mr-1 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1.5 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+                      <div className="absolute top-0 right-[100%] z-30 mr-1 w-44 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
                         {moveTargetProjects.map((project) => (
                           <button
                             key={project.id}
                             type="button"
                             onMouseEnter={() => moveConversationTo(project.id)}
                             onClick={() => moveConversationTo(project.id)}
-                            className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                            className="flex w-full items-center rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                           >
                             {project.name}
                           </button>
@@ -951,7 +951,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   <button
                     type="button"
                     onClick={togglePinActiveConversation}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                   >
                     <span className="text-[#374151]">
                       <IconPin />
@@ -964,7 +964,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     type="button"
                     onMouseEnter={() => moveConversationTo(null)}
                     onClick={() => moveConversationTo(null)}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#1f2937] transition hover:bg-white"
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                   >
                     <span className="text-[#374151]">
                       <IconFolderMove />
@@ -974,11 +974,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 ) : null}
                 {!isProjectHome && activeConversation ? (
                   <>
-                    <div className="my-1 h-px bg-[#f1f5f9]" />
+                    <div className="my-0.5 h-px bg-[#f1f5f9]" />
                     <button
                       type="button"
                       onClick={deleteActiveConversation}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[#dc2626] transition hover:bg-white"
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#dc2626] transition hover:bg-white"
                     >
                       <span>
                         <IconTrash />
