@@ -5,6 +5,18 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
 import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
+import {
+  createConversation as createConversationRequest,
+  createProject as createProjectRequest,
+  listConversations,
+  listMessages,
+  listProjects,
+  sendMessage as sendMessageRequest,
+  type ApiConversation,
+  type ApiMessage,
+  type ApiPhilosopher,
+  type ApiProject,
+} from "@/features/service/api/chat-api";
 
 type Message = {
   id: string;
@@ -63,10 +75,69 @@ type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 const initialConversations: Conversation[] = [];
 const initialProjects: Project[] = [];
 
-function buildAssistantReply(philosopher: PhilosopherProfile, question: string) {
-  const condensed = question.replace(/\s+/g, " ").trim().slice(0, 80);
+function toApiPhilosopherId(philosopherId: string): ApiPhilosopher {
+  if (philosopherId === "arendt") {
+    return "hannah_arendt";
+  }
+  if (philosopherId === "socrates" || philosopherId === "nietzsche") {
+    return philosopherId;
+  }
+  return "socrates";
+}
 
-  return `${philosopher.name}의 관점에서 보면, "${condensed}"라는 질문은 스스로의 근거를 더 명료하게 점검하라는 요청입니다. ${philosopher.tone} 방식으로 다음 질문을 이어가 보세요.`;
+function fromApiPhilosopherId(philosopherId: ApiPhilosopher): string {
+  if (philosopherId === "hannah_arendt") {
+    return "arendt";
+  }
+  return philosopherId;
+}
+
+function formatTimestamp(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "방금";
+  }
+  return date.toLocaleString("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function mapProject(project: ApiProject): Project {
+  return {
+    id: project.id,
+    name: project.name,
+  };
+}
+
+function mapMessage(message: ApiMessage): Message {
+  return {
+    id: message.id,
+    role: message.role,
+    text: message.content,
+    timestamp: formatTimestamp(message.created_at),
+  };
+}
+
+function mapConversation(
+  conversation: ApiConversation,
+  messages: ApiMessage[],
+): Conversation {
+  const localPhilosopherId = fromApiPhilosopherId(conversation.philosopher);
+  const philosopherName = philosophers.find((item) => item.id === localPhilosopherId)?.name ?? localPhilosopherId;
+  const titleFromServer = conversation.title?.trim();
+  const fallbackTitle = `${philosopherName} 대화`;
+
+  return {
+    id: conversation.id,
+    title: titleFromServer && titleFromServer.length > 0 ? titleFromServer : fallbackTitle,
+    philosopherId: localPhilosopherId,
+    projectId: conversation.project_id,
+    recent: true,
+    messages: messages.map(mapMessage),
+  };
 }
 
 function IconHamburger() {
@@ -240,6 +311,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   const [projects, setProjects] = useState(initialProjects);
   const [conversations, setConversations] = useState(initialConversations);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isHydrating, setIsHydrating] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeConversationId, setActiveConversationId] = useState("");
   const [draft, setDraft] = useState("");
@@ -263,13 +336,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const moveMenuRef = useRef<HTMLDivElement | null>(null);
   const profileCardRef = useRef<HTMLDivElement | null>(null);
   const headerProfileCardRef = useRef<HTMLDivElement | null>(null);
-  const messageIdRef = useRef(0);
-  const projectIdRef = useRef(0);
-  const conversationIdRef = useRef(0);
   const handledSelectionRef = useRef<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const isCancellingVoiceRef = useRef(false);
   const [isListening, setIsListening] = useState(false);
+  const accessToken = session?.access_token ?? "";
 
   const activeConversation = useMemo(() => {
     if (!activeConversationId) {
@@ -314,11 +385,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         return false;
       }
 
-      // "최근"은 프로젝트에 속하지 않은 일반 채팅만 보여준다.
-      if (conversation.projectId) {
-        return false;
-      }
-
       if (!normalized) {
         return true;
       }
@@ -335,35 +401,99 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         : [],
     [activeProjectId, conversations],
   );
+  const hydrateChatData = useCallback(async () => {
+    if (!accessToken) {
+      return;
+    }
 
-  const startConversationWith = useCallback((philosopher: PhilosopherProfile) => {
-    conversationIdRef.current += 1;
-    const conversationId = `conv-${conversationIdRef.current}`;
+    setIsHydrating(true);
+    setLoadError(null);
 
-    const seededMessage: Message = {
-      id: `msg-${conversationIdRef.current}-seed`,
-      role: "assistant",
-      text: `${philosopher.name}와의 대화가 시작되었습니다. ${philosopher.summary}`,
-      timestamp: "방금",
-    };
+    try {
+      const projectList = await listProjects(accessToken);
+      const mappedProjects = projectList.map(mapProject);
+      setProjects(mappedProjects);
 
-    const conversation: Conversation = {
-      id: conversationId,
-      title: `${philosopher.name} 대화`,
-      philosopherId: philosopher.id,
-      projectId: activeProjectId ?? undefined,
-      recent: true,
-      messages: [seededMessage],
-    };
+      const conversationResponses = await Promise.all(
+        projectList.map(async (project) => listConversations(accessToken, project.id)),
+      );
 
-    setConversations((previous) => [conversation, ...previous]);
-    setActiveConversationId(conversationId);
-    setDraft("");
-    setIsSelectingPhilosopher(false);
-    router.replace(`/service?conversation=${conversationId}`);
-  }, [activeProjectId, router]);
+      const conversationList = conversationResponses.flat();
+      const messageEntries = await Promise.all(
+        conversationList.map(async (conversation) => [conversation.id, await listMessages(accessToken, conversation.id)] as const),
+      );
+      const messageMap = new Map<string, ApiMessage[]>(messageEntries);
 
-  const createProject = () => {
+      const mappedConversations = conversationList.map((conversation) =>
+        mapConversation(conversation, messageMap.get(conversation.id) ?? []),
+      );
+
+      setConversations(mappedConversations);
+      setActiveProjectId((previous) =>
+        previous && mappedProjects.some((project) => project.id === previous) ? previous : null,
+      );
+      setActiveConversationId((previous) =>
+        previous && mappedConversations.some((conversation) => conversation.id === previous) ? previous : "",
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "데이터를 불러오지 못했습니다.";
+      setLoadError(message);
+    } finally {
+      setIsHydrating(false);
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    void hydrateChatData();
+  }, [hydrateChatData]);
+
+  const ensureConversationProjectId = useCallback(async () => {
+    if (activeProjectId) {
+      return activeProjectId;
+    }
+
+    if (projects.length > 0) {
+      return projects[0].id;
+    }
+
+    if (!accessToken) {
+      throw new Error("인증 토큰이 없습니다.");
+    }
+
+    const created = await createProjectRequest(accessToken, { name: "기본 프로젝트" });
+    const mapped = mapProject(created);
+    setProjects((previous) => [mapped, ...previous]);
+    return created.id;
+  }, [accessToken, activeProjectId, projects]);
+
+  const startConversationWith = useCallback(async (philosopher: PhilosopherProfile) => {
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 대화를 시작할 수 없습니다.");
+      return;
+    }
+
+    try {
+      const projectId = await ensureConversationProjectId();
+      const createdConversation = await createConversationRequest(accessToken, projectId, {
+        philosopher: toApiPhilosopherId(philosopher.id),
+        title: `${philosopher.name} 대화`,
+      });
+      const messages = await listMessages(accessToken, createdConversation.id);
+      const mappedConversation = mapConversation(createdConversation, messages);
+
+      setConversations((previous) => [mappedConversation, ...previous]);
+      setActiveConversationId(createdConversation.id);
+      setActiveProjectId(projectId);
+      setDraft("");
+      setIsSelectingPhilosopher(false);
+      router.replace(`/service?conversation=${createdConversation.id}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "대화를 시작하지 못했습니다.";
+      setLoadError(message);
+    }
+  }, [accessToken, ensureConversationProjectId, router]);
+
+  const createProject = async () => {
     const defaultName = `프로젝트 ${projects.length + 1}`;
     const input = window.prompt("새 프로젝트 이름을 입력하세요.", defaultName);
     if (!input) {
@@ -375,14 +505,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       return;
     }
 
-    projectIdRef.current += 1;
-    const projectId = `project-${projectIdRef.current}`;
-    const project: Project = { id: projectId, name: name.slice(0, 30) };
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 프로젝트를 만들 수 없습니다.");
+      return;
+    }
 
-    setProjects((previous) => [project, ...previous]);
-    setActiveProjectId(projectId);
-    setActiveConversationId("");
-    setIsSelectingPhilosopher(false);
+    try {
+      const project = await createProjectRequest(accessToken, { name: name.slice(0, 30) });
+      const mapped = mapProject(project);
+      setProjects((previous) => [mapped, ...previous]);
+      setActiveProjectId(project.id);
+      setActiveConversationId("");
+      setIsSelectingPhilosopher(false);
+      setLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "프로젝트를 생성하지 못했습니다.";
+      setLoadError(message);
+    }
   };
 
   const moveConversationTo = (targetProjectId: string | null) => {
@@ -471,7 +610,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     handledSelectionRef.current = marker;
-    startConversationWith(philosopher);
+    void startConversationWith(philosopher);
   }, [startConversationWith]);
 
   useEffect(() => {
@@ -533,55 +672,42 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     };
   }, [isHeaderProfileCardOpen]);
 
-  const submitMessage = (messageText: string) => {
+  const submitMessage = async (messageText: string) => {
     const trimmed = messageText.trim();
-    if (!trimmed || !activeConversation || !activePhilosopher || isResponding || isSelectingPhilosopher) {
+    if (!trimmed || !activeConversation || isResponding || isSelectingPhilosopher) {
       return;
     }
 
-    messageIdRef.current += 1;
-    const userMessage: Message = {
-      id: `msg-${messageIdRef.current}-u`,
-      role: "user",
-      text: trimmed,
-      timestamp: "방금",
-    };
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 메시지를 전송할 수 없습니다.");
+      return;
+    }
 
-    setConversations((previous) =>
-      previous.map((conversation) =>
-        conversation.id === activeConversation.id
-          ? {
-              ...conversation,
-              title: conversation.messages.length <= 1 ? trimmed.slice(0, 32) : conversation.title,
-              messages: [...conversation.messages, userMessage],
-            }
-          : conversation,
-      ),
-    );
     setDraft("");
     setIsResponding(true);
 
-    window.setTimeout(() => {
-      messageIdRef.current += 1;
-      const assistantMessage: Message = {
-        id: `msg-${messageIdRef.current}-a`,
-        role: "assistant",
-        text: buildAssistantReply(activePhilosopher, trimmed),
-        timestamp: "방금",
-      };
-
+    try {
+      const exchange = await sendMessageRequest(accessToken, activeConversation.id, trimmed);
+      const userMessage = mapMessage(exchange.user_message);
+      const assistantMessage = mapMessage(exchange.assistant_message);
       setConversations((previous) =>
         previous.map((conversation) =>
           conversation.id === activeConversation.id
             ? {
                 ...conversation,
-                messages: [...conversation.messages, assistantMessage],
+                title: conversation.messages.length <= 1 ? trimmed.slice(0, 32) : conversation.title,
+                messages: [...conversation.messages, userMessage, assistantMessage],
               }
             : conversation,
         ),
       );
+      setLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "메시지를 전송하지 못했습니다.";
+      setLoadError(message);
+    } finally {
       setIsResponding(false);
-    }, 500);
+    }
   };
 
   const createConversation = () => {
@@ -651,7 +777,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     event.preventDefault();
-    submitMessage(draft);
+    void submitMessage(draft);
   };
 
   const copyMessage = async (text: string) => {
@@ -821,7 +947,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div className="mt-1 px-2">
                   <button
                     type="button"
-                    onClick={createProject}
+                    onClick={() => void createProject()}
                     className="mb-1.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[#1f2937] transition hover:bg-[#f3f4f6]"
                   >
                     <span className="text-[#374151]">
@@ -873,7 +999,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     const isActive = conversation.id === activeConversation?.id;
                     const philosopher = philosophers.find((item) => item.id === conversation.philosopherId);
                     const philosopherName = philosopher?.name ?? "Unknown";
-                    const projectName = conversation.projectId ? "프로젝트" : "일반";
+                    const projectName = projects.find((project) => project.id === conversation.projectId)?.name ?? "프로젝트";
 
                     return (
                       <button
@@ -1165,6 +1291,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
         <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div className="mx-auto w-full max-w-[920px] px-5 pb-36 pt-8 md:px-8">
+            {isHydrating ? (
+              <div className="mb-4 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 py-3 text-sm text-[#6b7280]">
+                대화 데이터를 불러오는 중입니다...
+              </div>
+            ) : null}
+            {loadError ? (
+              <div className="mb-4 rounded-xl border border-[#fecaca] bg-[#fff1f2] px-4 py-3 text-sm text-[#b91c1c]">
+                {loadError}
+              </div>
+            ) : null}
             {isSelectingPhilosopher ? (
               <>
                 <header className="mb-6">
@@ -1227,7 +1363,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
                         <button
                           type="button"
-                          onClick={() => startConversationWith(philosopher)}
+                          onClick={() => void startConversationWith(philosopher)}
                           className="mt-auto w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
                         >
                           {philosopher.name}와 대화하기
@@ -1407,7 +1543,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => submitMessage(draft)}
+                      onClick={() => void submitMessage(draft)}
                       disabled={!hasDraft || !activeConversation || isResponding || isSelectingPhilosopher}
                       className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ff7f11] to-[#ff6d00] text-white transition hover:from-[#ffc933] hover:to-[#ff7f11] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
                       aria-label={hasDraft ? "send message" : "voice message"}
