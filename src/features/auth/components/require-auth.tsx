@@ -8,7 +8,7 @@ type RequireAuthProps = {
 };
 
 export function RequireAuth({ children }: RequireAuthProps) {
-  const { isLoading, session, authError, signInWithGoogle, signOut } = useAuthSession();
+  const { isLoading, session, authError, signInWithGoogle } = useAuthSession();
 
   if (isLoading) {
     return (
@@ -46,19 +46,5 @@ export function RequireAuth({ children }: RequireAuthProps) {
     );
   }
 
-  return (
-    <>
-      <div className="fixed top-3 right-3 z-40 rounded-full border border-[#e7dbcd] bg-white/95 px-3 py-1.5 text-xs text-[#5f554b] shadow-sm backdrop-blur">
-        <span>{session.user.email ?? "로그인 사용자"}</span>
-        <button
-          type="button"
-          onClick={signOut}
-          className="ml-2 rounded-full border border-[#ddccb8] px-2 py-0.5 text-[11px] transition hover:bg-[#f9f1e8]"
-        >
-          로그아웃
-        </button>
-      </div>
-      {children}
-    </>
-  );
+  return children;
 }
