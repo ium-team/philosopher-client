@@ -1017,9 +1017,20 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         </button>
                       ))}
                       {projectConversations.length === 0 ? (
-                        <p className="rounded-lg px-3 py-6 text-sm text-[#9ca3af]">
-                          이 프로젝트에는 아직 채팅이 없습니다. 상단 우측 `새 채팅`으로 시작하세요.
-                        </p>
+                        <div className="flex flex-col items-center justify-center rounded-2xl px-3 py-12 text-center">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f3f4f6] text-[#4b5563]">
+                            <IconFolder />
+                          </div>
+                          <p className="mt-5 text-[32px] font-semibold tracking-tight text-[#111827]">채팅이 없습니다</p>
+                          <p className="mt-3 text-[22px] text-[#8a919e]">새 채팅을 시작하면 여기에 표시됩니다.</p>
+                          <button
+                            type="button"
+                            onClick={createProjectConversation}
+                            className="mt-8 rounded-xl border border-[#d1d5db] bg-white px-5 py-2.5 text-base font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                          >
+                            새 채팅
+                          </button>
+                        </div>
                       ) : null}
                     </div>
                   </div>
