@@ -905,7 +905,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               •••
             </button>
             {isMoveMenuOpen && (activeConversation || isProjectHome) ? (
-              <div className="absolute right-0 top-11 z-20 w-48 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1 shadow-[0_10px_24px_rgba(17,24,39,0.15)]">
+              <div
+                className={`absolute right-0 top-11 z-20 rounded-2xl border border-[#d1d5db] bg-[#f9fafb] p-1 shadow-[0_10px_24px_rgba(17,24,39,0.15)] ${
+                  isProjectHome ? "w-[148px]" : "w-48"
+                }`}
+              >
                 {isProjectHome ? (
                   <button
                     type="button"
