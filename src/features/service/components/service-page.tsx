@@ -678,15 +678,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     </span>
                     새 프로젝트
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveProjectId(null)}
-                    className={`mb-0.5 w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
-                      activeProjectId === null ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
-                    }`}
-                  >
-                    전체 대화
-                  </button>
                   {projects.map((project) => {
                     const count = conversations.filter((conversation) => conversation.projectId === project.id).length;
                     const isActive = activeProjectId === project.id;
@@ -712,7 +703,15 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               </div>
 
               <div className="mt-3 border-t border-[#e5e7eb] pt-3">
-                <p className="px-6 text-xs text-[#9ca3af]">최근</p>
+                <button
+                  type="button"
+                  onClick={() => setActiveProjectId(null)}
+                  className={`px-6 text-xs transition ${
+                    activeProjectId === null ? "text-[#ff6d00]" : "text-[#9ca3af] hover:text-[#6b7280]"
+                  }`}
+                >
+                  최근
+                </button>
                 <div className="mt-1 px-2">
                   {filteredRecentConversations.map((conversation) => {
                     const isActive = conversation.id === activeConversation?.id;
