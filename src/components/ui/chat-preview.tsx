@@ -29,95 +29,83 @@ const prompts = [
 
 export function ChatPreview() {
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 shadow-[0_30px_120px_rgba(2,6,23,0.6)]">
-      <div className="border-b border-white/10 bg-white/5 px-5 py-4">
-        <div className="flex items-center justify-between gap-4">
+    <section className="flex h-full min-h-[calc(100vh-8rem)] flex-col rounded-b-[1.5rem] border-t border-stone-200 bg-[#fffaf5]">
+      <div className="mx-auto w-full max-w-4xl px-6 py-5 sm:px-8">
+        <div className="flex items-center justify-between gap-4 border-b border-stone-200 pb-5">
           <div>
-            <p className="text-xs tracking-[0.24em] text-slate-500 uppercase">
-              Live Dialogue Preview
+            <p className="text-xs tracking-[0.24em] text-stone-500 uppercase">
+              ChatGPT
             </p>
-            <h3 className="mt-2 text-xl font-semibold text-white">
-              철학자가 된 AI와의 대화
+            <h3 className="mt-2 text-xl font-semibold text-stone-900">
+              Nietzsche
             </h3>
           </div>
-          <div className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-300">
-            Memory + Persona Active
-          </div>
+          <div className="text-xs text-stone-500">GPT-5.4 Persona</div>
         </div>
       </div>
 
-      <div className="grid gap-0 lg:grid-cols-[1.3fr_0.8fr]">
-        <div className="space-y-4 px-5 py-5">
-          {messages.map((message, index) => (
-            <div
-              key={`${message.role}-${index}`}
-              className={message.role === "user" ? userBubble : aiBubble}
-            >
-              <p className="mb-2 text-[11px] tracking-[0.24em] text-slate-500 uppercase">
-                {message.speaker}
-              </p>
-              <p className="text-sm leading-7 text-slate-100">{message.text}</p>
-            </div>
-          ))}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-6 pb-8 sm:px-8">
+          <div className="flex-1 space-y-12 py-8">
+            {messages.map((message, index) => (
+              <div
+                key={`${message.role}-${index}`}
+                className={message.role === "user" ? userBubble : aiBubble}
+              >
+                <p className="mb-3 text-[11px] tracking-[0.24em] text-stone-500 uppercase">
+                  {message.speaker}
+                </p>
+                <p className="text-[16px] leading-8 text-stone-800">
+                  {message.text}
+                </p>
+              </div>
+            ))}
 
-          <div className="rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 px-4 py-4">
-            <p className="text-[11px] tracking-[0.24em] text-cyan-200 uppercase">
-              Suggested Follow-up
-            </p>
-            <p className="mt-2 text-sm leading-7 text-cyan-50">
-              내 기준으로 산다는 건 어떤 선택부터 시작해야 한다고 보나?
-            </p>
-          </div>
-        </div>
-
-        <aside className="border-t border-white/10 bg-black/20 px-5 py-5 lg:border-t-0 lg:border-l">
-          <div className="space-y-6">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-              <p className="text-xs tracking-[0.2em] text-slate-500 uppercase">
-                Persona Engine
+            <div className="space-y-3 border-t border-stone-200 pt-8">
+              <p className="text-[11px] tracking-[0.24em] text-stone-500 uppercase">
+                추천 질문
               </p>
-              <ul className="mt-4 space-y-3 text-sm text-slate-300">
-                <li>철학자별 문체와 논리 구조 유지</li>
-                <li>대표 저작과 개념 축 기반 답변</li>
-                <li>세션별 사용자 질문 맥락 보존</li>
-              </ul>
-            </div>
-
-            <div>
-              <p className="text-xs tracking-[0.2em] text-slate-500 uppercase">
-                질문 추천
-              </p>
-              <div className="mt-3 space-y-2">
-                {prompts.map((prompt) => (
+              <div className="flex flex-col gap-3">
+                {prompts.slice(0, 2).map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm leading-6 text-slate-200 transition hover:bg-white/10"
+                    className="text-left text-[15px] leading-8 text-stone-700 transition hover:text-stone-900"
                   >
                     {prompt}
                   </button>
                 ))}
               </div>
             </div>
+          </div>
 
-            <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/0 p-4">
-              <p className="text-xs tracking-[0.2em] text-slate-500 uppercase">
-                Session Goal
-              </p>
-              <p className="mt-2 text-sm leading-6 text-slate-200">
-                단순 챗봇이 아니라, 각 철학자의 세계관으로 현재의 문제를
-                해석하도록 돕는 대화 경험.
-              </p>
+          <div className="sticky bottom-0 border-t border-stone-200 bg-[linear-gradient(to_top,#fffaf5_75%,rgba(255,250,245,0))] pb-2 pt-8">
+            <div className="mx-auto w-full max-w-4xl">
+              <div className="rounded-[1.75rem] border border-stone-300 bg-white px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
+                <div className="min-h-16 text-sm leading-7 text-stone-400">
+                  철학자에게 질문해보세요
+                </div>
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <div className="flex gap-4 text-xs text-stone-500">
+                    <span>Deep mode</span>
+                    <span>Memory on</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700"
+                  >
+                    보내기
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </aside>
+        </div>
       </div>
     </section>
   );
 }
 
-const userBubble =
-  "ml-auto max-w-xl rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-4";
+const userBubble = "ml-auto max-w-2xl";
 
-const aiBubble =
-  "mr-auto max-w-xl rounded-[1.5rem] border border-cyan-400/20 bg-cyan-400/8 px-4 py-4";
+const aiBubble = "mr-auto max-w-2xl";

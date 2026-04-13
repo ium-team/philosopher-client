@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #071019;
-  --foreground: #e7eef7;
-  --surface: rgba(15, 23, 42, 0.72);
-  --surface-strong: rgba(9, 16, 28, 0.94);
-  --border: rgba(148, 163, 184, 0.16);
-  --accent: #8cf0ff;
+  --background: #fffaf5;
+  --foreground: #2f190d;
+  --surface: rgba(255, 247, 237, 0.86);
+  --surface-strong: rgba(255, 237, 213, 0.88);
+  --border: rgba(251, 146, 60, 0.18);
+  --accent: #f97316;
 }
 
 @theme inline {
@@ -35,21 +35,21 @@ body {
   font-family: var(--font-sans), sans-serif;
   background-image:
     radial-gradient(
-      circle at 15% 10%,
-      rgba(103, 232, 249, 0.18),
+      circle at 12% 10%,
+      rgba(251, 146, 60, 0.16),
       transparent 24%
     ),
     radial-gradient(
-      circle at 85% 12%,
-      rgba(217, 70, 239, 0.14),
+      circle at 88% 12%,
+      rgba(245, 158, 11, 0.12),
       transparent 20%
     ),
     radial-gradient(
       circle at 50% 55%,
-      rgba(71, 85, 105, 0.12),
+      rgba(234, 88, 12, 0.08),
       transparent 28%
     ),
-    linear-gradient(180deg, #071019 0%, #0d1628 50%, #020617 100%);
+    linear-gradient(180deg, #fffaf5 0%, #fff7ed 55%, #fffbf7 100%);
 }
 
 a {
@@ -62,6 +62,6 @@ button {
 }
 
 ::selection {
-  background: rgba(103, 232, 249, 0.24);
-  color: white;
+  background: rgba(249, 115, 22, 0.22);
+  color: #2f190d;
 }

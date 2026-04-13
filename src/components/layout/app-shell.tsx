@@ -4,32 +4,38 @@ type AppShellProps = {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <main className="relative mx-auto flex min-h-screen w-full max-w-[92rem] flex-col gap-16 px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+    <main className="relative flex min-h-screen w-full flex-col bg-[#fffaf5] px-3 py-3 sm:px-4 sm:py-4">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] bg-[radial-gradient(circle_at_top,rgba(103,232,249,0.14),transparent_58%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-56 bg-[radial-gradient(circle_at_top,rgba(251,146,60,0.10),transparent_60%)]"
       />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-40 -z-10 h-80 w-80 rounded-full bg-fuchsia-500/10 blur-3xl"
-      />
-
-      <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm tracking-[0.28em] text-slate-500 uppercase">
-            Conversational Philosophy
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            철학자를 살아 있는 인터페이스로 만드는 서비스
-          </h2>
+      <header className="flex items-center justify-between border-b border-stone-200 px-2 pb-3">
+        <div className="flex items-center gap-4">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-sm font-semibold text-white">
+            Φ
+          </div>
+          <div>
+            <p className="text-[11px] tracking-[0.24em] text-stone-500 uppercase">
+              Philosopher
+            </p>
+            <h1 className="mt-1 text-base font-semibold tracking-tight text-stone-900">
+              AI 철학자 대화실
+            </h1>
+          </div>
         </div>
-        <div className="max-w-md rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-slate-300 backdrop-blur">
-          철학자별 페르소나, 대표 저작 기반 추론, 현대적 대화 UX를 한 화면에서
-          보여주는 프로덕트 시작안
+
+        <div className="flex items-center gap-4 text-xs text-stone-500">
+          <span className="hidden sm:inline">공유하기</span>
+          <button
+            type="button"
+            className="rounded-full border border-stone-300 px-3 py-1.5 font-medium text-stone-700 transition hover:bg-white"
+          >
+            새 대화
+          </button>
         </div>
       </header>
 
-      <div className="flex flex-col gap-10">{children}</div>
+      <div className="flex flex-1 pt-3">{children}</div>
     </main>
   );
 }
