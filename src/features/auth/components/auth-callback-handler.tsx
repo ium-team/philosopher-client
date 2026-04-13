@@ -19,25 +19,37 @@ export function AuthCallbackHandler() {
       return;
     }
 
-    if (!code) {
-      router.replace("/service");
-      return;
-    }
-
     const supabase = getSupabaseClient();
 
-    supabase.auth
-      .exchangeCodeForSession(code)
-      .then(({ error: exchangeError }) => {
-        if (exchangeError) {
-          setExchangeErrorMessage(exchangeError.message);
+    const handleCallback = async () => {
+      if (!code) {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          setExchangeErrorMessage(error.message);
           return;
         }
-        router.replace("/service");
-      })
-      .catch((exchangeError: unknown) => {
-        setExchangeErrorMessage(exchangeError instanceof Error ? exchangeError.message : "알 수 없는 인증 오류");
-      });
+
+        if (data.session) {
+          router.replace("/service");
+          return;
+        }
+
+        setExchangeErrorMessage("인증 코드를 찾을 수 없습니다. Supabase OAuth Redirect URL 설정을 확인해 주세요.");
+        return;
+      }
+
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      if (exchangeError) {
+        setExchangeErrorMessage(exchangeError.message);
+        return;
+      }
+
+      router.replace("/service");
+    };
+
+    void handleCallback().catch((exchangeError: unknown) => {
+      setExchangeErrorMessage(exchangeError instanceof Error ? exchangeError.message : "알 수 없는 인증 오류");
+    });
   }, [code, configError, oauthError, router]);
 
   return (
