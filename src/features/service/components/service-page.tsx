@@ -977,11 +977,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
             {!isSelectingPhilosopher && !activeConversation ? (
               activeProject ? (
-                <div className="py-3">
-                  <div className="mt-2">
-                    <div className="mb-6 flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-2 text-[34px] font-semibold tracking-tight text-[#111827]">
-                        <span className="text-[#374151]">
+                <div className="py-4">
+                  <div className="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+                    <div className="mb-5 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#111827]">
+                        <span className="text-[#4b5563]">
                           <IconFolder />
                         </span>
                         {activeProject.name}
@@ -989,44 +989,42 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <button
                         type="button"
                         onClick={createProjectConversation}
-                        className="rounded-lg border border-[#ffb74d] bg-[#fff3e0] px-3 py-1.5 text-sm font-medium text-[#ff6d00] transition hover:bg-[#ffe0b2]"
+                        className="rounded-lg border border-[#d1d5db] bg-white px-3 py-1.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
                       >
                         새 채팅
                       </button>
                     </div>
-                    <div className="mb-4 flex items-center px-1">
-                      <span className="inline-flex rounded-full bg-[#f3f4f6] px-4 py-1 text-sm font-semibold text-[#1f2937]">채팅</span>
-                    </div>
-                    <div className="space-y-1">
+                    <div className="mb-3 text-sm font-medium text-[#6b7280]">채팅</div>
+                    <div className="space-y-2">
                       {projectConversations.map((conversation) => (
                         <button
                           key={conversation.id}
                           type="button"
                           onClick={() => setActiveConversationId(conversation.id)}
-                          className="flex w-full items-start justify-between gap-4 rounded-lg px-3 py-2 text-left transition hover:bg-[#f7f7f7]"
+                          className="flex w-full items-start justify-between gap-4 rounded-xl border border-[#e5e7eb] bg-white px-4 py-3 text-left transition hover:border-[#d1d5db] hover:bg-[#fafafa]"
                         >
                           <div className="min-w-0">
-                            <p className="truncate text-lg font-semibold text-[#1f2937]">{conversation.title}</p>
+                            <p className="truncate text-base font-semibold text-[#1f2937]">{conversation.title}</p>
                             <p className="mt-1 truncate text-sm text-[#6b7280]">
                               {conversation.messages[conversation.messages.length - 1]?.text ?? "대화를 시작해보세요."}
                             </p>
                           </div>
-                          <span className="shrink-0 pt-1 text-sm text-[#9ca3af]">
+                          <span className="shrink-0 pt-0.5 text-xs text-[#9ca3af]">
                             {conversation.messages[conversation.messages.length - 1]?.timestamp ?? "방금"}
                           </span>
                         </button>
                       ))}
                       {projectConversations.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center rounded-2xl px-3 py-12 text-center">
-                          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f3f4f6] text-[#4b5563]">
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#d1d5db] px-4 py-14 text-center">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#f3f4f6] text-[#6b7280]">
                             <IconFolder />
                           </div>
-                          <p className="mt-5 text-[32px] font-semibold tracking-tight text-[#111827]">채팅이 없습니다</p>
-                          <p className="mt-3 text-[22px] text-[#8a919e]">새 채팅을 시작하면 여기에 표시됩니다.</p>
+                          <p className="mt-4 text-xl font-semibold text-[#111827]">채팅이 없습니다</p>
+                          <p className="mt-2 text-sm text-[#8a919e]">새 채팅을 시작하면 여기에 표시됩니다.</p>
                           <button
                             type="button"
                             onClick={createProjectConversation}
-                            className="mt-8 rounded-xl border border-[#d1d5db] bg-white px-5 py-2.5 text-base font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                            className="mt-6 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
                           >
                             새 채팅
                           </button>
