@@ -753,8 +753,30 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       return;
     }
 
+    const optimisticMessageId = `optimistic-user-${Date.now()}`;
+    const optimisticUserMessage: Message = {
+      id: optimisticMessageId,
+      role: "user",
+      text: trimmed,
+      timestamp: "방금",
+    };
+
     setDraft("");
     setIsResponding(true);
+    setConversations((previous) =>
+      previous.map((conversation) =>
+        conversation.id === activeConversation.id
+          ? {
+              ...conversation,
+              title:
+                conversation.messages.length === 0
+                  ? deriveInitialConversationTitle(trimmed)
+                  : conversation.title,
+              messages: [...conversation.messages, optimisticUserMessage],
+            }
+          : conversation,
+      ),
+    );
 
     try {
       const exchange = await sendMessageRequest(accessToken, activeConversation.id, trimmed);
@@ -766,16 +788,31 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             ? {
                 ...conversation,
                 title:
-                  conversation.messages.length === 0
+                  conversation.messages.filter((message) => message.id !== optimisticMessageId).length === 0
                     ? deriveInitialConversationTitle(trimmed)
                     : conversation.title,
-                messages: [...conversation.messages, userMessage, assistantMessage],
+                messages: [
+                  ...conversation.messages.filter((message) => message.id !== optimisticMessageId),
+                  userMessage,
+                  assistantMessage,
+                ],
               }
             : conversation,
         ),
       );
       setLoadError(null);
     } catch (error) {
+      setConversations((previous) =>
+        previous.map((conversation) =>
+          conversation.id === activeConversation.id
+            ? {
+                ...conversation,
+                messages: conversation.messages.filter((message) => message.id !== optimisticMessageId),
+              }
+            : conversation,
+        ),
+      );
+      setDraft(trimmed);
       const message = error instanceof Error ? error.message : "메시지를 전송하지 못했습니다.";
       setLoadError(message);
     } finally {
