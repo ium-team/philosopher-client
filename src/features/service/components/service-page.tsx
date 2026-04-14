@@ -1066,9 +1066,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     const query = new URLSearchParams({
-      conversation: activeConversation.id,
       philosopher: activeConversation.philosopherId,
+      new: "1",
     });
+    if (activeConversation.projectId) {
+      query.set("project", activeConversation.projectId);
+    }
     router.push(`/service/voice?${query.toString()}`);
   }, [activeConversation, isResponding, isSelectingPhilosopher, router]);
 
