@@ -510,6 +510,19 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
   }, [accessToken, activeProjectId, router]);
 
+  const startVoiceConversationWith = useCallback((philosopher: PhilosopherProfile) => {
+    const query = new URLSearchParams({
+      philosopher: philosopher.id,
+      new: "1",
+    });
+
+    if (activeProjectId) {
+      query.set("project", activeProjectId);
+    }
+
+    router.push(`/service/voice?${query.toString()}`);
+  }, [activeProjectId, router]);
+
   const createProject = async () => {
     const defaultName = `프로젝트 ${projects.length + 1}`;
     const input = window.prompt("새 프로젝트 이름을 입력하세요.", defaultName);
@@ -1529,13 +1542,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         </div>
                       </div>
                       <div className="p-5">
-                        <button
-                          type="button"
-                          onClick={() => void startConversationWith(philosopher)}
-                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
-                        >
-                          {philosopher.name}와 대화하기
-                        </button>
+                        <div className="grid grid-cols-1 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void startConversationWith(philosopher)}
+                            className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
+                          >
+                            {philosopher.name}와 채팅 시작
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => startVoiceConversationWith(philosopher)}
+                            className="w-full rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-semibold text-[#4b5563] transition hover:border-[#ffb74d] hover:bg-[#fff7ed] hover:text-[#c2410c]"
+                          >
+                            {philosopher.name}와 음성 시작
+                          </button>
+                        </div>
                       </div>
                     </article>
                   ))}

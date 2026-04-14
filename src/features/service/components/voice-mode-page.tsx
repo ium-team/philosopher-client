@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { philosophers } from "@/data/philosophers";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
 import {
+  createConversation as createConversationRequest,
+  createDefaultConversation as createDefaultConversationRequest,
   sendMessage as sendMessageRequest,
   synthesizeSpeech as synthesizeSpeechRequest,
   type ApiPhilosopher,
@@ -14,6 +16,8 @@ import {
 type VoiceModePageProps = {
   conversationId: string | null;
   philosopherId: string | null;
+  projectId: string | null;
+  shouldCreateConversation: boolean;
 };
 
 type VoiceStatus = "idle" | "listening" | "thinking" | "speaking" | "error";
@@ -63,10 +67,17 @@ function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-export function VoiceModePage({ conversationId, philosopherId }: VoiceModePageProps) {
+export function VoiceModePage({
+  conversationId,
+  philosopherId,
+  projectId,
+  shouldCreateConversation,
+}: VoiceModePageProps) {
   const router = useRouter();
   const { session } = useAuthSession();
   const accessToken = session?.access_token ?? "";
+  const [resolvedConversationId, setResolvedConversationId] = useState<string | null>(conversationId);
+  const [isBootstrappingConversation, setIsBootstrappingConversation] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
   const [liveTranscript, setLiveTranscript] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -77,8 +88,14 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const isProcessingRef = useRef(false);
   const isManualListeningRef = useRef(false);
   const shouldSubmitOnEndRef = useRef(false);
+  const didBootstrapRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    setResolvedConversationId(conversationId);
+    didBootstrapRef.current = false;
+  }, [conversationId]);
 
   const stopAudioPlayback = useCallback(() => {
     if (audioRef.current) {
@@ -93,11 +110,11 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   }, []);
 
   const serviceHref = useMemo(() => {
-    if (!conversationId) {
+    if (!resolvedConversationId) {
       return "/service";
     }
-    return `/service?conversation=${encodeURIComponent(conversationId)}`;
-  }, [conversationId]);
+    return `/service?conversation=${encodeURIComponent(resolvedConversationId)}`;
+  }, [resolvedConversationId]);
 
   const closeVoiceMode = () => {
     isClosingRef.current = true;
@@ -110,7 +127,46 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     () => philosophers.find((philosopher) => philosopher.id === philosopherId) ?? null,
     [philosopherId],
   );
-  const hasVoiceSession = Boolean(conversationId && accessToken);
+  const hasVoiceSession = Boolean(resolvedConversationId && accessToken);
+
+  useEffect(() => {
+    if (!shouldCreateConversation || !accessToken || didBootstrapRef.current) {
+      return;
+    }
+
+    didBootstrapRef.current = true;
+    setIsBootstrappingConversation(true);
+    setErrorMessage(null);
+
+    const createConversationPromise = projectId
+      ? createConversationRequest(accessToken, projectId, {
+          philosopher: toApiPhilosopherId(philosopherId),
+        })
+      : createDefaultConversationRequest(accessToken, {
+          philosopher: toApiPhilosopherId(philosopherId),
+        });
+
+    void createConversationPromise
+      .then((createdConversation) => {
+        setResolvedConversationId(createdConversation.id);
+        const nextQuery = new URLSearchParams({
+          conversation: createdConversation.id,
+          philosopher: philosopherId ?? "socrates",
+        });
+        if (projectId) {
+          nextQuery.set("project", projectId);
+        }
+        router.replace(`/service/voice?${nextQuery.toString()}`);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : "새 음성 대화를 시작하지 못했습니다.";
+        setVoiceStatus("error");
+        setErrorMessage(message);
+      })
+      .finally(() => {
+        setIsBootstrappingConversation(false);
+      });
+  }, [accessToken, philosopherId, projectId, router, shouldCreateConversation]);
 
   const speechRecognitionConstructor = useMemo(() => {
     if (typeof window === "undefined") {
@@ -166,7 +222,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   }, [accessToken, philosopherId, stopAudioPlayback]);
 
   const sendUserSpeech = useCallback(async () => {
-    if (!hasVoiceSession || !conversationId) {
+    if (!hasVoiceSession || !resolvedConversationId) {
       return;
     }
 
@@ -182,7 +238,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     setErrorMessage(null);
 
     try {
-      const exchange = await sendMessageRequest(accessToken, conversationId, spokenText);
+      const exchange = await sendMessageRequest(accessToken, resolvedConversationId, spokenText);
       const assistantText = exchange.assistant_message.content.trim();
       if (!assistantText) {
         throw new Error("응답이 비어 있습니다.");
@@ -199,7 +255,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     } finally {
       isProcessingRef.current = false;
     }
-  }, [accessToken, conversationId, getSpokenText, hasVoiceSession, speakAssistantText]);
+  }, [accessToken, getSpokenText, hasVoiceSession, resolvedConversationId, speakAssistantText]);
 
   const startListening = useCallback(() => {
     if (isClosingRef.current || !hasVoiceSession) {
@@ -333,7 +389,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           ? "읽는 중..."
           : voiceStatus === "error"
             ? errorMessage ?? "음성 모드에 문제가 있습니다."
-            : hasVoiceSession
+            : isBootstrappingConversation
+              ? "새 대화를 준비 중입니다..."
+              : hasVoiceSession
               ? "화면 탭 또는 스페이스바를 눌러 듣기를 시작하세요."
               : "대화를 먼저 시작한 뒤 음성 모드를 사용하세요.";
 
