@@ -5,7 +5,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { philosophers } from "@/data/philosophers";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
-import { sendMessage as sendMessageRequest } from "@/features/service/api/chat-api";
+import {
+  sendMessage as sendMessageRequest,
+  synthesizeSpeech as synthesizeSpeechRequest,
+  type ApiPhilosopher,
+} from "@/features/service/api/chat-api";
 
 type VoiceModePageProps = {
   conversationId: string | null;
@@ -40,45 +44,16 @@ type SpeechRecognitionLike = {
 };
 
 type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
-type VoiceProfile = {
-  rate: number;
-  pitch: number;
-  volume: number;
-  langHints: string[];
-  voiceNameHints: string[];
-};
 
-const DEFAULT_VOICE_PROFILE: VoiceProfile = {
-  rate: 1.0,
-  pitch: 1,
-  volume: 1,
-  langHints: ["ko", "en"],
-  voiceNameHints: [],
-};
-
-const VOICE_PROFILE_BY_PHILOSOPHER: Record<string, VoiceProfile> = {
-  socrates: {
-    rate: 0.92,
-    pitch: 0.98,
-    volume: 0.96,
-    langHints: ["ko", "en"],
-    voiceNameHints: ["male", "google", "microsoft", "daniel", "matthew"],
-  },
-  nietzsche: {
-    rate: 1.06,
-    pitch: 0.84,
-    volume: 1,
-    langHints: ["ko", "de", "en"],
-    voiceNameHints: ["male", "google", "microsoft", "thomas", "markus", "heami"],
-  },
-  arendt: {
-    rate: 0.95,
-    pitch: 1.12,
-    volume: 0.98,
-    langHints: ["ko", "de", "en"],
-    voiceNameHints: ["female", "google", "microsoft", "anna", "victoria", "zira"],
-  },
-};
+function toApiPhilosopherId(philosopherId: string | null): ApiPhilosopher {
+  if (philosopherId === "arendt") {
+    return "hannah_arendt";
+  }
+  if (philosopherId === "socrates" || philosopherId === "nietzsche") {
+    return philosopherId;
+  }
+  return "socrates";
+}
 
 function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   return (
@@ -102,6 +77,20 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const isProcessingRef = useRef(false);
   const isManualListeningRef = useRef(false);
   const shouldSubmitOnEndRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+
+  const stopAudioPlayback = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+  }, []);
 
   const serviceHref = useMemo(() => {
     if (!conversationId) {
@@ -113,7 +102,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const closeVoiceMode = () => {
     isClosingRef.current = true;
     recognitionRef.current?.stop();
-    window.speechSynthesis.cancel();
+    stopAudioPlayback();
     router.replace(serviceHref);
   };
 
@@ -121,12 +110,6 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     () => philosophers.find((philosopher) => philosopher.id === philosopherId) ?? null,
     [philosopherId],
   );
-  const activeVoiceProfile = useMemo<VoiceProfile>(() => {
-    if (!philosopherId) {
-      return DEFAULT_VOICE_PROFILE;
-    }
-    return VOICE_PROFILE_BY_PHILOSOPHER[philosopherId] ?? DEFAULT_VOICE_PROFILE;
-  }, [philosopherId]);
   const hasVoiceSession = Boolean(conversationId && accessToken);
 
   const speechRecognitionConstructor = useMemo(() => {
@@ -155,40 +138,32 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     return `${finalTranscriptRef.current} ${interimTranscriptRef.current}`.trim();
   }, []);
 
-  const speakAssistantText = useCallback((text: string) => {
-    return new Promise<void>((resolve, reject) => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
-      const hintLangs = activeVoiceProfile.langHints.map((hint) => hint.toLowerCase());
-      const hintNames = activeVoiceProfile.voiceNameHints.map((hint) => hint.toLowerCase());
-      const voiceByNameAndLang = voices.find((voice) => {
-        const voiceName = voice.name.toLowerCase();
-        const voiceLang = voice.lang.toLowerCase();
-        return hintNames.some((hint) => voiceName.includes(hint)) && hintLangs.some((hint) => voiceLang.startsWith(hint));
-      });
-      const voiceByLang = voices.find((voice) =>
-        hintLangs.some((hint) => voice.lang.toLowerCase().startsWith(hint)),
-      );
-      const fallbackKoreanVoice = voices.find((voice) => voice.lang.toLowerCase().startsWith("ko"));
-      const selectedVoice = voiceByNameAndLang ?? voiceByLang ?? fallbackKoreanVoice ?? null;
-
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-        utterance.lang = selectedVoice.lang;
-      } else {
-        utterance.lang = "ko-KR";
-      }
-
-      utterance.rate = activeVoiceProfile.rate;
-      utterance.pitch = activeVoiceProfile.pitch;
-      utterance.volume = activeVoiceProfile.volume;
-      utterance.onend = () => resolve();
-      utterance.onerror = () => reject(new Error("TTS playback failed"));
-
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
+  const speakAssistantText = useCallback(async (text: string) => {
+    const ttsBlob = await synthesizeSpeechRequest(accessToken, {
+      philosopher_id: toApiPhilosopherId(philosopherId),
+      text,
     });
-  }, [activeVoiceProfile]);
+    const audioUrl = URL.createObjectURL(ttsBlob);
+    stopAudioPlayback();
+    audioUrlRef.current = audioUrl;
+
+    return new Promise<void>((resolve, reject) => {
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.onended = () => {
+        stopAudioPlayback();
+        resolve();
+      };
+      audio.onerror = () => {
+        stopAudioPlayback();
+        reject(new Error("TTS playback failed"));
+      };
+      void audio.play().catch(() => {
+        stopAudioPlayback();
+        reject(new Error("TTS playback failed"));
+      });
+    });
+  }, [accessToken, philosopherId, stopAudioPlayback]);
 
   const sendUserSpeech = useCallback(async () => {
     if (!hasVoiceSession || !conversationId) {
@@ -345,9 +320,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     return () => {
       isClosingRef.current = true;
       recognitionRef.current?.stop();
-      window.speechSynthesis.cancel();
+      stopAudioPlayback();
     };
-  }, []);
+  }, [stopAudioPlayback]);
 
   const statusText =
     voiceStatus === "listening"
