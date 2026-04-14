@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { philosophers } from "@/data/philosophers";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
 import {
+  createConversation as createConversationRequest,
   createDefaultConversation as createDefaultConversationRequest,
   sendMessage as sendMessageRequest,
   synthesizeSpeech as synthesizeSpeechRequest,
@@ -15,6 +16,7 @@ import {
 type VoiceModePageProps = {
   conversationId: string | null;
   philosopherId: string | null;
+  projectId: string | null;
   shouldCreateConversation: boolean;
 };
 
@@ -65,7 +67,12 @@ function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-export function VoiceModePage({ conversationId, philosopherId, shouldCreateConversation }: VoiceModePageProps) {
+export function VoiceModePage({
+  conversationId,
+  philosopherId,
+  projectId,
+  shouldCreateConversation,
+}: VoiceModePageProps) {
   const router = useRouter();
   const { session } = useAuthSession();
   const accessToken = session?.access_token ?? "";
@@ -131,15 +138,24 @@ export function VoiceModePage({ conversationId, philosopherId, shouldCreateConve
     setIsBootstrappingConversation(true);
     setErrorMessage(null);
 
-    void createDefaultConversationRequest(accessToken, {
-      philosopher: toApiPhilosopherId(philosopherId),
-    })
+    const createConversationPromise = projectId
+      ? createConversationRequest(accessToken, projectId, {
+          philosopher: toApiPhilosopherId(philosopherId),
+        })
+      : createDefaultConversationRequest(accessToken, {
+          philosopher: toApiPhilosopherId(philosopherId),
+        });
+
+    void createConversationPromise
       .then((createdConversation) => {
         setResolvedConversationId(createdConversation.id);
         const nextQuery = new URLSearchParams({
           conversation: createdConversation.id,
           philosopher: philosopherId ?? "socrates",
         });
+        if (projectId) {
+          nextQuery.set("project", projectId);
+        }
         router.replace(`/service/voice?${nextQuery.toString()}`);
       })
       .catch((error: unknown) => {
@@ -150,7 +166,7 @@ export function VoiceModePage({ conversationId, philosopherId, shouldCreateConve
       .finally(() => {
         setIsBootstrappingConversation(false);
       });
-  }, [accessToken, philosopherId, router, shouldCreateConversation]);
+  }, [accessToken, philosopherId, projectId, router, shouldCreateConversation]);
 
   const speechRecognitionConstructor = useMemo(() => {
     if (typeof window === "undefined") {
