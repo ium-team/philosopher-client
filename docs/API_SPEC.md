@@ -70,21 +70,9 @@
 현재 사용자 프로젝트 목록을 반환합니다.
 
 - 기본 프로젝트(`is_default=true`)는 내부 개념으로만 사용되며 목록에 노출되지 않습니다.
-- 목록 정렬: `is_pinned` 내림차순, `updated_at` 내림차순, `created_at` 내림차순
+- 목록 정렬: `updated_at` 내림차순, `created_at` 내림차순
 
-### 3.6 `PATCH /api/v1/chat/projects/{project_id}/pin`
-
-프로젝트 고정 여부를 수정합니다.
-
-요청:
-
-```json
-{
-  "is_pinned": true
-}
-```
-
-### 3.7 `PATCH /api/v1/chat/projects/{project_id}/settings`
+### 3.6 `PATCH /api/v1/chat/projects/{project_id}/settings`
 
 프로젝트 설정을 수정합니다.
 
@@ -97,7 +85,7 @@
 }
 ```
 
-### 3.8 `POST /api/v1/chat/conversations`
+### 3.7 `POST /api/v1/chat/conversations`
 
 일반 채팅용 대화를 생성합니다.
 
@@ -112,7 +100,7 @@
 }
 ```
 
-### 3.9 `POST /api/v1/chat/projects/{project_id}/conversations`
+### 3.8 `POST /api/v1/chat/projects/{project_id}/conversations`
 
 특정 프로젝트에 철학자 대화를 생성합니다.
 
@@ -127,11 +115,11 @@
 
 - `philosopher` 허용값: `socrates`, `nietzsche`, `hannah_arendt`
 
-### 3.10 `GET /api/v1/chat/projects/{project_id}/conversations`
+### 3.9 `GET /api/v1/chat/projects/{project_id}/conversations`
 
 프로젝트 단위 대화 목록을 조회합니다.
 
-### 3.11 `PATCH /api/v1/chat/conversations/{conversation_id}/project`
+### 3.10 `PATCH /api/v1/chat/conversations/{conversation_id}/project`
 
 대화의 소속 프로젝트를 변경합니다(프로젝트 이동).
 - `project_id`가 `null`이면 사용자 기본 프로젝트(숨김)로 이동합니다.
@@ -144,7 +132,7 @@
 }
 ```
 
-### 3.12 `POST /api/v1/chat/conversations/{conversation_id}/messages`
+### 3.11 `POST /api/v1/chat/conversations/{conversation_id}/messages`
 
 사용자 메시지를 저장하고, 선택된 철학자 페르소나로 AI 응답을 생성해 함께 저장합니다.
 
@@ -181,9 +169,34 @@
 - `503`: `OPENAI_API_KEY` 누락 (`OPENAI_API_KEY is not configured`)
 - `502`: OpenAI 호출 실패/빈 응답
 
-### 3.13 `GET /api/v1/chat/conversations/{conversation_id}/messages`
+### 3.12 `GET /api/v1/chat/conversations/{conversation_id}/messages`
 
 대화 메시지 히스토리를 시간순으로 조회합니다.
+
+### 3.13 `DELETE /api/v1/chat/conversations/{conversation_id}`
+
+대화 1개를 삭제합니다.
+
+- 본인 소유 대화만 삭제할 수 있습니다.
+- 삭제 성공 시 `204 No Content`를 반환합니다.
+- 대화에 속한 메시지는 함께 삭제됩니다.
+
+주요 오류 응답:
+
+- `404`: 다른 사용자 소유 대화 또는 존재하지 않는 대화 (`Conversation not found`)
+
+### 3.14 `DELETE /api/v1/chat/projects/{project_id}`
+
+프로젝트 1개를 삭제합니다.
+
+- 본인 소유 일반 프로젝트만 삭제할 수 있습니다.
+- 기본 프로젝트(`is_default=true`)는 삭제 대상이 아닙니다.
+- 삭제 성공 시 `204 No Content`를 반환합니다.
+- 프로젝트에 속한 대화와 메시지는 모두 함께 삭제됩니다.
+
+주요 오류 응답:
+
+- `404`: 다른 사용자 소유 프로젝트 또는 존재하지 않는 프로젝트 (`Project not found`)
 
 ## 4. 환경 변수
 
@@ -217,6 +230,7 @@
 - `2026-04-13`: 헬스체크/인증 API 추가
 - `2026-04-13`: 프로젝트/철학자 대화/메시지 저장 API 추가
 - `2026-04-13`: OpenAI 모델 `gpt-4o-mini` 고정 정책 반영
-- `2026-04-14`: 프로젝트 고정/이동/설정 수정 API 추가
+- `2026-04-14`: 프로젝트 이동/설정 수정 API 추가
 - `2026-04-14`: 일반 채팅용 기본 프로젝트(숨김) 개념 도입
 - `2026-04-14`: 프로젝트 지침(`instruction`) AI 반영
+- `2026-04-14`: 프로젝트 삭제/대화 삭제 API 추가
