@@ -917,6 +917,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     const query = new URLSearchParams({
       conversation: activeConversation.id,
+      philosopher: activeConversation.philosopherId,
     });
     router.push(`/service/voice?${query.toString()}`);
   }, [activeConversation, isResponding, isSelectingPhilosopher, router]);
