@@ -390,14 +390,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     return philosophers.find((philosopher) => philosopher.id === activeConversation.philosopherId) ?? null;
   }, [activeConversation]);
-  const initialConversationGuide = useMemo(() => {
-    if (!activePhilosopher) {
-      return "철학자에게 질문을 던져 대화를 시작해보세요.";
-    }
-
-    const sampleQuestion = activePhilosopher.promptSamples[0] ?? "요즘의 고민";
-    return `${activePhilosopher.name}에게 "${sampleQuestion}"를 물어보세요. ${activePhilosopher.name}는 ${activePhilosopher.summary}`;
-  }, [activePhilosopher]);
+  const initialGuideQuestion = activePhilosopher?.promptSamples[0] ?? "요즘의 고민은 무엇인가요?";
+  const initialGuideTitle = activePhilosopher
+    ? `${activePhilosopher.name}와 대화를 시작해보세요`
+    : "철학자와 대화를 시작해보세요";
+  const initialGuideSummary = activePhilosopher?.summary ?? "질문을 던지면 생각의 결을 따라 깊이 있게 답변합니다.";
   const cautionSubject = activePhilosopher?.name ?? "AI";
 
   const filteredRecentConversations = useMemo(() => {
@@ -1572,8 +1569,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             {!isSelectingPhilosopher
               ? activeConversation && activeConversation.messages.length === 0
                 ? (
-                  <div className="mb-8 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] px-5 py-4 text-[#4b5563]">
-                    <p className="text-sm leading-7">{initialConversationGuide}</p>
+                  <div className="mb-8 rounded-3xl border border-[#fde7cf] bg-gradient-to-br from-[#fffaf2] via-[#fff6e9] to-[#fff3df] p-6 shadow-[0_10px_28px_rgba(255,109,0,0.08)]">
+                    <p className="text-xs font-semibold tracking-[0.16em] text-[#d97706] uppercase">Conversation Guide</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-[#9a3412]">{initialGuideTitle}</p>
+                    <div className="mt-4 inline-flex max-w-full items-center rounded-full border border-[#fdba74] bg-white px-4 py-2 text-sm text-[#7c2d12]">
+                      <span className="mr-2 shrink-0 text-[#ea580c]">질문 예시</span>
+                      <span className="truncate">"{initialGuideQuestion}"</span>
+                    </div>
+                    <p className="mt-4 text-sm leading-7 text-[#7c4a2b]">{initialGuideSummary}</p>
                   </div>
                 )
                 : null
