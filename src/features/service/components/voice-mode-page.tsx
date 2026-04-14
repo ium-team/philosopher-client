@@ -40,6 +40,40 @@ type SpeechRecognitionLike = {
 };
 
 type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
+type VoiceProfile = {
+  rate: number;
+  pitch: number;
+  langHints: string[];
+  voiceNameHints: string[];
+};
+
+const DEFAULT_VOICE_PROFILE: VoiceProfile = {
+  rate: 1.02,
+  pitch: 1,
+  langHints: ["ko", "en"],
+  voiceNameHints: [],
+};
+
+const VOICE_PROFILE_BY_PHILOSOPHER: Record<string, VoiceProfile> = {
+  socrates: {
+    rate: 0.94,
+    pitch: 1.08,
+    langHints: ["ko", "en"],
+    voiceNameHints: ["daniel", "matthew", "male"],
+  },
+  nietzsche: {
+    rate: 1.08,
+    pitch: 0.9,
+    langHints: ["ko", "de", "en"],
+    voiceNameHints: ["thomas", "markus", "male"],
+  },
+  arendt: {
+    rate: 0.98,
+    pitch: 1.16,
+    langHints: ["ko", "de", "en"],
+    voiceNameHints: ["anna", "victoria", "female"],
+  },
+};
 
 function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   return (
@@ -82,6 +116,12 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     () => philosophers.find((philosopher) => philosopher.id === philosopherId) ?? null,
     [philosopherId],
   );
+  const activeVoiceProfile = useMemo<VoiceProfile>(() => {
+    if (!philosopherId) {
+      return DEFAULT_VOICE_PROFILE;
+    }
+    return VOICE_PROFILE_BY_PHILOSOPHER[philosopherId] ?? DEFAULT_VOICE_PROFILE;
+  }, [philosopherId]);
   const hasVoiceSession = Boolean(conversationId && accessToken);
 
   const speechRecognitionConstructor = useMemo(() => {
@@ -114,24 +154,35 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     return new Promise<void>((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
-      const koreanVoice = voices.find((voice) => voice.lang.toLowerCase().startsWith("ko"));
+      const hintLangs = activeVoiceProfile.langHints.map((hint) => hint.toLowerCase());
+      const hintNames = activeVoiceProfile.voiceNameHints.map((hint) => hint.toLowerCase());
+      const voiceByNameAndLang = voices.find((voice) => {
+        const voiceName = voice.name.toLowerCase();
+        const voiceLang = voice.lang.toLowerCase();
+        return hintNames.some((hint) => voiceName.includes(hint)) && hintLangs.some((hint) => voiceLang.startsWith(hint));
+      });
+      const voiceByLang = voices.find((voice) =>
+        hintLangs.some((hint) => voice.lang.toLowerCase().startsWith(hint)),
+      );
+      const fallbackKoreanVoice = voices.find((voice) => voice.lang.toLowerCase().startsWith("ko"));
+      const selectedVoice = voiceByNameAndLang ?? voiceByLang ?? fallbackKoreanVoice ?? null;
 
-      if (koreanVoice) {
-        utterance.voice = koreanVoice;
-        utterance.lang = koreanVoice.lang;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        utterance.lang = selectedVoice.lang;
       } else {
         utterance.lang = "ko-KR";
       }
 
-      utterance.rate = 1.02;
-      utterance.pitch = 1;
+      utterance.rate = activeVoiceProfile.rate;
+      utterance.pitch = activeVoiceProfile.pitch;
       utterance.onend = () => resolve();
       utterance.onerror = () => reject(new Error("TTS playback failed"));
 
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     });
-  }, []);
+  }, [activeVoiceProfile]);
 
   const sendUserSpeech = useCallback(async () => {
     if (!hasVoiceSession || !conversationId) {
