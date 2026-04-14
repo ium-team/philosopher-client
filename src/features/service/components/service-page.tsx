@@ -1195,7 +1195,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                               <button
                                 key={project.id}
                                 type="button"
-                                onMouseEnter={() => moveConversationTo(project.id)}
                                 onClick={() => moveConversationTo(project.id)}
                                 className="flex w-full items-center rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                               >
@@ -1221,7 +1220,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     {!isProjectHome && activeConversation?.projectId ? (
                       <button
                         type="button"
-                        onMouseEnter={() => moveConversationTo(null)}
                         onClick={() => moveConversationTo(null)}
                         className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                       >
