@@ -460,13 +460,27 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       const mappedConversations = conversationList.map((conversation) =>
         mapConversation(conversation, messageMap.get(conversation.id) ?? []),
       );
+      const visibleProjectIdSet = new Set(mappedProjects.map((project) => project.id));
 
-      setConversations(mappedConversations);
+      setConversations((previous) => {
+        const preservedHiddenConversations = previous.filter((conversation) => {
+          if (!conversation.projectId) {
+            return true;
+          }
+          return !visibleProjectIdSet.has(conversation.projectId);
+        });
+
+        const mergedConversations = [...mappedConversations];
+        for (const hiddenConversation of preservedHiddenConversations) {
+          if (!mergedConversations.some((conversation) => conversation.id === hiddenConversation.id)) {
+            mergedConversations.push(hiddenConversation);
+          }
+        }
+
+        return mergedConversations;
+      });
       setActiveProjectId((previous) =>
         previous && mappedProjects.some((project) => project.id === previous) ? previous : null,
-      );
-      setActiveConversationId((previous) =>
-        previous && mappedConversations.some((conversation) => conversation.id === previous) ? previous : "",
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : "데이터를 불러오지 못했습니다.";
