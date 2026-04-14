@@ -390,6 +390,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     return philosophers.find((philosopher) => philosopher.id === activeConversation.philosopherId) ?? null;
   }, [activeConversation]);
+  const initialConversationGuide = useMemo(() => {
+    if (!activePhilosopher) {
+      return "철학자에게 질문을 던져 대화를 시작해보세요.";
+    }
+
+    const sampleQuestion = activePhilosopher.promptSamples[0] ?? "요즘의 고민";
+    return `${activePhilosopher.name}에게 "${sampleQuestion}"를 물어보세요. ${activePhilosopher.name}는 ${activePhilosopher.summary}`;
+  }, [activePhilosopher]);
   const cautionSubject = activePhilosopher?.name ?? "AI";
 
   const filteredRecentConversations = useMemo(() => {
@@ -1549,6 +1557,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 </div>
               )
             ) : null}
+
+            {!isSelectingPhilosopher
+              ? activeConversation && activeConversation.messages.length === 0
+                ? (
+                  <div className="mb-8 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] px-5 py-4 text-[#4b5563]">
+                    <p className="text-sm leading-7">{initialConversationGuide}</p>
+                  </div>
+                )
+                : null
+              : null}
 
             {!isSelectingPhilosopher
               ? activeConversation?.messages.map((message) => (
