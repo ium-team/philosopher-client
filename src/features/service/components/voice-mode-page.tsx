@@ -43,35 +43,40 @@ type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 type VoiceProfile = {
   rate: number;
   pitch: number;
+  volume: number;
   langHints: string[];
   voiceNameHints: string[];
 };
 
 const DEFAULT_VOICE_PROFILE: VoiceProfile = {
-  rate: 1.02,
+  rate: 1.0,
   pitch: 1,
+  volume: 1,
   langHints: ["ko", "en"],
   voiceNameHints: [],
 };
 
 const VOICE_PROFILE_BY_PHILOSOPHER: Record<string, VoiceProfile> = {
   socrates: {
-    rate: 0.94,
-    pitch: 1.08,
+    rate: 0.92,
+    pitch: 0.98,
+    volume: 0.96,
     langHints: ["ko", "en"],
-    voiceNameHints: ["daniel", "matthew", "male"],
+    voiceNameHints: ["male", "google", "microsoft", "daniel", "matthew"],
   },
   nietzsche: {
-    rate: 1.08,
-    pitch: 0.9,
+    rate: 1.06,
+    pitch: 0.84,
+    volume: 1,
     langHints: ["ko", "de", "en"],
-    voiceNameHints: ["thomas", "markus", "male"],
+    voiceNameHints: ["male", "google", "microsoft", "thomas", "markus", "heami"],
   },
   arendt: {
-    rate: 0.98,
-    pitch: 1.16,
+    rate: 0.95,
+    pitch: 1.12,
+    volume: 0.98,
     langHints: ["ko", "de", "en"],
-    voiceNameHints: ["anna", "victoria", "female"],
+    voiceNameHints: ["female", "google", "microsoft", "anna", "victoria", "zira"],
   },
 };
 
@@ -176,6 +181,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
 
       utterance.rate = activeVoiceProfile.rate;
       utterance.pitch = activeVoiceProfile.pitch;
+      utterance.volume = activeVoiceProfile.volume;
       utterance.onend = () => resolve();
       utterance.onerror = () => reject(new Error("TTS playback failed"));
 
