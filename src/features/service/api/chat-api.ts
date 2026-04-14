@@ -7,7 +7,10 @@ export type ApiProject = {
   id: string;
   name: string;
   description: string | null;
+  instruction: string | null;
+  is_pinned: boolean;
   created_at: string;
+  updated_at: string;
 };
 
 export type ApiConversation = {
@@ -42,7 +45,7 @@ async function request<T>(
   path: string,
   accessToken: string,
   options?: {
-    method?: "GET" | "POST";
+    method?: "GET" | "POST" | "PATCH";
     body?: unknown;
   },
 ): Promise<T> {
@@ -86,6 +89,31 @@ export function createProject(
   });
 }
 
+export function updateProjectPin(
+  accessToken: string,
+  projectId: string,
+  isPinned: boolean,
+): Promise<ApiProject> {
+  return request<ApiProject>(`/api/v1/chat/projects/${projectId}/pin`, accessToken, {
+    method: "PATCH",
+    body: { is_pinned: isPinned },
+  });
+}
+
+export function updateProjectSettings(
+  accessToken: string,
+  projectId: string,
+  payload: {
+    name?: string;
+    instruction?: string | null;
+  },
+): Promise<ApiProject> {
+  return request<ApiProject>(`/api/v1/chat/projects/${projectId}/settings`, accessToken, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
 export function listConversations(
   accessToken: string,
   projectId: string,
@@ -110,6 +138,34 @@ export function createConversation(
     {
       method: "POST",
       body: payload,
+    },
+  );
+}
+
+export function createDefaultConversation(
+  accessToken: string,
+  payload: {
+    philosopher: ApiPhilosopher;
+    title?: string;
+  },
+): Promise<ApiConversation> {
+  return request<ApiConversation>("/api/v1/chat/conversations", accessToken, {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export function moveConversationProject(
+  accessToken: string,
+  conversationId: string,
+  projectId: string | null,
+): Promise<ApiConversation> {
+  return request<ApiConversation>(
+    `/api/v1/chat/conversations/${conversationId}/project`,
+    accessToken,
+    {
+      method: "PATCH",
+      body: { project_id: projectId },
     },
   );
 }

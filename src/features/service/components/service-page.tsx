@@ -6,12 +6,16 @@ import { useRouter } from "next/navigation";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
 import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
 import {
+  createDefaultConversation as createDefaultConversationRequest,
   createConversation as createConversationRequest,
   createProject as createProjectRequest,
   listConversations,
   listMessages,
   listProjects,
+  moveConversationProject as moveConversationProjectRequest,
   sendMessage as sendMessageRequest,
+  updateProjectPin as updateProjectPinRequest,
+  updateProjectSettings as updateProjectSettingsRequest,
   type ApiConversation,
   type ApiMessage,
   type ApiPhilosopher,
@@ -38,6 +42,8 @@ type Conversation = {
 type Project = {
   id: string;
   name: string;
+  instruction: string | null;
+  pinned: boolean;
 };
 
 type ServicePageProps = {
@@ -109,6 +115,8 @@ function mapProject(project: ApiProject): Project {
   return {
     id: project.id,
     name: project.name,
+    instruction: project.instruction,
+    pinned: project.is_pinned,
   };
 }
 
@@ -447,25 +455,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     void hydrateChatData();
   }, [hydrateChatData]);
 
-  const ensureConversationProjectId = useCallback(async () => {
-    if (activeProjectId) {
-      return activeProjectId;
-    }
-
-    if (projects.length > 0) {
-      return projects[0].id;
-    }
-
-    if (!accessToken) {
-      throw new Error("인증 토큰이 없습니다.");
-    }
-
-    const created = await createProjectRequest(accessToken, { name: "기본 프로젝트" });
-    const mapped = mapProject(created);
-    setProjects((previous) => [mapped, ...previous]);
-    return created.id;
-  }, [accessToken, activeProjectId, projects]);
-
   const startConversationWith = useCallback(async (philosopher: PhilosopherProfile) => {
     if (!accessToken) {
       setLoadError("로그인 정보가 없어 대화를 시작할 수 없습니다.");
@@ -473,17 +462,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     try {
-      const projectId = await ensureConversationProjectId();
-      const createdConversation = await createConversationRequest(accessToken, projectId, {
-        philosopher: toApiPhilosopherId(philosopher.id),
-        title: `${philosopher.name} 대화`,
-      });
+      const isProjectConversation = Boolean(activeProjectId);
+      const createdConversation = isProjectConversation
+        ? await createConversationRequest(accessToken, activeProjectId as string, {
+            philosopher: toApiPhilosopherId(philosopher.id),
+            title: `${philosopher.name} 대화`,
+          })
+        : await createDefaultConversationRequest(accessToken, {
+            philosopher: toApiPhilosopherId(philosopher.id),
+            title: `${philosopher.name} 대화`,
+          });
       const messages = await listMessages(accessToken, createdConversation.id);
       const mappedConversation = mapConversation(createdConversation, messages);
 
       setConversations((previous) => [mappedConversation, ...previous]);
       setActiveConversationId(createdConversation.id);
-      setActiveProjectId(projectId);
+      setActiveProjectId(isProjectConversation ? activeProjectId : null);
       setDraft("");
       setIsSelectingPhilosopher(false);
       router.replace(`/service?conversation=${createdConversation.id}`);
@@ -491,7 +485,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       const message = error instanceof Error ? error.message : "대화를 시작하지 못했습니다.";
       setLoadError(message);
     }
-  }, [accessToken, ensureConversationProjectId, router]);
+  }, [accessToken, activeProjectId, router]);
 
   const createProject = async () => {
     const defaultName = `프로젝트 ${projects.length + 1}`;
@@ -524,24 +518,64 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
   };
 
-  const moveConversationTo = (targetProjectId: string | null) => {
+  const moveConversationTo = async (targetProjectId: string | null) => {
     if (!activeConversation) {
       return;
     }
 
-    setConversations((previous) =>
-      previous.map((item) =>
-        item.id === activeConversation.id
-          ? {
-              ...item,
-              projectId: targetProjectId ?? undefined,
-            }
-          : item,
-      ),
-    );
-    setActiveProjectId(targetProjectId);
-    setIsMoveMenuOpen(false);
-    setIsProjectMoveMenuOpen(false);
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 프로젝트 이동을 수행할 수 없습니다.");
+      return;
+    }
+
+    try {
+      const movedConversation = await moveConversationProjectRequest(accessToken, activeConversation.id, targetProjectId);
+      setConversations((previous) =>
+        previous.map((item) =>
+          item.id === activeConversation.id
+            ? {
+                ...item,
+                projectId: movedConversation.project_id,
+              }
+            : item,
+        ),
+      );
+      setActiveProjectId(targetProjectId);
+      setIsMoveMenuOpen(false);
+      setIsProjectMoveMenuOpen(false);
+      setLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "프로젝트 이동에 실패했습니다.";
+      setLoadError(message);
+    }
+  };
+
+  const togglePinActiveProject = async () => {
+    if (!activeProject) {
+      return;
+    }
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 프로젝트 고정을 변경할 수 없습니다.");
+      return;
+    }
+
+    try {
+      const updated = await updateProjectPinRequest(accessToken, activeProject.id, !activeProject.pinned);
+      const mapped = mapProject(updated);
+      setProjects((previous) =>
+        previous.map((project) =>
+          project.id === mapped.id
+            ? mapped
+            : project,
+        ),
+      );
+      setLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "프로젝트 고정 변경에 실패했습니다.";
+      setLoadError(message);
+    } finally {
+      setIsMoveMenuOpen(false);
+    }
   };
 
   const togglePinActiveConversation = () => {
@@ -724,26 +758,38 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setActiveConversationId("");
     setIsSelectingPhilosopher(true);
   };
-  const closeProjectSettings = () => {
+  const closeProjectSettings = async () => {
     if (!activeProject) {
       setIsProjectSettingsOpen(false);
       return;
     }
 
     const trimmed = projectSettingsName.trim();
-    setProjects((previous) =>
-      previous.map((project) =>
-        project.id === activeProject.id
-          ? {
-              ...project,
-              name: trimmed ? trimmed.slice(0, 30) : project.name,
-            }
-          : project,
-      ),
-    );
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 프로젝트 설정을 저장할 수 없습니다.");
+      return;
+    }
 
-    setIsProjectSettingsOpen(false);
-    setIsProjectDeleteConfirmOpen(false);
+    try {
+      const updated = await updateProjectSettingsRequest(accessToken, activeProject.id, {
+        name: trimmed ? trimmed.slice(0, 30) : activeProject.name,
+        instruction: projectSettingsGuideline.trim() || null,
+      });
+      const mapped = mapProject(updated);
+      setProjects((previous) =>
+        previous.map((project) =>
+          project.id === mapped.id
+            ? mapped
+            : project,
+        ),
+      );
+      setLoadError(null);
+      setIsProjectSettingsOpen(false);
+      setIsProjectDeleteConfirmOpen(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "프로젝트 설정을 저장하지 못했습니다.";
+      setLoadError(message);
+    }
   };
   const openProjectSettings = () => {
     if (!activeProject) {
@@ -751,6 +797,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     setProjectSettingsName(activeProject.name);
+    setProjectSettingsGuideline(activeProject.instruction ?? "");
     setIsMoveMenuOpen(false);
     setIsProjectSettingsOpen(true);
   };
@@ -1162,16 +1209,28 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     }`}
                   >
                     {isProjectHome ? (
-                      <button
-                        type="button"
-                        onClick={openProjectSettings}
-                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
-                      >
-                        <span className="text-[#374151]">
-                          <IconEdit />
-                        </span>
-                        프로젝트 설정
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => void togglePinActiveProject()}
+                          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
+                        >
+                          <span className="text-[#374151]">
+                            <IconPin />
+                          </span>
+                          {activeProject?.pinned ? "프로젝트 고정 해제" : "프로젝트 고정"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={openProjectSettings}
+                          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
+                        >
+                          <span className="text-[#374151]">
+                            <IconEdit />
+                          </span>
+                          프로젝트 설정
+                        </button>
+                      </>
                     ) : null}
                     {!isProjectHome && moveTargetProjects.length > 0 ? (
                       <div className="relative">
@@ -1195,7 +1254,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                               <button
                                 key={project.id}
                                 type="button"
-                                onClick={() => moveConversationTo(project.id)}
+                                onClick={() => void moveConversationTo(project.id)}
                                 className="flex w-full items-center rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                               >
                                 {project.name}
@@ -1220,7 +1279,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     {!isProjectHome && activeConversation?.projectId ? (
                       <button
                         type="button"
-                        onClick={() => moveConversationTo(null)}
+                        onClick={() => void moveConversationTo(null)}
                         className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
                       >
                         <span className="text-[#374151]">
@@ -1554,7 +1613,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         {isProjectSettingsOpen && activeProject ? (
           <div
             className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
-            onClick={closeProjectSettings}
+            onClick={() => void closeProjectSettings()}
           >
             <div
               className="w-full max-w-[640px] rounded-2xl border border-[#d1d5db] bg-white p-5 shadow-[0_18px_50px_rgba(17,24,39,0.2)]"
@@ -1564,7 +1623,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <h2 className="text-[30px] font-semibold tracking-tight text-[#111827]">프로젝트 설정</h2>
                 <button
                   type="button"
-                  onClick={closeProjectSettings}
+                  onClick={() => void closeProjectSettings()}
                   className="rounded-xl border border-[#111827] p-2 text-[#111827] hover:bg-[#f3f4f6]"
                   aria-label="close project settings"
                 >
