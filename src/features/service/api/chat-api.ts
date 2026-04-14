@@ -45,7 +45,7 @@ async function request<T>(
   path: string,
   accessToken: string,
   options?: {
-    method?: "GET" | "POST" | "PATCH";
+    method?: "GET" | "POST" | "PATCH" | "DELETE";
     body?: unknown;
   },
 ): Promise<T> {
@@ -67,6 +67,10 @@ async function request<T>(
       | null;
 
     throw new Error(payload?.detail ?? fallbackMessage);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return (await response.json()) as T;
@@ -191,6 +195,32 @@ export function sendMessage(
     {
       method: "POST",
       body: { content },
+    },
+  );
+}
+
+export function deleteConversation(
+  accessToken: string,
+  conversationId: string,
+): Promise<void> {
+  return request<void>(
+    `/api/v1/chat/conversations/${conversationId}`,
+    accessToken,
+    {
+      method: "DELETE",
+    },
+  );
+}
+
+export function deleteProject(
+  accessToken: string,
+  projectId: string,
+): Promise<void> {
+  return request<void>(
+    `/api/v1/chat/projects/${projectId}`,
+    accessToken,
+    {
+      method: "DELETE",
     },
   );
 }

@@ -9,6 +9,8 @@ import {
   createDefaultConversation as createDefaultConversationRequest,
   createConversation as createConversationRequest,
   createProject as createProjectRequest,
+  deleteConversation as deleteConversationRequest,
+  deleteProject as deleteProjectRequest,
   listConversations,
   listMessages,
   listProjects,
@@ -569,15 +571,27 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setIsMoveMenuOpen(false);
   };
 
-  const deleteActiveConversation = () => {
+  const deleteActiveConversation = async () => {
     if (!activeConversation) {
       return;
     }
 
-    setConversations((previous) => previous.filter((conversation) => conversation.id !== activeConversation.id));
-    setActiveConversationId("");
-    setIsSelectingPhilosopher(false);
-    setIsMoveMenuOpen(false);
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 채팅을 삭제할 수 없습니다.");
+      return;
+    }
+
+    try {
+      await deleteConversationRequest(accessToken, activeConversation.id);
+      setConversations((previous) => previous.filter((conversation) => conversation.id !== activeConversation.id));
+      setActiveConversationId("");
+      setIsSelectingPhilosopher(false);
+      setIsMoveMenuOpen(false);
+      setLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "채팅 삭제에 실패했습니다.";
+      setLoadError(message);
+    }
   };
 
   useEffect(() => {
@@ -774,17 +788,29 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setIsMoveMenuOpen(false);
     setIsProjectSettingsOpen(true);
   };
-  const deleteActiveProject = () => {
+  const deleteActiveProject = async () => {
     if (!activeProject) {
       return;
     }
 
-    setProjects((previous) => previous.filter((project) => project.id !== activeProject.id));
-    setConversations((previous) => previous.filter((conversation) => conversation.projectId !== activeProject.id));
-    setActiveProjectId(null);
-    setActiveConversationId("");
-    setIsProjectSettingsOpen(false);
-    setIsProjectDeleteConfirmOpen(false);
+    if (!accessToken) {
+      setLoadError("로그인 정보가 없어 프로젝트를 삭제할 수 없습니다.");
+      return;
+    }
+
+    try {
+      await deleteProjectRequest(accessToken, activeProject.id);
+      setProjects((previous) => previous.filter((project) => project.id !== activeProject.id));
+      setConversations((previous) => previous.filter((conversation) => conversation.projectId !== activeProject.id));
+      setActiveProjectId(null);
+      setActiveConversationId("");
+      setIsProjectSettingsOpen(false);
+      setIsProjectDeleteConfirmOpen(false);
+      setLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "프로젝트 삭제에 실패했습니다.";
+      setLoadError(message);
+    }
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -1273,7 +1299,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         <div className="my-0.5 h-px bg-[#f1f5f9]" />
                         <button
                           type="button"
-                          onClick={deleteActiveConversation}
+                          onClick={() => void deleteActiveConversation()}
                           className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#dc2626] transition hover:bg-white"
                         >
                           <span>
@@ -1662,7 +1688,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 </button>
                 <button
                   type="button"
-                  onClick={deleteActiveProject}
+                  onClick={() => void deleteActiveProject()}
                   className="rounded-full bg-[#dc2626] px-4 py-2 text-base text-white transition hover:bg-[#b91c1c]"
                 >
                   삭제
