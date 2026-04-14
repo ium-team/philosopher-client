@@ -398,7 +398,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     return philosophers.find((philosopher) => philosopher.id === activeConversation.philosopherId) ?? null;
   }, [activeConversation]);
-  const initialGuideQuestion = activePhilosopher?.promptSamples[0] ?? "요즘의 고민은 무엇인가요?";
+  const initialGuideQuestions = activePhilosopher?.promptSamples.length
+    ? activePhilosopher.promptSamples.slice(0, 2)
+    : ["정의로운 삶은 왜 어려운가?", "나는 왜 확신하면서도 자주 틀릴까?"];
   const initialGuideTitle = activePhilosopher
     ? `${activePhilosopher.name}와 대화를 시작해보세요`
     : "철학자와 대화를 시작해보세요";
@@ -1578,14 +1580,27 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             {!isSelectingPhilosopher
               ? activeConversation && activeConversation.messages.length === 0
                 ? (
-                  <div className="mb-8 px-1 py-1">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-[#d97706] uppercase">Conversation Guide</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight text-[#9a3412]">{initialGuideTitle}</p>
-                    <div className="mt-4 inline-flex max-w-full items-center rounded-full border border-[#fdba74] px-4 py-2 text-sm text-[#7c2d12]">
-                      <span className="mr-2 shrink-0 text-[#ea580c]">질문 예시</span>
-                      <span className="truncate">"{initialGuideQuestion}"</span>
+                  <div className="mb-10 flex flex-col items-center px-3 py-2 text-center">
+                    <p className="text-2xl font-semibold tracking-tight text-[#9a3412]">{initialGuideTitle}</p>
+                    <p className="mt-3 max-w-[560px] text-sm leading-7 text-[#7c4a2b]">{initialGuideSummary}</p>
+                    <div className="mt-6 w-full max-w-[620px] rounded-2xl border border-[#fed7aa] bg-[#fff7ed] p-4">
+                      <p className="text-xs font-semibold tracking-[0.1em] text-[#c2410c] uppercase">질문 예시</p>
+                      <div className="mt-3 flex flex-col gap-2">
+                        {initialGuideQuestions.map((question) => (
+                          <button
+                            key={question}
+                            type="button"
+                            onClick={() => {
+                              setDraft(question);
+                              composerRef.current?.focus();
+                            }}
+                            className="rounded-xl border border-[#fdba74] bg-white px-4 py-3 text-left text-sm text-[#7c2d12] transition hover:bg-[#fff3e0]"
+                          >
+                            "{question}"
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <p className="mt-4 text-sm leading-7 text-[#7c4a2b]">{initialGuideSummary}</p>
                   </div>
                 )
                 : null
