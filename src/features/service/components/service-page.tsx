@@ -80,6 +80,7 @@ type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 
 const initialConversations: Conversation[] = [];
 const initialProjects: Project[] = [];
+const VOICE_SILENCE_TIMEOUT_MS = 1600;
 
 function toApiPhilosopherId(philosopherId: string): ApiPhilosopher {
   if (philosopherId === "arendt") {
@@ -347,6 +348,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const isCancellingVoiceRef = useRef(false);
   const latestVoiceDraftRef = useRef("");
+  const voiceSilenceTimeoutRef = useRef<number | null>(null);
   const submitMessageRef = useRef<(messageText: string) => Promise<void>>(
     async () => Promise.resolve(),
   );
@@ -640,9 +642,27 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   useEffect(() => {
     return () => {
+      if (voiceSilenceTimeoutRef.current !== null) {
+        window.clearTimeout(voiceSilenceTimeoutRef.current);
+      }
       recognitionRef.current?.stop();
     };
   }, []);
+
+  const clearVoiceSilenceTimeout = useCallback(() => {
+    if (voiceSilenceTimeoutRef.current === null) {
+      return;
+    }
+    window.clearTimeout(voiceSilenceTimeoutRef.current);
+    voiceSilenceTimeoutRef.current = null;
+  }, []);
+
+  const armVoiceSilenceTimeout = useCallback(() => {
+    clearVoiceSilenceTimeout();
+    voiceSilenceTimeoutRef.current = window.setTimeout(() => {
+      recognitionRef.current?.stop();
+    }, VOICE_SILENCE_TIMEOUT_MS);
+  }, [clearVoiceSilenceTimeout]);
 
   useEffect(() => {
     if (!isMoveMenuOpen) {
@@ -875,12 +895,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
       recognition.onstart = () => {
         setIsListening(true);
+        armVoiceSilenceTimeout();
       };
 
       recognition.onresult = (event) => {
         if (isCancellingVoiceRef.current) {
           return;
         }
+        armVoiceSilenceTimeout();
 
         let finalTranscript = "";
         let interimTranscript = "";
@@ -904,10 +926,12 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       };
 
       recognition.onerror = () => {
+        clearVoiceSilenceTimeout();
         setIsListening(false);
       };
 
       recognition.onend = () => {
+        clearVoiceSilenceTimeout();
         const spokenText = latestVoiceDraftRef.current.trim();
 
         if (isCancellingVoiceRef.current) {
@@ -932,6 +956,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     isCancellingVoiceRef.current = false;
     latestVoiceDraftRef.current = "";
+    clearVoiceSilenceTimeout();
     setDraft("");
 
     try {
@@ -939,20 +964,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     } catch {
       setIsListening(false);
     }
-  }, [isListening, isSelectingPhilosopher]);
+  }, [armVoiceSilenceTimeout, clearVoiceSilenceTimeout, isListening, isSelectingPhilosopher]);
 
   const stopVoiceInput = useCallback(() => {
+    clearVoiceSilenceTimeout();
     recognitionRef.current?.stop();
     setIsListening(false);
-  }, []);
+  }, [clearVoiceSilenceTimeout]);
 
   const cancelVoiceInput = useCallback(() => {
     isCancellingVoiceRef.current = true;
     latestVoiceDraftRef.current = "";
+    clearVoiceSilenceTimeout();
     recognitionRef.current?.stop();
     setDraft("");
     setIsListening(false);
-  }, []);
+  }, [clearVoiceSilenceTimeout]);
 
   const hasDraft = draft.trim().length > 0;
   const openVoiceMode = useCallback(() => {

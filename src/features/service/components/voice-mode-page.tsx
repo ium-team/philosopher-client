@@ -40,6 +40,7 @@ type SpeechRecognitionLike = {
 };
 
 type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
+const VOICE_SILENCE_TIMEOUT_MS = 1600;
 
 function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   return (
@@ -62,6 +63,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const isClosingRef = useRef(false);
   const finalTranscriptRef = useRef("");
   const interimTranscriptRef = useRef("");
+  const silenceTimeoutRef = useRef<number | null>(null);
   const isProcessingRef = useRef(false);
   const startedOnceRef = useRef(false);
 
@@ -113,6 +115,21 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     setLiveTranscript("");
   };
 
+  const clearSilenceTimeout = useCallback(() => {
+    if (silenceTimeoutRef.current === null) {
+      return;
+    }
+    window.clearTimeout(silenceTimeoutRef.current);
+    silenceTimeoutRef.current = null;
+  }, []);
+
+  const armSilenceTimeout = useCallback(() => {
+    clearSilenceTimeout();
+    silenceTimeoutRef.current = window.setTimeout(() => {
+      recognitionRef.current?.stop();
+    }, VOICE_SILENCE_TIMEOUT_MS);
+  }, [clearSilenceTimeout]);
+
   const startListening = useCallback(() => {
     if (isClosingRef.current || !hasVoiceSession) {
       return;
@@ -133,9 +150,11 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       recognition.onstart = () => {
         setVoiceStatus("listening");
         setErrorMessage(null);
+        armSilenceTimeout();
       };
 
       recognition.onresult = (event) => {
+        armSilenceTimeout();
         for (let index = event.resultIndex; index < event.results.length; index += 1) {
           const result = event.results[index];
           const transcript = result[0]?.transcript ?? "";
@@ -153,6 +172,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       };
 
       recognition.onerror = () => {
+        clearSilenceTimeout();
         if (!isClosingRef.current) {
           setVoiceStatus("error");
           setErrorMessage("음성 인식 중 문제가 발생했습니다. 화면을 눌러 다시 시작하세요.");
@@ -160,6 +180,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       };
 
       recognition.onend = () => {
+        clearSilenceTimeout();
         if (isClosingRef.current) {
           return;
         }
@@ -180,7 +201,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       setVoiceStatus("error");
       setErrorMessage("마이크를 시작하지 못했습니다. 화면을 눌러 다시 시도하세요.");
     }
-  }, [hasVoiceSession, speechRecognitionConstructor]);
+  }, [armSilenceTimeout, clearSilenceTimeout, hasVoiceSession, speechRecognitionConstructor]);
 
   const speakAssistantText = useCallback((text: string) => {
     return new Promise<void>((resolve, reject) => {
@@ -284,10 +305,11 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   useEffect(() => {
     return () => {
       isClosingRef.current = true;
+      clearSilenceTimeout();
       recognitionRef.current?.stop();
       window.speechSynthesis.cancel();
     };
-  }, []);
+  }, [clearSilenceTimeout]);
 
   const statusText =
     voiceStatus === "listening"
