@@ -910,6 +910,24 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   }, []);
 
   const hasDraft = draft.trim().length > 0;
+  const openVoiceMode = useCallback(() => {
+    if (!activeConversation || isResponding || isSelectingPhilosopher) {
+      return;
+    }
+
+    const query = new URLSearchParams({
+      conversation: activeConversation.id,
+    });
+    router.push(`/service/voice?${query.toString()}`);
+  }, [activeConversation, isResponding, isSelectingPhilosopher, router]);
+
+  const handlePrimaryComposerAction = () => {
+    if (hasDraft) {
+      void submitMessage(draft);
+      return;
+    }
+    openVoiceMode();
+  };
 
   return (
     <main className="flex h-screen w-full overflow-hidden bg-[#ffffff] text-[#111827]">
@@ -1555,10 +1573,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => void submitMessage(draft)}
-                      disabled={!hasDraft || !activeConversation || isResponding || isSelectingPhilosopher}
+                      onClick={handlePrimaryComposerAction}
+                      disabled={!activeConversation || isResponding || isSelectingPhilosopher}
                       className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ff7f11] to-[#ff6d00] text-white transition hover:from-[#ffc933] hover:to-[#ff7f11] disabled:cursor-not-allowed disabled:bg-[#b9b9b9] disabled:bg-none"
-                      aria-label={hasDraft ? "send message" : "voice message"}
+                      aria-label={hasDraft ? "send message" : "start voice mode"}
                     >
                       {hasDraft ? <IconSend /> : <IconVoiceWave />}
                     </button>
