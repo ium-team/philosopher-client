@@ -5,6 +5,7 @@ type VoiceRouteProps = {
   searchParams: Promise<{
     conversation?: string | string[];
     philosopher?: string | string[];
+    new?: string | string[];
   }>;
 };
 
@@ -12,12 +13,18 @@ export default async function ServiceVoiceRoute({ searchParams }: VoiceRouteProp
   const params = await searchParams;
   const conversationParam = params.conversation;
   const philosopherParam = params.philosopher;
+  const newParam = params.new;
   const conversationId = Array.isArray(conversationParam) ? conversationParam[0] : conversationParam;
   const philosopherId = Array.isArray(philosopherParam) ? philosopherParam[0] : philosopherParam;
+  const shouldCreateConversation = (Array.isArray(newParam) ? newParam[0] : newParam) === "1";
 
   return (
     <RequireAuth>
-      <VoiceModePage conversationId={conversationId ?? null} philosopherId={philosopherId ?? null} />
+      <VoiceModePage
+        conversationId={conversationId ?? null}
+        philosopherId={philosopherId ?? null}
+        shouldCreateConversation={shouldCreateConversation}
+      />
     </RequireAuth>
   );
 }

@@ -14,6 +14,7 @@ import {
 type VoiceModePageProps = {
   conversationId: string | null;
   philosopherId: string | null;
+  shouldCreateConversation: boolean;
 };
 
 type VoiceStatus = "idle" | "listening" | "thinking" | "speaking" | "error";
@@ -63,7 +64,7 @@ function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-export function VoiceModePage({ conversationId, philosopherId }: VoiceModePageProps) {
+export function VoiceModePage({ conversationId, philosopherId, shouldCreateConversation }: VoiceModePageProps) {
   const router = useRouter();
   const { session } = useAuthSession();
   const accessToken = session?.access_token ?? "";
@@ -111,6 +112,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     [philosopherId],
   );
   const hasVoiceSession = Boolean(conversationId && accessToken);
+  void shouldCreateConversation;
 
   const speechRecognitionConstructor = useMemo(() => {
     if (typeof window === "undefined") {
