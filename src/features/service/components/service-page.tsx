@@ -1687,7 +1687,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
             <div className="pointer-events-auto w-full max-w-[860px]">
               {!isSelectingPhilosopher && activeConversation && activeConversation.messages.length === 0 ? (
-                <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+                <div className="mb-3 flex flex-wrap items-center gap-2 pl-5">
                   {initialGuideQuestions.map((question) => (
                     <button
                       key={question}
