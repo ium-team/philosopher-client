@@ -666,6 +666,68 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   }, []);
 
   useEffect(() => {
+    if (!accessToken || !activeConversationId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void listMessages(accessToken, activeConversationId)
+      .then((messages) => {
+        if (cancelled) {
+          return;
+        }
+
+        const mappedMessages = messages.map(mapMessage);
+        const firstUserMessage = mappedMessages.find((message) => message.role === "user");
+
+        setConversations((previous) => {
+          const existingConversation = previous.find((conversation) => conversation.id === activeConversationId);
+          if (existingConversation) {
+            return previous.map((conversation) =>
+              conversation.id === activeConversationId
+                ? {
+                    ...conversation,
+                    messages: mappedMessages,
+                  }
+                : conversation,
+            );
+          }
+
+          const params = new URLSearchParams(window.location.search);
+          const philosopherFromUrl = params.get("philosopher")?.trim() ?? "";
+          const fallbackPhilosopher =
+            philosophers.some((philosopher) => philosopher.id === philosopherFromUrl)
+              ? philosopherFromUrl
+              : "socrates";
+          const fallbackPhilosopherName =
+            philosophers.find((philosopher) => philosopher.id === fallbackPhilosopher)?.name ?? fallbackPhilosopher;
+          const fallbackTitle = firstUserMessage
+            ? deriveInitialConversationTitle(firstUserMessage.text)
+            : `${fallbackPhilosopherName} 대화`;
+
+          return [
+            {
+              id: activeConversationId,
+              title: fallbackTitle,
+              philosopherId: fallbackPhilosopher,
+              recent: true,
+              messages: mappedMessages,
+            },
+            ...previous,
+          ];
+        });
+      })
+      .catch(() => {
+        // no-op: keep existing local state when refresh fails
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, activeConversationId]);
+
+  useEffect(() => {
     return () => {
       if (voiceSilenceTimeoutRef.current !== null) {
         window.clearTimeout(voiceSilenceTimeoutRef.current);

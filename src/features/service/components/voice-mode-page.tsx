@@ -96,8 +96,14 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     if (!conversationId) {
       return "/service";
     }
-    return `/service?conversation=${encodeURIComponent(conversationId)}`;
-  }, [conversationId]);
+    const query = new URLSearchParams({
+      conversation: conversationId,
+    });
+    if (philosopherId) {
+      query.set("philosopher", philosopherId);
+    }
+    return `/service?${query.toString()}`;
+  }, [conversationId, philosopherId]);
 
   const closeVoiceMode = () => {
     isClosingRef.current = true;
