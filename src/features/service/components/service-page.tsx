@@ -650,6 +650,17 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   }, [startConversationWith]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const conversationIdFromUrl = params.get("conversation")?.trim() ?? "";
+    if (!conversationIdFromUrl) {
+      return;
+    }
+
+    setIsSelectingPhilosopher(false);
+    setActiveConversationId(conversationIdFromUrl);
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (voiceSilenceTimeoutRef.current !== null) {
         window.clearTimeout(voiceSilenceTimeoutRef.current);
