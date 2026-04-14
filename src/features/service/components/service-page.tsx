@@ -1569,10 +1569,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             {!isSelectingPhilosopher
               ? activeConversation && activeConversation.messages.length === 0
                 ? (
-                  <div className="mb-8 rounded-3xl border border-[#fde7cf] bg-gradient-to-br from-[#fffaf2] via-[#fff6e9] to-[#fff3df] p-6 shadow-[0_10px_28px_rgba(255,109,0,0.08)]">
+                  <div className="mb-8 px-1 py-1">
                     <p className="text-xs font-semibold tracking-[0.16em] text-[#d97706] uppercase">Conversation Guide</p>
                     <p className="mt-2 text-2xl font-semibold tracking-tight text-[#9a3412]">{initialGuideTitle}</p>
-                    <div className="mt-4 inline-flex max-w-full items-center rounded-full border border-[#fdba74] bg-white px-4 py-2 text-sm text-[#7c2d12]">
+                    <div className="mt-4 inline-flex max-w-full items-center rounded-full border border-[#fdba74] px-4 py-2 text-sm text-[#7c2d12]">
                       <span className="mr-2 shrink-0 text-[#ea580c]">질문 예시</span>
                       <span className="truncate">"{initialGuideQuestion}"</span>
                     </div>
