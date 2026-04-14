@@ -41,6 +41,17 @@ function getApiBaseUrl(): string {
   return baseUrl.replace(/\/+$/, "");
 }
 
+type ApiErrorPayload = {
+  detail?: string;
+};
+
+async function getErrorMessageFromResponse(response: Response): Promise<string> {
+  const fallbackMessage = `API request failed (${response.status})`;
+  const payload = (await response.json().catch(() => null)) as ApiErrorPayload | null;
+
+  return payload?.detail ?? fallbackMessage;
+}
+
 async function request<T>(
   path: string,
   accessToken: string,
@@ -59,14 +70,7 @@ async function request<T>(
   });
 
   if (!response.ok) {
-    const fallbackMessage = `API request failed (${response.status})`;
-    const payload = (await response.json().catch(() => null)) as
-      | {
-          detail?: string;
-        }
-      | null;
-
-    throw new Error(payload?.detail ?? fallbackMessage);
+    throw new Error(await getErrorMessageFromResponse(response));
   }
 
   if (response.status === 204) {
@@ -74,6 +78,30 @@ async function request<T>(
   }
 
   return (await response.json()) as T;
+}
+
+export async function synthesizeSpeech(
+  accessToken: string,
+  payload: {
+    philosopher_id: ApiPhilosopher;
+    text: string;
+  },
+): Promise<Blob> {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/tts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "audio/mpeg",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessageFromResponse(response));
+  }
+
+  return response.blob();
 }
 
 export function listProjects(accessToken: string): Promise<ApiProject[]> {
