@@ -56,6 +56,8 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
   const [liveTranscript, setLiveTranscript] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lastUserSpeech, setLastUserSpeech] = useState("");
+  const [lastAssistantSpeech, setLastAssistantSpeech] = useState("");
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const isClosingRef = useRef(false);
   const finalTranscriptRef = useRef("");
@@ -213,6 +215,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       return;
     }
 
+    setLastUserSpeech(spokenText);
     isProcessingRef.current = true;
     setVoiceStatus("thinking");
     setErrorMessage(null);
@@ -224,6 +227,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
         throw new Error("응답이 비어 있습니다.");
       }
 
+      setLastAssistantSpeech(assistantText);
       setVoiceStatus("speaking");
       await speakAssistantText(assistantText);
       resetTranscript();
@@ -341,7 +345,19 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           ) : null}
         </div>
 
-        <div className="px-6 pb-10 text-center">
+        <div className="px-6 pb-10">
+          <div className="mx-auto mb-4 w-full max-w-[720px] space-y-2 text-left">
+            <div className="rounded-xl border border-[#e5e7eb] bg-white/70 px-4 py-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-[#6b7280] uppercase">User</p>
+              <p className="mt-1 text-sm text-[#111827]">{lastUserSpeech || "아직 없음"}</p>
+            </div>
+            <div className="rounded-xl border border-[#e5e7eb] bg-white/70 px-4 py-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-[#6b7280] uppercase">AI</p>
+              <p className="mt-1 whitespace-pre-line text-sm text-[#111827]">{lastAssistantSpeech || "아직 없음"}</p>
+            </div>
+          </div>
+
+          <div className="text-center">
           <p
             className={`text-base ${
               voiceStatus === "error" ? "text-[#b91c1c]" : "text-[#4b5563]"
@@ -350,6 +366,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
             {statusText}
           </p>
           {liveTranscript ? <p className="mt-2 text-sm text-[#6b7280]">{liveTranscript}</p> : null}
+          </div>
         </div>
       </div>
     </main>
