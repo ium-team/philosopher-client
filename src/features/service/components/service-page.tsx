@@ -1615,20 +1615,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   />
                 </div>
 
-                <div>
-                  <p className="mb-2 text-sm font-medium text-[#1f2937]">메모리</p>
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-left text-base text-[#6b7280]"
-                  >
-                    <span>기본값</span>
-                    <span className="text-[#9ca3af]">▾</span>
-                  </button>
-                  <p className="mt-2 text-sm text-[#9ca3af]">
-                    프로젝트가 외부 채팅에서 메모리에 액세스할 수 있으며 그 반대도 가능합니다. 이는 변경할 수 없습니다.
-                  </p>
-                </div>
-
                 <button
                   type="button"
                   onClick={() => setIsProjectDeleteConfirmOpen(true)}
