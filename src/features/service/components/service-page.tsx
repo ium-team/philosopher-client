@@ -1620,24 +1620,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   <div className="mb-10 flex flex-col items-center px-3 py-2 text-center">
                     <p className="text-2xl font-semibold tracking-tight text-[#9a3412]">{initialGuideTitle}</p>
                     <p className="mt-3 max-w-[560px] text-sm leading-7 text-[#7c4a2b]">{initialGuideSummary}</p>
-                    <div className="mt-6 w-full max-w-[620px] rounded-2xl border border-[#fed7aa] bg-[#fff7ed] p-4">
-                      <p className="text-xs font-semibold tracking-[0.1em] text-[#c2410c] uppercase">질문 예시</p>
-                      <div className="mt-3 flex flex-col gap-2">
-                        {initialGuideQuestions.map((question) => (
-                          <button
-                            key={question}
-                            type="button"
-                            onClick={() => {
-                              setDraft(question);
-                              composerRef.current?.focus();
-                            }}
-                            className="rounded-xl border border-[#fdba74] bg-white px-4 py-3 text-left text-sm text-[#7c2d12] transition hover:bg-[#fff3e0]"
-                          >
-                            "{question}"
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 )
                 : null
@@ -1704,6 +1686,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         {!(activeProject && !activeConversation && !isSelectingPhilosopher) ? (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-3 pb-4">
             <div className="pointer-events-auto w-full max-w-[860px]">
+              {!isSelectingPhilosopher && activeConversation && activeConversation.messages.length === 0 ? (
+                <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+                  {initialGuideQuestions.map((question) => (
+                    <button
+                      key={question}
+                      type="button"
+                      onClick={() => {
+                        setDraft(question);
+                        composerRef.current?.focus();
+                      }}
+                      className="rounded-full border border-[#fdba74] bg-[#fff7ed] px-3 py-1.5 text-sm text-[#7c2d12] transition hover:bg-[#fff3e0]"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               <div className="rounded-[26px] border border-[#e5e7eb] bg-white px-3 py-2 shadow-[0_-1px_0_rgba(17,24,39,0.06),0_10px_30px_rgba(17,24,39,0.12)]">
                 <div className="flex items-end gap-2">
                   <textarea
