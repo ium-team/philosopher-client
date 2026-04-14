@@ -14,7 +14,6 @@ import {
   listProjects,
   moveConversationProject as moveConversationProjectRequest,
   sendMessage as sendMessageRequest,
-  updateProjectPin as updateProjectPinRequest,
   updateProjectSettings as updateProjectSettingsRequest,
   type ApiConversation,
   type ApiMessage,
@@ -43,7 +42,6 @@ type Project = {
   id: string;
   name: string;
   instruction: string | null;
-  pinned: boolean;
 };
 
 type ServicePageProps = {
@@ -116,7 +114,6 @@ function mapProject(project: ApiProject): Project {
     id: project.id,
     name: project.name,
     instruction: project.instruction,
-    pinned: project.is_pinned,
   };
 }
 
@@ -372,6 +369,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     [activeProjectId, projects],
   );
   const isProjectHome = Boolean(activeProject && !activeConversationId && !isSelectingPhilosopher);
+  const visibleProjectIds = useMemo(() => new Set(projects.map((project) => project.id)), [projects]);
   const moveTargetProjects = useMemo(
     () => projects.filter((project) => project.id !== activeConversation?.projectId),
     [activeConversation?.projectId, projects],
@@ -392,6 +390,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       if (!conversation.recent) {
         return false;
       }
+      if (conversation.projectId && visibleProjectIds.has(conversation.projectId)) {
+        return false;
+      }
 
       if (!normalized) {
         return true;
@@ -401,7 +402,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     });
 
     return filtered.sort((left, right) => Number(Boolean(right.pinned)) - Number(Boolean(left.pinned)));
-  }, [conversations, searchQuery]);
+  }, [conversations, searchQuery, visibleProjectIds]);
   const projectConversations = useMemo(
     () =>
       activeProjectId
@@ -547,34 +548,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     } catch (error) {
       const message = error instanceof Error ? error.message : "프로젝트 이동에 실패했습니다.";
       setLoadError(message);
-    }
-  };
-
-  const togglePinActiveProject = async () => {
-    if (!activeProject) {
-      return;
-    }
-    if (!accessToken) {
-      setLoadError("로그인 정보가 없어 프로젝트 고정을 변경할 수 없습니다.");
-      return;
-    }
-
-    try {
-      const updated = await updateProjectPinRequest(accessToken, activeProject.id, !activeProject.pinned);
-      const mapped = mapProject(updated);
-      setProjects((previous) =>
-        previous.map((project) =>
-          project.id === mapped.id
-            ? mapped
-            : project,
-        ),
-      );
-      setLoadError(null);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "프로젝트 고정 변경에 실패했습니다.";
-      setLoadError(message);
-    } finally {
-      setIsMoveMenuOpen(false);
     }
   };
 
@@ -1209,28 +1182,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     }`}
                   >
                     {isProjectHome ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => void togglePinActiveProject()}
-                          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
-                        >
-                          <span className="text-[#374151]">
-                            <IconPin />
-                          </span>
-                          {activeProject?.pinned ? "프로젝트 고정 해제" : "프로젝트 고정"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={openProjectSettings}
-                          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
-                        >
-                          <span className="text-[#374151]">
-                            <IconEdit />
-                          </span>
-                          프로젝트 설정
-                        </button>
-                      </>
+                      <button
+                        type="button"
+                        onClick={openProjectSettings}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1f2937] transition hover:bg-white"
+                      >
+                        <span className="text-[#374151]">
+                          <IconEdit />
+                        </span>
+                        프로젝트 설정
+                      </button>
                     ) : null}
                     {!isProjectHome && moveTargetProjects.length > 0 ? (
                       <div className="relative">
