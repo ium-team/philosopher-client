@@ -55,3 +55,15 @@ textarea {
   background: rgba(251, 146, 60, 0.2);
   color: #111;
 }
+
+@keyframes philosopher-speaking {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.03);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}

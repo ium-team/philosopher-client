@@ -382,7 +382,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
                 width={440}
                 height={440}
                 className={`h-[280px] w-[280px] object-contain object-bottom transition-all duration-300 md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px] ${
-                  voiceStatus === "speaking" ? "scale-[1.03]" : "scale-100"
+                  voiceStatus === "speaking"
+                    ? "animate-[philosopher-speaking_900ms_ease-in-out_infinite]"
+                    : "scale-100"
                 }`}
               />
             </div>
