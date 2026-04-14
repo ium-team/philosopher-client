@@ -346,6 +346,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const handledSelectionRef = useRef<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const isCancellingVoiceRef = useRef(false);
+  const latestVoiceDraftRef = useRef("");
+  const submitMessageRef = useRef<(messageText: string) => Promise<void>>(
+    async () => Promise.resolve(),
+  );
   const [isListening, setIsListening] = useState(false);
   const accessToken = session?.access_token ?? "";
 
@@ -730,6 +734,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       setIsResponding(false);
     }
   };
+  submitMessageRef.current = submitMessage;
 
   const createConversation = () => {
     // Sidebar "새 채팅"은 항상 일반 채팅에서 시작한다.
@@ -864,7 +869,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     if (!recognitionRef.current) {
       const recognition = new speechRecognitionConstructor();
-      recognition.continuous = true;
+      recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = "ko-KR";
 
@@ -894,6 +899,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
         const combinedDraft = `${finalTranscript} ${interimTranscript}`.trim();
 
+        latestVoiceDraftRef.current = combinedDraft;
         setDraft(combinedDraft);
       };
 
@@ -902,18 +908,30 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       };
 
       recognition.onend = () => {
+        const spokenText = latestVoiceDraftRef.current.trim();
+
         if (isCancellingVoiceRef.current) {
           isCancellingVoiceRef.current = false;
+          latestVoiceDraftRef.current = "";
           setDraft("");
+          setIsListening(false);
+          return;
         }
 
         setIsListening(false);
+
+        if (!spokenText) {
+          return;
+        }
+
+        void submitMessageRef.current(spokenText);
       };
 
       recognitionRef.current = recognition;
     }
 
     isCancellingVoiceRef.current = false;
+    latestVoiceDraftRef.current = "";
     setDraft("");
 
     try {
@@ -930,6 +948,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   const cancelVoiceInput = useCallback(() => {
     isCancellingVoiceRef.current = true;
+    latestVoiceDraftRef.current = "";
     recognitionRef.current?.stop();
     setDraft("");
     setIsListening(false);
