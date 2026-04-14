@@ -390,6 +390,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
     return philosophers.find((philosopher) => philosopher.id === activeConversation.philosopherId) ?? null;
   }, [activeConversation]);
+  const cautionSubject = activePhilosopher?.name ?? "AI";
 
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
@@ -1657,7 +1658,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 </div>
               </div>
               <p className="mt-2 text-center text-xs text-[#9ca3af]">
-                ChatGPT는 실수를 할 수 있습니다. 중요한 정보는 재차 확인하세요.
+                {cautionSubject}는 실수할 수 있습니다. 완전히 믿지 말고 다시 확인하세요.
               </p>
             </div>
           </div>

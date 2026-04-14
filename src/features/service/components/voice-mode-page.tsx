@@ -90,6 +90,15 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     () => philosophers.find((philosopher) => philosopher.id === philosopherId) ?? null,
     [philosopherId],
   );
+  const hasAnyVoiceExchange = Boolean(lastUserSpeech || lastAssistantSpeech || liveTranscript);
+  const initialGuideMessage = useMemo(() => {
+    if (!activePhilosopher) {
+      return "철학자에게 질문을 물어보세요. 대화가 시작되면 답변을 읽어드립니다.";
+    }
+
+    const sampleQuestion = activePhilosopher.promptSamples[0] ?? "요즘의 고민";
+    return `${activePhilosopher.name}에게 "${sampleQuestion}"를 물어보세요. ${activePhilosopher.name}는 ${activePhilosopher.summary}`;
+  }, [activePhilosopher]);
   const hasVoiceSession = Boolean(conversationId && accessToken);
 
   const speechRecognitionConstructor = useMemo(() => {
@@ -386,6 +395,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           </div>
 
           <div className="text-center">
+          {!hasAnyVoiceExchange ? (
+            <p className="mx-auto mb-3 max-w-[720px] text-sm leading-6 text-[#6b7280]">{initialGuideMessage}</p>
+          ) : null}
           <p
             className={`text-base ${
               voiceStatus === "error" ? "text-[#b91c1c]" : "text-[#4b5563]"
