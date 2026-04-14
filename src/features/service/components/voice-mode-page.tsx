@@ -40,7 +40,6 @@ type SpeechRecognitionLike = {
 };
 
 type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
-const VOICE_SILENCE_TIMEOUT_MS = 1600;
 
 function IconClose({ className = "h-5 w-5" }: { className?: string }) {
   return (
@@ -61,9 +60,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const isClosingRef = useRef(false);
   const finalTranscriptRef = useRef("");
   const interimTranscriptRef = useRef("");
-  const silenceTimeoutRef = useRef<number | null>(null);
   const isProcessingRef = useRef(false);
-  const startedOnceRef = useRef(false);
+  const isManualListeningRef = useRef(false);
+  const shouldSubmitOnEndRef = useRef(false);
 
   const serviceHref = useMemo(() => {
     if (!conversationId) {
@@ -76,12 +75,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     isClosingRef.current = true;
     recognitionRef.current?.stop();
     window.speechSynthesis.cancel();
-
-    if (window.history.length > 1) {
-      router.back();
-      return;
-    }
-    router.push(serviceHref);
+    router.replace(serviceHref);
   };
 
   const activePhilosopher = useMemo(
@@ -115,94 +109,6 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   const getSpokenText = useCallback(() => {
     return `${finalTranscriptRef.current} ${interimTranscriptRef.current}`.trim();
   }, []);
-
-  const clearSilenceTimeout = useCallback(() => {
-    if (silenceTimeoutRef.current === null) {
-      return;
-    }
-    window.clearTimeout(silenceTimeoutRef.current);
-    silenceTimeoutRef.current = null;
-  }, []);
-
-  const armSilenceTimeout = useCallback(() => {
-    clearSilenceTimeout();
-    silenceTimeoutRef.current = window.setTimeout(() => {
-      recognitionRef.current?.stop();
-    }, VOICE_SILENCE_TIMEOUT_MS);
-  }, [clearSilenceTimeout]);
-
-  const startListening = useCallback(() => {
-    if (isClosingRef.current || !hasVoiceSession) {
-      return;
-    }
-
-    if (!speechRecognitionConstructor) {
-      setVoiceStatus("error");
-      setErrorMessage("브라우저에서 음성 인식을 지원하지 않습니다.");
-      return;
-    }
-
-    if (!recognitionRef.current) {
-      const recognition = new speechRecognitionConstructor();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = "ko-KR";
-
-      recognition.onstart = () => {
-        setVoiceStatus("listening");
-        setErrorMessage(null);
-        armSilenceTimeout();
-      };
-
-      recognition.onresult = (event) => {
-        armSilenceTimeout();
-        for (let index = event.resultIndex; index < event.results.length; index += 1) {
-          const result = event.results[index];
-          const transcript = result[0]?.transcript ?? "";
-
-          if (result.isFinal) {
-            finalTranscriptRef.current = `${finalTranscriptRef.current} ${transcript}`.trim();
-            interimTranscriptRef.current = "";
-            continue;
-          }
-
-          interimTranscriptRef.current = transcript;
-        }
-
-        setLiveTranscript(`${finalTranscriptRef.current} ${interimTranscriptRef.current}`.trim());
-      };
-
-      recognition.onerror = () => {
-        clearSilenceTimeout();
-        if (!isClosingRef.current) {
-          setVoiceStatus("error");
-          setErrorMessage("음성 인식 중 문제가 발생했습니다. 화면을 눌러 다시 시작하세요.");
-        }
-      };
-
-      recognition.onend = () => {
-        clearSilenceTimeout();
-        if (isClosingRef.current) {
-          return;
-        }
-
-        const spokenText = getSpokenText();
-        if (!spokenText && !isProcessingRef.current) {
-          setVoiceStatus("idle");
-        }
-      };
-
-      recognitionRef.current = recognition;
-    }
-
-    resetTranscript();
-    try {
-      recognitionRef.current.start();
-    } catch {
-      setVoiceStatus("error");
-      setErrorMessage("마이크를 시작하지 못했습니다. 화면을 눌러 다시 시도하세요.");
-    }
-  }, [armSilenceTimeout, clearSilenceTimeout, getSpokenText, hasVoiceSession, speechRecognitionConstructor]);
 
   const speakAssistantText = useCallback((text: string) => {
     return new Promise<void>((resolve, reject) => {
@@ -253,10 +159,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       setVoiceStatus("speaking");
       await speakAssistantText(assistantText);
       resetTranscript();
-
-      if (!isClosingRef.current) {
-        startListening();
-      }
+      setVoiceStatus("idle");
     } catch (error) {
       const message = error instanceof Error ? error.message : "음성 대화 처리에 실패했습니다.";
       setVoiceStatus("error");
@@ -264,58 +167,134 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     } finally {
       isProcessingRef.current = false;
     }
-  }, [accessToken, conversationId, getSpokenText, hasVoiceSession, speakAssistantText, startListening]);
+  }, [accessToken, conversationId, getSpokenText, hasVoiceSession, speakAssistantText]);
 
-  useEffect(() => {
+  const startListening = useCallback(() => {
+    if (isClosingRef.current || !hasVoiceSession) {
+      return;
+    }
+
+    if (!speechRecognitionConstructor) {
+      setVoiceStatus("error");
+      setErrorMessage("브라우저에서 음성 인식을 지원하지 않습니다.");
+      return;
+    }
+
     if (!recognitionRef.current) {
+      const recognition = new speechRecognitionConstructor();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "ko-KR";
+
+      recognition.onstart = () => {
+        setVoiceStatus("listening");
+        setErrorMessage(null);
+      };
+
+      recognition.onresult = (event) => {
+        for (let index = event.resultIndex; index < event.results.length; index += 1) {
+          const result = event.results[index];
+          const transcript = result[0]?.transcript ?? "";
+
+          if (result.isFinal) {
+            finalTranscriptRef.current = `${finalTranscriptRef.current} ${transcript}`.trim();
+            interimTranscriptRef.current = "";
+            continue;
+          }
+
+          interimTranscriptRef.current = transcript;
+        }
+
+        setLiveTranscript(`${finalTranscriptRef.current} ${interimTranscriptRef.current}`.trim());
+      };
+
+      recognition.onerror = () => {
+        if (!isClosingRef.current) {
+          setVoiceStatus("error");
+          setErrorMessage("음성 인식 중 문제가 발생했습니다. 화면을 눌러 다시 시작하세요.");
+        }
+      };
+
+      recognition.onend = () => {
+        if (isClosingRef.current) {
+          return;
+        }
+
+        if (shouldSubmitOnEndRef.current) {
+          shouldSubmitOnEndRef.current = false;
+          isManualListeningRef.current = false;
+          const spokenText = getSpokenText();
+          if (!spokenText && !isProcessingRef.current) {
+            setVoiceStatus("idle");
+            return;
+          }
+          if (!isProcessingRef.current) {
+            void sendUserSpeech();
+          }
+          return;
+        }
+
+        if (isManualListeningRef.current && !isProcessingRef.current) {
+          try {
+            recognition.start();
+            return;
+          } catch {
+            setVoiceStatus("error");
+            setErrorMessage("마이크를 다시 시작하지 못했습니다. 화면을 눌러 다시 시도하세요.");
+            return;
+          }
+        }
+
+        const spokenText = getSpokenText();
+        if (!spokenText && !isProcessingRef.current) {
+          setVoiceStatus("idle");
+        }
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    resetTranscript();
+    isManualListeningRef.current = true;
+    shouldSubmitOnEndRef.current = false;
+    try {
+      recognitionRef.current.start();
+    } catch {
+      setVoiceStatus("error");
+      setErrorMessage("마이크를 시작하지 못했습니다. 화면을 눌러 다시 시도하세요.");
+    }
+  }, [getSpokenText, hasVoiceSession, sendUserSpeech, speechRecognitionConstructor]);
+
+  const stopListeningAndSubmit = useCallback(() => {
+    if (!recognitionRef.current || !isManualListeningRef.current || isProcessingRef.current) {
+      return;
+    }
+    shouldSubmitOnEndRef.current = true;
+    recognitionRef.current.stop();
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    if (voiceStatus === "listening") {
+      stopListeningAndSubmit();
       return;
     }
 
-    recognitionRef.current.onend = () => {
-      clearSilenceTimeout();
-      if (isClosingRef.current) {
-        return;
-      }
-
-      const spokenText = getSpokenText();
-      if (!spokenText && !isProcessingRef.current) {
-        setVoiceStatus("idle");
-        return;
-      }
-
-      if (!isProcessingRef.current) {
-        void sendUserSpeech();
-      }
-    };
-  }, [clearSilenceTimeout, getSpokenText, sendUserSpeech]);
-
-  useEffect(() => {
-    if (!hasVoiceSession || startedOnceRef.current) {
-      return;
-    }
-
-    startedOnceRef.current = true;
-    const timeoutId = window.setTimeout(() => {
+    if (voiceStatus === "idle" || voiceStatus === "error") {
       startListening();
-    }, 280);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [hasVoiceSession, startListening]);
+    }
+  }, [startListening, stopListeningAndSubmit, voiceStatus]);
 
   useEffect(() => {
     return () => {
       isClosingRef.current = true;
-      clearSilenceTimeout();
       recognitionRef.current?.stop();
       window.speechSynthesis.cancel();
     };
-  }, [clearSilenceTimeout]);
+  }, []);
 
   const statusText =
     voiceStatus === "listening"
-      ? "듣는 중..."
+      ? "듣는 중... 화면 탭 또는 스페이스바로 종료 후 전송됩니다."
       : voiceStatus === "thinking"
         ? "생각 중..."
         : voiceStatus === "speaking"
@@ -323,7 +302,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           : voiceStatus === "error"
             ? errorMessage ?? "음성 모드에 문제가 있습니다."
             : hasVoiceSession
-              ? "화면을 탭하면 다시 듣기 시작합니다."
+              ? "화면 탭 또는 스페이스바를 눌러 듣기를 시작하세요."
               : "대화를 먼저 시작한 뒤 음성 모드를 사용하세요.";
 
   return (
@@ -333,15 +312,11 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       <div
         role="button"
         tabIndex={0}
-        onClick={() => {
-          if (voiceStatus === "idle" || voiceStatus === "error") {
-            startListening();
-          }
-        }}
+        onClick={toggleListening}
         onKeyDown={(event) => {
-          if ((event.key === "Enter" || event.key === " ") && (voiceStatus === "idle" || voiceStatus === "error")) {
+          if ((event.key === " " || event.code === "Space" || event.key === "Spacebar")) {
             event.preventDefault();
-            startListening();
+            toggleListening();
           }
         }}
         className="relative flex min-h-screen flex-1 flex-col"
@@ -349,7 +324,10 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
         <div className="flex justify-end px-5 pt-5">
           <button
             type="button"
-            onClick={closeVoiceMode}
+            onClick={(event) => {
+              event.stopPropagation();
+              closeVoiceMode();
+            }}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e5e7eb] bg-[#efefee] text-[#111827] shadow-[0_8px_20px_rgba(17,24,39,0.08)] transition hover:bg-[#e7e7e6]"
             aria-label="close voice mode"
           >
