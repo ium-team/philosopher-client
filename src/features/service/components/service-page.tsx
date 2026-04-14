@@ -148,6 +148,14 @@ function mapConversation(
   };
 }
 
+function deriveInitialConversationTitle(content: string, maxLength = 80): string {
+  const normalized = content.trim().replace(/\s+/g, " ");
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+  return normalized.slice(0, maxLength).trimEnd();
+}
+
 function IconHamburger() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -481,11 +489,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       const createdConversation = isProjectConversation
         ? await createConversationRequest(accessToken, activeProjectId as string, {
             philosopher: toApiPhilosopherId(philosopher.id),
-            title: `${philosopher.name} 대화`,
           })
         : await createDefaultConversationRequest(accessToken, {
             philosopher: toApiPhilosopherId(philosopher.id),
-            title: `${philosopher.name} 대화`,
           });
       const messages = await listMessages(accessToken, createdConversation.id);
       const mappedConversation = mapConversation(createdConversation, messages);
@@ -757,7 +763,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           conversation.id === activeConversation.id
             ? {
                 ...conversation,
-                title: conversation.messages.length <= 1 ? trimmed.slice(0, 32) : conversation.title,
+                title:
+                  conversation.messages.length === 0
+                    ? deriveInitialConversationTitle(trimmed)
+                    : conversation.title,
                 messages: [...conversation.messages, userMessage, assistantMessage],
               }
             : conversation,
