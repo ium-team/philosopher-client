@@ -376,18 +376,16 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
         <div className="flex flex-1 items-center justify-center px-6">
           {activePhilosopher ? (
             <div
-              className={`rounded-full transition-all duration-300 ${
-                voiceStatus === "speaking"
-                  ? "scale-[1.03] animate-pulse bg-white/40 shadow-[0_0_56px_rgba(56,189,248,0.35)]"
-                  : "scale-100"
-              }`}
+              className={`rounded-full bg-white/40 shadow-[0_0_56px_rgba(56,189,248,0.35)]`}
             >
               <Image
                 src={activePhilosopher.imageSrc}
                 alt={`${activePhilosopher.name} portrait`}
                 width={440}
                 height={440}
-                className="h-[280px] w-[280px] object-contain object-bottom md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px]"
+                className={`h-[280px] w-[280px] object-contain object-bottom transition-all duration-300 md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px] ${
+                  voiceStatus === "speaking" ? "scale-[1.03] animate-pulse" : "scale-100"
+                }`}
               />
             </div>
           ) : null}
