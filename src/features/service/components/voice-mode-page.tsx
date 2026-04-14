@@ -114,6 +114,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     interimTranscriptRef.current = "";
     setLiveTranscript("");
   };
+  const getSpokenText = useCallback(() => {
+    return `${finalTranscriptRef.current} ${interimTranscriptRef.current}`.trim();
+  }, []);
 
   const clearSilenceTimeout = useCallback(() => {
     if (silenceTimeoutRef.current === null) {
@@ -185,7 +188,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           return;
         }
 
-        const spokenText = finalTranscriptRef.current.trim();
+        const spokenText = getSpokenText();
         if (!spokenText && !isProcessingRef.current) {
           setVoiceStatus("idle");
         }
@@ -201,7 +204,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       setVoiceStatus("error");
       setErrorMessage("마이크를 시작하지 못했습니다. 화면을 눌러 다시 시도하세요.");
     }
-  }, [armSilenceTimeout, clearSilenceTimeout, hasVoiceSession, speechRecognitionConstructor]);
+  }, [armSilenceTimeout, clearSilenceTimeout, getSpokenText, hasVoiceSession, speechRecognitionConstructor]);
 
   const speakAssistantText = useCallback((text: string) => {
     return new Promise<void>((resolve, reject) => {
@@ -231,10 +234,12 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
       return;
     }
 
-    const spokenText = finalTranscriptRef.current.trim();
+    const spokenText = getSpokenText();
     if (!spokenText) {
       return;
     }
+    finalTranscriptRef.current = spokenText;
+    interimTranscriptRef.current = "";
 
     setLastUserSpeech(spokenText);
     isProcessingRef.current = true;
@@ -263,7 +268,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     } finally {
       isProcessingRef.current = false;
     }
-  }, [accessToken, conversationId, hasVoiceSession, speakAssistantText, startListening]);
+  }, [accessToken, conversationId, getSpokenText, hasVoiceSession, speakAssistantText, startListening]);
 
   useEffect(() => {
     if (!recognitionRef.current) {
@@ -271,11 +276,12 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
     }
 
     recognitionRef.current.onend = () => {
+      clearSilenceTimeout();
       if (isClosingRef.current) {
         return;
       }
 
-      const spokenText = finalTranscriptRef.current.trim();
+      const spokenText = getSpokenText();
       if (!spokenText && !isProcessingRef.current) {
         setVoiceStatus("idle");
         return;
@@ -285,7 +291,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
         void sendUserSpeech();
       }
     };
-  }, [sendUserSpeech]);
+  }, [clearSilenceTimeout, getSpokenText, sendUserSpeech]);
 
   useEffect(() => {
     if (!hasVoiceSession || startedOnceRef.current) {
