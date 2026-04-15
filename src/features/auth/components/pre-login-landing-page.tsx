@@ -58,7 +58,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
             <h1 className="mt-4 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
               Philosopher
               <br />
-              <span className="text-[#b28646]">Unpacked</span>
+              <span className="text-[#b28646]">Dialogue</span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#5f5143]">
               {siteConfig.description} 질문하고, 반박하고, 재구성하며 사고를 명확하게 만드는 대화형 철학 도구입니다.
