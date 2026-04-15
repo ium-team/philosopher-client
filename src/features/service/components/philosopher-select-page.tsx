@@ -1,11 +1,62 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { philosophers } from "@/data/philosophers";
 
+function getCardsPerPage(width: number): number {
+  if (width >= 1280) {
+    return 6;
+  }
+  if (width >= 768) {
+    return 4;
+  }
+  return 2;
+}
+
 export function PhilosopherSelectPage() {
   const router = useRouter();
+  const [philosopherQuery, setPhilosopherQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [cardsPerPage, setCardsPerPage] = useState(6);
+
+  useEffect(() => {
+    const updateCardsPerPage = () => {
+      setCardsPerPage(getCardsPerPage(window.innerWidth));
+    };
+
+    updateCardsPerPage();
+    window.addEventListener("resize", updateCardsPerPage);
+    return () => window.removeEventListener("resize", updateCardsPerPage);
+  }, []);
+
+  const filteredPhilosophers = useMemo(() => {
+    const normalized = philosopherQuery.trim().toLowerCase();
+    if (!normalized) {
+      return philosophers;
+    }
+
+    return philosophers.filter((philosopher) =>
+      [philosopher.name, philosopher.era, philosopher.school].some((value) =>
+        value.toLowerCase().includes(normalized),
+      ),
+    );
+  }, [philosopherQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredPhilosophers.length / cardsPerPage));
+  const pagedPhilosophers = useMemo(() => {
+    const start = currentPage * cardsPerPage;
+    return filteredPhilosophers.slice(start, start + cardsPerPage);
+  }, [cardsPerPage, currentPage, filteredPhilosophers]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [philosopherQuery, cardsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage((previous) => Math.min(previous, totalPages - 1));
+  }, [totalPages]);
 
   return (
     <main className="min-h-screen bg-[#fffcf8] px-5 py-10 text-[#2a241f] md:px-8">
@@ -24,8 +75,48 @@ export function PhilosopherSelectPage() {
           <p className="mt-2 text-sm text-[#7f7369]">선택 후 `채팅하기`를 누르면 해당 철학자와의 대화가 시작됩니다.</p>
         </header>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {philosophers.map((philosopher) => (
+        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <label className="block w-full md:max-w-sm">
+            <span className="sr-only">철학자 검색</span>
+            <input
+              type="text"
+              value={philosopherQuery}
+              onChange={(event) => setPhilosopherQuery(event.target.value)}
+              placeholder="철학자 검색 (이름/시대/학파)"
+              className="w-full rounded-xl border border-[#e7ddcf] bg-white px-4 py-2.5 text-sm text-[#2a241f] outline-none transition placeholder:text-[#aa9e91] focus:border-[#d7c5ae] focus:ring-2 focus:ring-[#f4e5d3]"
+            />
+          </label>
+          <div className="flex items-center gap-2 self-end md:self-auto">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((previous) => Math.max(previous - 1, 0))}
+              disabled={currentPage === 0}
+              className="h-10 rounded-lg border border-[#e7ddcf] bg-white px-3 text-sm text-[#7b6958] transition hover:bg-[#f9f3ec] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ←
+            </button>
+            <p className="min-w-24 text-center text-xs text-[#8a7a6c]">
+              {currentPage + 1} / {totalPages}
+            </p>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((previous) => Math.min(previous + 1, totalPages - 1))}
+              disabled={currentPage >= totalPages - 1}
+              className="h-10 rounded-lg border border-[#e7ddcf] bg-white px-3 text-sm text-[#7b6958] transition hover:bg-[#f9f3ec] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              →
+            </button>
+          </div>
+        </div>
+
+        {filteredPhilosophers.length === 0 ? (
+          <div className="rounded-2xl border border-[#efe6da] bg-white px-4 py-8 text-center text-sm text-[#8f8377]">
+            검색 결과가 없습니다.
+          </div>
+        ) : null}
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {pagedPhilosophers.map((philosopher) => (
             <article
               key={philosopher.id}
               className="group rounded-2xl border border-[#efe6da] bg-white p-5 shadow-[0_10px_26px_rgba(125,79,25,0.08)]"

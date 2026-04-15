@@ -84,6 +84,16 @@ const initialConversations: Conversation[] = [];
 const initialProjects: Project[] = [];
 const VOICE_SILENCE_TIMEOUT_MS = 1600;
 
+function getPhilosopherCardsPerPage(width: number): number {
+  if (width >= 1280) {
+    return 6;
+  }
+  if (width >= 768) {
+    return 4;
+  }
+  return 2;
+}
+
 function toApiPhilosopherId(philosopherId: string): ApiPhilosopher {
   if (philosopherId === "arendt") {
     return "hannah_arendt";
@@ -377,6 +387,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [activeConversationId, setActiveConversationId] = useState("");
   const [draft, setDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [philosopherSearchQuery, setPhilosopherSearchQuery] = useState("");
+  const [philosopherSelectPage, setPhilosopherSelectPage] = useState(0);
+  const [philosopherCardsPerPage, setPhilosopherCardsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isResponding, setIsResponding] = useState(false);
   const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
@@ -457,6 +470,41 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     : "철학자와 대화를 시작해보세요";
   const initialGuideSummary = activePhilosopher?.summary ?? "질문을 던지면 생각의 결을 따라 깊이 있게 답변합니다.";
   const cautionSubject = activePhilosopher?.name ?? "AI";
+  const filteredPhilosophers = useMemo(() => {
+    const normalized = philosopherSearchQuery.trim().toLowerCase();
+    if (!normalized) {
+      return philosophers;
+    }
+
+    return philosophers.filter((philosopher) =>
+      [philosopher.name, philosopher.era, philosopher.school].some((value) =>
+        value.toLowerCase().includes(normalized),
+      ),
+    );
+  }, [philosopherSearchQuery]);
+  const philosopherTotalPages = Math.max(1, Math.ceil(filteredPhilosophers.length / philosopherCardsPerPage));
+  const pagedPhilosophers = useMemo(() => {
+    const start = philosopherSelectPage * philosopherCardsPerPage;
+    return filteredPhilosophers.slice(start, start + philosopherCardsPerPage);
+  }, [filteredPhilosophers, philosopherCardsPerPage, philosopherSelectPage]);
+
+  useEffect(() => {
+    const updateCardsPerPage = () => {
+      setPhilosopherCardsPerPage(getPhilosopherCardsPerPage(window.innerWidth));
+    };
+
+    updateCardsPerPage();
+    window.addEventListener("resize", updateCardsPerPage);
+    return () => window.removeEventListener("resize", updateCardsPerPage);
+  }, []);
+
+  useEffect(() => {
+    setPhilosopherSelectPage(0);
+  }, [philosopherSearchQuery, philosopherCardsPerPage]);
+
+  useEffect(() => {
+    setPhilosopherSelectPage((previous) => Math.min(previous, philosopherTotalPages - 1));
+  }, [philosopherTotalPages]);
 
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
@@ -1733,8 +1781,50 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   </p>
                 </header>
 
+                <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <label className="block w-full md:max-w-sm">
+                    <span className="sr-only">철학자 검색</span>
+                    <input
+                      type="text"
+                      value={philosopherSearchQuery}
+                      onChange={(event) => setPhilosopherSearchQuery(event.target.value)}
+                      placeholder="철학자 검색 (이름/시대/학파)"
+                      className="w-full rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm text-[#111827] outline-none transition placeholder:text-[#9ca3af] focus:border-[#cbd5e1] focus:ring-2 focus:ring-[#e2e8f0]"
+                    />
+                  </label>
+                  <div className="flex items-center gap-2 self-end md:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => setPhilosopherSelectPage((previous) => Math.max(previous - 1, 0))}
+                      disabled={philosopherSelectPage === 0}
+                      className="h-10 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#475569] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      ←
+                    </button>
+                    <p className="min-w-24 text-center text-xs text-[#6b7280]">
+                      {philosopherSelectPage + 1} / {philosopherTotalPages}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPhilosopherSelectPage((previous) => Math.min(previous + 1, philosopherTotalPages - 1))
+                      }
+                      disabled={philosopherSelectPage >= philosopherTotalPages - 1}
+                      className="h-10 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#475569] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      →
+                    </button>
+                  </div>
+                </div>
+
+                {filteredPhilosophers.length === 0 ? (
+                  <div className="mb-5 rounded-2xl border border-[#e5e7eb] bg-white px-4 py-8 text-center text-sm text-[#6b7280]">
+                    검색 결과가 없습니다.
+                  </div>
+                ) : null}
+
                 <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                  {philosophers.map((philosopher) => (
+                  {pagedPhilosophers.map((philosopher) => (
                     <article
                       key={philosopher.id}
                       className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-[0_12px_30px_rgba(17,24,39,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(17,24,39,0.12)]"
