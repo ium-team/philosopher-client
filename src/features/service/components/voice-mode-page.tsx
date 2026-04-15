@@ -47,13 +47,21 @@ type SpeechRecognitionLike = {
 type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 
 function toApiPhilosopherId(philosopherId: string | null): ApiPhilosopher {
-  if (philosopherId === "arendt") {
-    return "hannah_arendt";
+  const mapper: Record<string, ApiPhilosopher> = {
+    socrates: "socrates",
+    nietzsche: "nietzsche",
+    arendt: "hannah_arendt",
+    plato: "plato",
+    aristotle: "aristotle",
+    descartes: "rene_descartes",
+    kant: "immanuel_kant",
+    confucius: "confucius",
+    simone_de_beauvoir: "simone_de_beauvoir",
+  };
+  if (!philosopherId) {
+    return "socrates";
   }
-  if (philosopherId === "socrates" || philosopherId === "nietzsche") {
-    return philosopherId;
-  }
-  return "socrates";
+  return mapper[philosopherId] ?? "socrates";
 }
 
 function IconClose({ className = "h-5 w-5" }: { className?: string }) {

@@ -9,7 +9,6 @@ export type PhilosopherProfile = {
   works: string[];
   promptSamples: string[];
   accentColor: string;
-  isComingSoon?: boolean;
 };
 
 export const philosophers: PhilosopherProfile[] = [
@@ -76,7 +75,6 @@ export const philosophers: PhilosopherProfile[] = [
     works: ["Republic", "Symposium", "Phaedrus"],
     promptSamples: ["정의로운 국가는 가능할까?", "사랑은 왜 인간을 변화시키는가?"],
     accentColor: "from-indigo-400/30 to-blue-500/10",
-    isComingSoon: true,
   },
   {
     id: "aristotle",
@@ -89,7 +87,6 @@ export const philosophers: PhilosopherProfile[] = [
     works: ["Nicomachean Ethics", "Politics", "Metaphysics"],
     promptSamples: ["좋은 삶은 무엇으로 판단할 수 있을까?", "덕은 타고나는가, 길러지는가?"],
     accentColor: "from-emerald-400/30 to-teal-500/10",
-    isComingSoon: true,
   },
   {
     id: "descartes",
@@ -102,7 +99,6 @@ export const philosophers: PhilosopherProfile[] = [
     works: ["Meditations", "Discourse on the Method", "Principles of Philosophy"],
     promptSamples: ["무엇을 확실히 안다고 말할 수 있을까?", "이성만으로 진리에 도달할 수 있을까?"],
     accentColor: "from-slate-400/30 to-zinc-500/10",
-    isComingSoon: true,
   },
   {
     id: "kant",
@@ -115,7 +111,6 @@ export const philosophers: PhilosopherProfile[] = [
     works: ["Critique of Pure Reason", "Groundwork of the Metaphysics of Morals", "Critique of Practical Reason"],
     promptSamples: ["옳은 행동은 결과보다 의도에 달렸을까?", "자유는 왜 도덕의 전제가 되는가?"],
     accentColor: "from-violet-400/30 to-purple-500/10",
-    isComingSoon: true,
   },
   {
     id: "confucius",
@@ -128,7 +123,6 @@ export const philosophers: PhilosopherProfile[] = [
     works: ["Analects", "Book of Rites", "Spring and Autumn Annals"],
     promptSamples: ["좋은 리더는 어떤 태도를 가져야 할까?", "배움은 왜 평생 지속되어야 할까?"],
     accentColor: "from-amber-400/30 to-yellow-500/10",
-    isComingSoon: true,
   },
   {
     id: "simone_de_beauvoir",
@@ -141,6 +135,5 @@ export const philosophers: PhilosopherProfile[] = [
     works: ["The Second Sex", "The Ethics of Ambiguity", "The Coming of Age"],
     promptSamples: ["나는 얼마나 스스로를 선택하며 살고 있을까?", "자유는 왜 타인의 자유와 함께 생각해야 할까?"],
     accentColor: "from-rose-400/30 to-pink-500/10",
-    isComingSoon: true,
   },
 ];

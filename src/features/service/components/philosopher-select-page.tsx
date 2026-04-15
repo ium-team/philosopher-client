@@ -141,15 +141,11 @@ export function PhilosopherSelectPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (philosopher.isComingSoon) {
-                    return;
-                  }
                   router.push(`/service?philosopher=${philosopher.id}&new=1`);
                 }}
-                disabled={philosopher.isComingSoon}
-                className="mb-4 w-full rounded-xl border border-[#fed7aa] bg-[#fff5ea] px-4 py-2.5 text-sm font-semibold text-[#9a3412] transition hover:bg-[#ffedd8] disabled:cursor-not-allowed disabled:border-[#e7e5e4] disabled:bg-[#f5f5f4] disabled:text-[#a8a29e] disabled:hover:bg-[#f5f5f4]"
+                className="mb-4 w-full rounded-xl border border-[#fed7aa] bg-[#fff5ea] px-4 py-2.5 text-sm font-semibold text-[#9a3412] transition hover:bg-[#ffedd8]"
               >
-                {philosopher.isComingSoon ? "준비 중" : "채팅하기"}
+                채팅하기
               </button>
               <p className="text-xs text-[#a3917f]">{philosopher.era}</p>
               <h2 className="mt-1 text-xl font-semibold text-[#2f2720]">{philosopher.name}</h2>

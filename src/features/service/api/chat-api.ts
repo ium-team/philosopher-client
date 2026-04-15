@@ -1,6 +1,15 @@
 import { env } from "@/config/env";
 
-export type ApiPhilosopher = "socrates" | "nietzsche" | "hannah_arendt";
+export type ApiPhilosopher =
+  | "socrates"
+  | "nietzsche"
+  | "hannah_arendt"
+  | "plato"
+  | "aristotle"
+  | "rene_descartes"
+  | "immanuel_kant"
+  | "confucius"
+  | "simone_de_beauvoir";
 export type ApiMessageRole = "user" | "assistant";
 
 export type ApiProject = {

@@ -95,18 +95,29 @@ function getPhilosopherCardsPerPage(width: number): number {
 }
 
 function toApiPhilosopherId(philosopherId: string): ApiPhilosopher {
-  if (philosopherId === "arendt") {
-    return "hannah_arendt";
-  }
-  if (philosopherId === "socrates" || philosopherId === "nietzsche") {
-    return philosopherId;
-  }
-  return "socrates";
+  const mapper: Record<string, ApiPhilosopher> = {
+    socrates: "socrates",
+    nietzsche: "nietzsche",
+    arendt: "hannah_arendt",
+    plato: "plato",
+    aristotle: "aristotle",
+    descartes: "rene_descartes",
+    kant: "immanuel_kant",
+    confucius: "confucius",
+    simone_de_beauvoir: "simone_de_beauvoir",
+  };
+  return mapper[philosopherId] ?? "socrates";
 }
 
 function fromApiPhilosopherId(philosopherId: ApiPhilosopher): string {
   if (philosopherId === "hannah_arendt") {
     return "arendt";
+  }
+  if (philosopherId === "rene_descartes") {
+    return "descartes";
+  }
+  if (philosopherId === "immanuel_kant") {
+    return "kant";
   }
   return philosopherId;
 }
@@ -1866,15 +1877,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         <button
                           type="button"
                           onClick={() => {
-                            if (philosopher.isComingSoon) {
-                              return;
-                            }
                             void startConversationWith(philosopher);
                           }}
-                          disabled={philosopher.isComingSoon}
-                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af] disabled:hover:bg-[#f3f4f6]"
+                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
                         >
-                          {philosopher.isComingSoon ? `${philosopher.name} (준비 중)` : `${philosopher.name}와 대화하기`}
+                          {`${philosopher.name}와 대화하기`}
                         </button>
                       </div>
                     </article>
