@@ -31,14 +31,6 @@ export function PhilosopherSelectPage() {
     return () => window.removeEventListener("resize", updateCardsPerPage);
   }, []);
 
-  useEffect(() => {
-    const previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousBodyOverflow;
-    };
-  }, []);
-
   const filteredPhilosophers = useMemo(() => {
     const normalized = philosopherQuery.trim().toLowerCase();
     if (!normalized) {
@@ -67,7 +59,7 @@ export function PhilosopherSelectPage() {
   }, [totalPages]);
 
   return (
-    <main className="h-screen overflow-hidden bg-[#fffcf8] px-5 py-10 text-[#2a241f] md:px-8">
+    <main className="min-h-screen bg-[#fffcf8] px-5 py-6 text-[#2a241f] md:px-8 md:py-8">
       <div className="mx-auto w-full max-w-5xl">
         <button
           type="button"
@@ -77,13 +69,13 @@ export function PhilosopherSelectPage() {
           ← 대화로 돌아가기
         </button>
 
-        <header className="mb-7">
+        <header className="mb-5">
           <p className="text-xs tracking-[0.18em] text-[#a3917f] uppercase">New Conversation</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#2f2720]">대화할 철학자를 선택하세요</h1>
           <p className="mt-2 text-sm text-[#7f7369]">선택 후 `채팅하기`를 누르면 해당 철학자와의 대화가 시작됩니다.</p>
         </header>
 
-        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <label className="block w-full md:max-w-sm">
             <span className="sr-only">철학자 검색</span>
             <input
@@ -129,7 +121,7 @@ export function PhilosopherSelectPage() {
               key={philosopher.id}
               className="group rounded-2xl border border-[#efe6da] bg-white p-5 shadow-[0_10px_26px_rgba(125,79,25,0.08)]"
             >
-              <div className="relative mb-4 h-72 overflow-hidden rounded-2xl border border-[#f2e9de] bg-[radial-gradient(circle_at_50%_20%,#fffaf3_0%,#f5ece2_75%)] md:h-80">
+              <div className="relative mb-4 h-56 overflow-hidden rounded-2xl border border-[#f2e9de] bg-[radial-gradient(circle_at_50%_20%,#fffaf3_0%,#f5ece2_75%)] md:h-60 xl:h-64">
                 <div className="absolute inset-x-5 bottom-3 h-8 rounded-full bg-[#7c5b3f]/20 blur-md" />
                 <Image
                   src={philosopher.imageSrc}

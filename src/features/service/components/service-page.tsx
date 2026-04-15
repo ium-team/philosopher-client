@@ -506,18 +506,6 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setPhilosopherSelectPage((previous) => Math.min(previous, philosopherTotalPages - 1));
   }, [philosopherTotalPages]);
 
-  useEffect(() => {
-    if (!isSelectingPhilosopher) {
-      return;
-    }
-
-    const previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousBodyOverflow;
-    };
-  }, [isSelectingPhilosopher]);
-
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
 
@@ -1772,11 +1760,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           </div>
         </header>
 
-        <div
-          ref={scrollRef}
-          className={`flex min-h-0 flex-1 flex-col ${isSelectingPhilosopher ? "overflow-hidden" : "overflow-y-auto"}`}
-        >
-          <div className="mx-auto w-full max-w-[920px] px-5 pb-36 pt-8 md:px-8">
+        <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div
+            className={`mx-auto w-full max-w-[920px] px-5 ${isSelectingPhilosopher ? "pb-12 pt-6" : "pb-36 pt-8"} md:px-8`}
+          >
             {isHydrating ? (
               <div className="sr-only">대화 데이터를 불러오는 중입니다...</div>
             ) : null}
@@ -1787,7 +1774,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             ) : null}
             {isSelectingPhilosopher ? (
               <>
-                <header className="mb-6">
+                <header className="mb-5">
                   <p className="text-xs tracking-[0.18em] text-[#9ca3af] uppercase">New Conversation</p>
                   <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#111827]">대화할 철학자를 선택하세요</h1>
                   <p className="mt-2 text-sm text-[#6b7280]">
@@ -1796,7 +1783,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   </p>
                 </header>
 
-                <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <label className="block w-full md:max-w-sm">
                     <span className="sr-only">철학자 검색</span>
                     <input
@@ -1844,7 +1831,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       key={philosopher.id}
                       className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-[0_12px_30px_rgba(17,24,39,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(17,24,39,0.12)]"
                     >
-                      <div className="relative h-72 overflow-hidden border-b border-[#edf1f5] bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#f5f8fb_74%)]">
+                      <div className="relative h-56 overflow-hidden border-b border-[#edf1f5] bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#f5f8fb_74%)] md:h-60 xl:h-64">
                         <div className="absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-[#0f172a]/70 to-transparent" />
                         <div className="absolute inset-x-8 bottom-3 h-8 rounded-full bg-[#64748b]/20 blur-md" />
                         <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#fff3e0]" />
