@@ -1773,10 +1773,16 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                       <div className="p-5">
                         <button
                           type="button"
-                          onClick={() => void startConversationWith(philosopher)}
-                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2]"
+                          onClick={() => {
+                            if (philosopher.isComingSoon) {
+                              return;
+                            }
+                            void startConversationWith(philosopher);
+                          }}
+                          disabled={philosopher.isComingSoon}
+                          className="w-full rounded-xl border border-[#ffb74d] bg-[#fff3e0] px-4 py-2.5 text-sm font-semibold text-[#ff6d00] transition group-hover:bg-[#ffe8c5] hover:bg-[#ffe0b2] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-[#f3f4f6] disabled:text-[#9ca3af] disabled:hover:bg-[#f3f4f6]"
                         >
-                          {philosopher.name}와 대화하기
+                          {philosopher.isComingSoon ? `${philosopher.name} (준비 중)` : `${philosopher.name}와 대화하기`}
                         </button>
                       </div>
                     </article>
