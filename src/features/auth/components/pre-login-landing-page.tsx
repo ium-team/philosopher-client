@@ -44,7 +44,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 py-12 md:px-10 md:py-20">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 pt-12 pb-0 md:px-10 md:pt-20 md:pb-0">
         <section className="px-1 py-10 md:px-2 md:py-14">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
@@ -112,20 +112,21 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </section>
         ) : null}
 
-        <footer className="mt-auto border-t border-[#eadccc] pt-10 pb-6">
-          <div className="flex flex-col gap-3 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between">
-            <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="transition hover:text-[#4f4031]">
-                이용약관
-              </a>
-              <a href="#" className="transition hover:text-[#4f4031]">
-                개인정보처리방침
-              </a>
-            </div>
-          </div>
-        </footer>
       </div>
+
+      <footer className="relative mt-auto border-t border-[#eadccc] pt-6 pb-0">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 px-6 pb-4 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between md:px-10">
+          <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <a href="#" className="transition hover:text-[#4f4031]">
+              이용약관
+            </a>
+            <a href="#" className="transition hover:text-[#4f4031]">
+              개인정보처리방침
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
