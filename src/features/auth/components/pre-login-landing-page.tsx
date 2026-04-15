@@ -14,7 +14,6 @@ const heroPhilosophers = ["socrates", "plato", "nietzsche", "simone_de_beauvoir"
 const keyPoints = [
   "철학자별 고유한 말투와 사고 방식",
   "텍스트와 음성 기반 대화 모두 지원",
-  "대화 기록을 프로젝트 단위로 정리",
 ] as const;
 
 export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPageProps) {
