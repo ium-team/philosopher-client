@@ -27,7 +27,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
   const selectedPhilosophers = philosophers.filter((philosopher) => heroPhilosophers.includes(philosopher.id));
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#fffdf8] text-[#211c16]">
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#fffdf8] text-[#211c16]">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-30%,rgba(195,140,44,0.1)_0%,rgba(255,253,248,0)_60%)]" />
         <div className="absolute inset-0 opacity-[0.14] [background:repeating-linear-gradient(90deg,transparent,transparent_7px,rgba(96,74,40,0.08)_8px,transparent_9px)]" />
@@ -51,7 +51,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-[1280px] flex-col gap-20 px-6 py-16 md:px-10 md:py-24">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 py-16 md:px-10 md:py-24">
         <section className="px-1 py-12 md:px-2 md:py-16">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
@@ -144,7 +144,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </div>
 
-        <footer className="border-t border-[#eadccc] pt-10 pb-6">
+        <footer className="mt-auto border-t border-[#eadccc] pt-10 pb-6">
           <div className="flex flex-col gap-3 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between">
             <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
             <div className="flex items-center gap-4">
