@@ -9,7 +9,7 @@ type PreLoginLandingPageProps = {
   onSignIn: () => Promise<void>;
 };
 
-const heroPhilosophers = ["socrates", "nietzsche"];
+const heroPhilosophers = ["socrates", "plato", "nietzsche", "simone_de_beauvoir"];
 
 const keyPoints = [
   "철학자별 고유한 말투와 사고 방식",
@@ -20,6 +20,7 @@ const keyPoints = [
 const flowItems = [
   { number: "01", title: "철학자 선택" },
   { number: "02", title: "질문 시작" },
+  { number: "03", title: "생각 확장" },
 ] as const;
 
 export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPageProps) {
@@ -78,11 +79,11 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="rounded-2xl border border-[#eadfce] bg-white/92 p-5 md:p-6">
+          <div className="p-1 md:p-2">
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-[#2a231b] md:text-4xl">What You Get</h2>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-5 space-y-2">
               {keyPoints.map((point) => (
-                <li key={point} className="rounded-xl border border-[#eee2d3] bg-[#fffbf6] px-4 py-3 text-base text-[#4c4034]">
+                <li key={point} className="border-b border-[#eee2d3] py-3 text-base text-[#4c4034]">
                   <span className="font-semibold text-[#a0763d]">•</span> {point}
                 </li>
               ))}
@@ -90,13 +91,13 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
 
           <div className="rounded-2xl border border-[#eadfce] bg-[linear-gradient(180deg,#fffaf3_0%,#f9f1e6_100%)] p-3">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-3">
               {selectedPhilosophers.map((philosopher) => (
                 <article
                   key={philosopher.id}
                   className="group overflow-hidden rounded-2xl border border-[#ebdecf] bg-white p-3 transition duration-200 hover:-translate-y-1 hover:shadow-[0_12px_20px_rgba(84,54,24,0.14)]"
                 >
-                  <div className="relative h-52 md:h-56">
+                  <div className="relative h-40 md:h-44">
                     <Image
                       src={philosopher.imageSrc}
                       alt={`${philosopher.name} portrait`}
@@ -115,14 +116,14 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#eadccc] bg-white/95 p-6 md:p-8">
+        <section className="p-1 md:p-2">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">How It Works</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="mt-5 grid gap-6 md:grid-cols-3">
             {flowItems.map((item) => (
-              <article key={item.number} className="relative rounded-xl border border-[#efe2d4] bg-[#fffaf4] p-4 text-center">
+              <article key={item.number} className="relative text-center">
                 <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
                 <h2 className="mt-2 text-xl font-bold tracking-tight text-[#2f2720]">{item.title}</h2>
-                <div className="mt-3 h-1 w-12 rounded-full bg-[#f4c59e]" />
+                <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#f4c59e]" />
               </article>
             ))}
           </div>
@@ -131,7 +132,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           ) : null}
         </section>
 
-        <section className="rounded-2xl border border-[#eadccc] bg-[#fff8ef] px-5 py-5 md:px-8">
+        <div className="border-t border-[#eadccc] pt-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <p className="text-base leading-7 text-[#5d5147]">
               대화는 단순한 Q&A가 아니라, <span className="font-semibold text-[#332821]">사고를 확장하는 훈련</span>입니다.
@@ -144,7 +145,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
               Google로 계속하기
             </button>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   );
