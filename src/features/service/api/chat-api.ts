@@ -86,6 +86,7 @@ export async function synthesizeSpeech(
     philosopher_id: ApiPhilosopher;
     text: string;
   },
+  signal?: AbortSignal,
 ): Promise<Blob> {
   const response = await fetch(`${getApiBaseUrl()}/api/v1/tts`, {
     method: "POST",
@@ -95,6 +96,7 @@ export async function synthesizeSpeech(
       Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify(payload),
+    signal,
   });
 
   if (!response.ok) {

@@ -369,8 +369,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [readingMessageId, setReadingMessageId] = useState<string | null>(null);
   const [isRoutePending, startRouteTransition] = useTransition();
   const messageLoadRequestIdRef = useRef(0);
-  const readingAudioRef = useRef<HTMLAudioElement | null>(null);
-  const readingAudioUrlRef = useRef<string | null>(null);
+  const readingAudiosRef = useRef<Set<HTMLAudioElement>>(new Set());
+  const readingAudioUrlsRef = useRef<Set<string>>(new Set());
+  const readingAbortControllerRef = useRef<AbortController | null>(null);
   const readingRequestIdRef = useRef(0);
   const accessToken = session?.access_token ?? "";
 
@@ -784,15 +785,19 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   const stopReadingAudio = useCallback(() => {
     readingRequestIdRef.current += 1;
-    if (readingAudioRef.current) {
-      readingAudioRef.current.pause();
-      readingAudioRef.current.src = "";
-      readingAudioRef.current = null;
+    if (readingAbortControllerRef.current) {
+      readingAbortControllerRef.current.abort();
+      readingAbortControllerRef.current = null;
     }
-    if (readingAudioUrlRef.current) {
-      URL.revokeObjectURL(readingAudioUrlRef.current);
-      readingAudioUrlRef.current = null;
+    for (const audio of readingAudiosRef.current) {
+      audio.pause();
+      audio.src = "";
     }
+    readingAudiosRef.current.clear();
+    for (const url of readingAudioUrlsRef.current) {
+      URL.revokeObjectURL(url);
+    }
+    readingAudioUrlsRef.current.clear();
     setReadingMessageId(null);
   }, []);
 
@@ -1079,20 +1084,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setReadingMessageId(messageId);
     const requestId = readingRequestIdRef.current + 1;
     readingRequestIdRef.current = requestId;
+    const abortController = new AbortController();
+    readingAbortControllerRef.current = abortController;
 
     try {
       const ttsBlob = await synthesizeSpeechRequest(accessToken, {
         philosopher_id: toApiPhilosopherId(activeConversation.philosopherId),
         text,
-      });
+      }, abortController.signal);
       if (readingRequestIdRef.current !== requestId) {
         return;
       }
       const audioUrl = URL.createObjectURL(ttsBlob);
-      readingAudioUrlRef.current = audioUrl;
+      readingAudioUrlsRef.current.add(audioUrl);
 
       const audio = new Audio(audioUrl);
-      readingAudioRef.current = audio;
+      readingAudiosRef.current.add(audio);
       audio.onended = () => {
         stopReadingAudio();
       };
@@ -1104,6 +1111,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       await audio.play();
     } catch (error) {
       stopReadingAudio();
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
       const message = error instanceof Error ? error.message : "답변 음성 재생에 실패했습니다.";
       setLoadError(message);
     }
