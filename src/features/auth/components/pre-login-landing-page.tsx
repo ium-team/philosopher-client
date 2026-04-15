@@ -51,19 +51,19 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-[1280px] flex-col gap-14 px-6 py-12 md:px-10 md:py-16">
-        <section className="px-1 py-8 md:px-2 md:py-10">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-col gap-20 px-6 py-16 md:px-10 md:py-24">
+        <section className="px-1 py-12 md:px-2 md:py-16">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
-            <h1 className="mt-5 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
+            <h1 className="mt-7 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
               Philosopher
               <br />
               <span className="text-[#b28646]">Dialogue</span>
             </h1>
-            <p className="mx-auto mt-8 max-w-4xl text-lg leading-8 text-[#5f5143] md:text-xl md:leading-9">
+            <p className="mx-auto mt-10 max-w-4xl text-lg leading-8 text-[#5f5143] md:text-xl md:leading-9">
               {siteConfig.description} 질문하고, 반박하고, 재구성하며 사고를 명확하게 만드는 대화형 철학 도구입니다.
             </p>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
               <button
                 type="button"
                 onClick={onSignIn}
@@ -75,12 +75,12 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </section>
 
-        <section className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-start">
+        <section className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="p-1 md:p-2">
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-[#2a231b] md:text-4xl">What You Get</h2>
-            <ul className="mt-7 space-y-3">
+            <ul className="mt-8 space-y-4">
               {keyPoints.map((point) => (
-                <li key={point} className="border-b border-[#eee2d3] py-3 text-base text-[#4c4034]">
+                <li key={point} className="border-b border-[#eee2d3] py-4 text-base text-[#4c4034]">
                   <span className="font-semibold text-[#a0763d]">•</span> {point}
                 </li>
               ))}
@@ -88,7 +88,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
 
           <div className="p-1">
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 gap-6">
               {selectedPhilosophers.map((philosopher) => (
                 <article
                   key={philosopher.id}
@@ -115,7 +115,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
 
         <section className="p-1 md:p-2">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">How It Works</p>
-          <div className="mt-7 grid gap-10 md:grid-cols-3">
+          <div className="mt-10 grid gap-12 md:grid-cols-3">
             {flowItems.map((item) => (
               <article key={item.number} className="text-center">
                 <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
@@ -129,7 +129,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           ) : null}
         </section>
 
-        <div className="border-t border-[#eadccc] pt-8">
+        <div className="border-t border-[#eadccc] pt-10">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <p className="text-base leading-7 text-[#5d5147]">
               대화는 단순한 Q&A가 아니라, <span className="font-semibold text-[#332821]">사고를 확장하는 훈련</span>입니다.
@@ -144,7 +144,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </div>
 
-        <footer className="border-t border-[#eadccc] pt-8 pb-3">
+        <footer className="border-t border-[#eadccc] pt-10 pb-6">
           <div className="flex flex-col gap-3 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between">
             <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
             <div className="flex items-center gap-4">
