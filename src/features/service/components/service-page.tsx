@@ -410,6 +410,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [isProjectMoveMenuOpen, setIsProjectMoveMenuOpen] = useState(false);
   const [isProjectSettingsOpen, setIsProjectSettingsOpen] = useState(false);
   const [isProjectDeleteConfirmOpen, setIsProjectDeleteConfirmOpen] = useState(false);
+  const [isConversationDeleteConfirmOpen, setIsConversationDeleteConfirmOpen] = useState(false);
   const [projectSettingsName, setProjectSettingsName] = useState("");
   const [projectSettingsGuideline, setProjectSettingsGuideline] = useState(
     "내가 분야를 말하면 그 분야의 cs 지식에 대한 질문을 던져주는데 일단 너의 형식을 알려주자면 질문주고나서 내가 답변을 하면 너는 그 답을 평가해줘.",
@@ -730,6 +731,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   const deleteActiveConversation = async () => {
     if (!activeConversation) {
+      setIsConversationDeleteConfirmOpen(false);
       return;
     }
 
@@ -744,6 +746,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       setActiveConversationId("");
       setIsSelectingPhilosopher(false);
       setIsMoveMenuOpen(false);
+      setIsConversationDeleteConfirmOpen(false);
       setLoadError(null);
     } catch (error) {
       const message = error instanceof Error ? error.message : "채팅 삭제에 실패했습니다.";
@@ -1074,7 +1077,15 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setActiveConversationId("");
     setIsSelectingPhilosopher(true);
   };
-  const closeProjectSettings = async () => {
+  const cancelProjectSettings = () => {
+    if (activeProject) {
+      setProjectSettingsName(activeProject.name);
+      setProjectSettingsGuideline(activeProject.instruction ?? "");
+    }
+    setIsProjectSettingsOpen(false);
+    setIsProjectDeleteConfirmOpen(false);
+  };
+  const saveProjectSettings = async () => {
     if (!activeProject) {
       setIsProjectSettingsOpen(false);
       return;
@@ -1706,7 +1717,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                         <div className="my-0.5 h-px bg-[#f1f5f9]" />
                         <button
                           type="button"
-                          onClick={() => void deleteActiveConversation()}
+                          onClick={() => {
+                            setIsMoveMenuOpen(false);
+                            setIsConversationDeleteConfirmOpen(true);
+                          }}
                           className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#dc2626] transition hover:bg-white"
                         >
                           <span>
@@ -2127,7 +2141,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         {isProjectSettingsOpen && activeProject ? (
           <div
             className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
-            onClick={() => void closeProjectSettings()}
+            onClick={cancelProjectSettings}
           >
             <div
               className="w-full max-w-[640px] rounded-2xl border border-[#d1d5db] bg-white p-5 shadow-[0_18px_50px_rgba(17,24,39,0.2)]"
@@ -2137,7 +2151,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <h2 className="text-[30px] font-semibold tracking-tight text-[#111827]">프로젝트 설정</h2>
                 <button
                   type="button"
-                  onClick={() => void closeProjectSettings()}
+                  onClick={cancelProjectSettings}
                   className="rounded-xl border border-[#111827] p-2 text-[#111827] hover:bg-[#f3f4f6]"
                   aria-label="close project settings"
                 >
@@ -2175,6 +2189,23 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 >
                   프로젝트 삭제
                 </button>
+
+                <div className="flex justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={cancelProjectSettings}
+                    className="rounded-full border border-[#d1d5db] px-4 py-2 text-base text-[#374151] transition hover:bg-[#f9fafb]"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void saveProjectSettings()}
+                    className="rounded-full bg-[#ff6d00] px-4 py-2 text-base text-white transition hover:bg-[#ea580c]"
+                  >
+                    저장
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2197,6 +2228,32 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <button
                   type="button"
                   onClick={() => void deleteActiveProject()}
+                  className="rounded-full bg-[#dc2626] px-4 py-2 text-base text-white transition hover:bg-[#b91c1c]"
+                >
+                  삭제
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {isConversationDeleteConfirmOpen && activeConversation ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-[420px] rounded-2xl border border-[#d1d5db] bg-white p-5 shadow-[0_18px_50px_rgba(17,24,39,0.2)]">
+              <h3 className="text-[26px] font-semibold tracking-tight text-[#111827]">채팅을 삭제할까요?</h3>
+              <p className="mt-3 text-[16px] leading-6 text-[#111827]">
+                이 채팅의 모든 메시지가 영구 삭제됩니다.
+              </p>
+              <div className="mt-6 flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsConversationDeleteConfirmOpen(false)}
+                  className="rounded-full border border-[#d1d5db] px-4 py-2 text-base text-[#374151] transition hover:bg-[#f9fafb]"
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void deleteActiveConversation()}
                   className="rounded-full bg-[#dc2626] px-4 py-2 text-base text-white transition hover:bg-[#b91c1c]"
                 >
                   삭제
