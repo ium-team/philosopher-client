@@ -27,78 +27,82 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
   const selectedPhilosophers = philosophers.filter((philosopher) => heroPhilosophers.includes(philosopher.id));
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#fffcf8] text-[#2a241f]">
+    <main className="relative min-h-screen overflow-hidden bg-[#fffdf8] text-[#211c16]">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-160px] top-[-140px] h-[420px] w-[420px] rounded-full bg-[#fed7aa]/40 blur-3xl" />
-        <div className="absolute right-[-140px] top-[220px] h-[360px] w-[360px] rounded-full bg-[#fdba74]/35 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-30%,rgba(195,140,44,0.1)_0%,rgba(255,253,248,0)_60%)]" />
+        <div className="absolute inset-0 opacity-[0.14] [background:repeating-linear-gradient(90deg,transparent,transparent_7px,rgba(96,74,40,0.08)_8px,transparent_9px)]" />
       </div>
 
-      <header className="sticky top-0 z-30 border-b border-[#e7d9ca] bg-[#fffaf4]/90 backdrop-blur-lg">
+      <header className="sticky top-0 z-30 border-b border-[#eadfce] bg-[#fffdf8]/95 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-2.5 md:px-8 md:py-3">
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-8 items-center rounded-full border border-[#ecdcc9] bg-white px-3 text-xs font-semibold tracking-[0.14em] text-[#9b856d]">
+            <span className="inline-flex h-7 items-center rounded-full border border-[#dfceb5] bg-white px-3 text-[11px] font-semibold tracking-[0.16em] text-[#8b6b3f]">
               PHILOSOPHER
             </span>
-            <p className="text-sm font-semibold tracking-tight text-[#2f2720] md:text-base">AI 철학 인터페이스</p>
+            <p className="text-sm tracking-tight text-[#4d3e2f] md:text-base">AI 철학 인터페이스</p>
           </div>
           <button
             type="button"
             onClick={onSignIn}
-            className="rounded-xl bg-[#ea580c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c2410c]"
+            className="rounded-full border border-[#d7c2a1] bg-white px-4 py-2 text-sm font-semibold text-[#7c5a2e] transition hover:bg-[#fff7ea]"
           >
             Google 로그인
           </button>
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-8 md:px-8 md:py-10">
-        <section className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">Socratic Interface</p>
-            <h1 className="mt-4 text-5xl font-extrabold leading-[1.08] tracking-tight text-[#2f2720] md:text-6xl">
-              철학자와 대화하며
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-9 px-5 py-8 md:px-8 md:py-12">
+        <section className="rounded-3xl border border-[#eadfce] bg-white/88 px-6 py-9 shadow-[0_20px_44px_rgba(84,62,32,0.08)] md:px-12 md:py-12">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
+            <h1 className="mt-4 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
+              Philosopher
               <br />
-              생각을 더 선명하게.
+              <span className="text-[#b28646]">Unpacked</span>
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-[#5f554c]">{siteConfig.description}</p>
-
-            <ul className="mt-6 space-y-2.5">
-              {keyPoints.map((point) => (
-                <li
-                  key={point}
-                  className="flex items-start gap-3 rounded-xl border border-[#ebddce] bg-white/85 px-4 py-3 text-[17px] leading-7 text-[#3d332b]"
-                >
-                  <span className="mt-2 inline-block h-2 w-2 rounded-full bg-[#ea580c]" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#5f5143]">
+              {siteConfig.description} 질문하고, 반박하고, 재구성하며 사고를 명확하게 만드는 대화형 철학 도구입니다.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={onSignIn}
-                className="rounded-xl bg-[#ea580c] px-6 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(194,65,12,0.24)] transition hover:bg-[#c2410c]"
+                className="rounded-full border border-[#d8be98] bg-[#b28646] px-7 py-3 text-sm font-semibold tracking-wide text-white transition hover:bg-[#9a723c]"
               >
-                지금 시작하기
+                START EXPLORING
               </button>
-              <p className="text-sm text-[#7a6a5a]">3단계로 바로 대화 시작</p>
+              <span className="rounded-full border border-[#e5d7c0] bg-[#fffaf1] px-4 py-2 text-xs tracking-[0.12em] text-[#8a6a3c]">
+                GOOGLE LOGIN REQUIRED
+              </span>
             </div>
           </div>
+        </section>
 
-          <div className="rounded-3xl border border-[#ebddce] bg-[linear-gradient(180deg,#fffaf4_0%,#f8efe4_100%)] p-3 shadow-[0_20px_38px_rgba(101,67,34,0.12)]">
+        <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="rounded-2xl border border-[#eadfce] bg-white/92 p-5 md:p-6">
+            <h2 className="font-serif text-3xl font-semibold tracking-tight text-[#2a231b] md:text-4xl">What You Get</h2>
+            <ul className="mt-5 space-y-3">
+              {keyPoints.map((point) => (
+                <li key={point} className="rounded-xl border border-[#eee2d3] bg-[#fffbf6] px-4 py-3 text-base text-[#4c4034]">
+                  <span className="font-semibold text-[#a0763d]">•</span> {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#eadfce] bg-[linear-gradient(180deg,#fffaf3_0%,#f9f1e6_100%)] p-3">
             <div className="grid grid-cols-2 gap-3">
-            {selectedPhilosophers.map((philosopher) => (
+              {selectedPhilosophers.map((philosopher) => (
                 <article
                   key={philosopher.id}
-                  className="group overflow-hidden rounded-2xl border border-[#ebdecf] bg-[#fff8f0] p-3 transition duration-200 hover:-translate-y-1 hover:shadow-[0_14px_26px_rgba(84,54,24,0.18)]"
+                  className="group overflow-hidden rounded-2xl border border-[#ebdecf] bg-white p-3 transition duration-200 hover:-translate-y-1 hover:shadow-[0_12px_20px_rgba(84,54,24,0.14)]"
                 >
-                  <div className="relative h-44 md:h-52">
+                  <div className="relative h-40 md:h-44">
                     <Image
                       src={philosopher.imageSrc}
                       alt={`${philosopher.name} portrait`}
                       fill
-                      className="object-contain object-bottom drop-shadow-[0_12px_20px_rgba(59,39,21,0.2)] transition duration-300 group-hover:scale-105"
+                      className="object-contain object-bottom drop-shadow-[0_10px_16px_rgba(59,39,21,0.2)] transition duration-300 group-hover:scale-105"
                       sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   </div>
@@ -112,11 +116,11 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#eadccc] bg-white/95 p-6 shadow-[0_12px_28px_rgba(110,73,36,0.08)] md:p-8">
+        <section className="rounded-2xl border border-[#eadccc] bg-white/95 p-6 md:p-8">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">How It Works</p>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             {flowItems.map((item) => (
-              <article key={item.number} className="relative rounded-xl border border-[#efe2d4] bg-[#fffaf4] p-4">
+              <article key={item.number} className="relative rounded-xl border border-[#efe2d4] bg-[#fffaf4] p-4 text-center">
                 <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
                 <h2 className="mt-2 text-xl font-bold tracking-tight text-[#2f2720]">{item.title}</h2>
                 <div className="mt-3 h-1 w-12 rounded-full bg-[#f4c59e]" />
@@ -128,7 +132,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           ) : null}
         </section>
 
-        <section className="rounded-2xl border border-[#eadccc] bg-[#fff7ee] px-5 py-5 md:px-8">
+        <section className="rounded-2xl border border-[#eadccc] bg-[#fff8ef] px-5 py-5 md:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <p className="text-base leading-7 text-[#5d5147]">
               대화는 단순한 Q&A가 아니라, <span className="font-semibold text-[#332821]">사고를 확장하는 훈련</span>입니다.
@@ -136,7 +140,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
             <button
               type="button"
               onClick={onSignIn}
-              className="rounded-xl border border-[#f3c8a1] bg-white px-5 py-2.5 text-sm font-semibold text-[#9a3412] transition hover:bg-[#fff2e5]"
+              className="rounded-full border border-[#d7c2a1] bg-white px-5 py-2.5 text-sm font-semibold text-[#7c5a2e] transition hover:bg-[#fff2e5]"
             >
               Google로 계속하기
             </button>
