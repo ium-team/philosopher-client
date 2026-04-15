@@ -23,6 +23,7 @@ import {
   type ApiPhilosopher,
   type ApiProject,
 } from "@/features/service/api/chat-api";
+import { getCachedTtsBlob, setCachedTtsBlob } from "@/features/service/lib/tts-audio-cache";
 
 type Message = {
   id: string;
@@ -1104,10 +1105,15 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     readingAbortControllerRef.current = abortController;
 
     try {
-      const ttsBlob = await synthesizeSpeechRequest(accessToken, {
-        philosopher_id: toApiPhilosopherId(activeConversation.philosopherId),
-        text,
-      }, abortController.signal);
+      const philosopherId = toApiPhilosopherId(activeConversation.philosopherId);
+      let ttsBlob = getCachedTtsBlob(philosopherId, text);
+      if (!ttsBlob) {
+        ttsBlob = await synthesizeSpeechRequest(accessToken, {
+          philosopher_id: philosopherId,
+          text,
+        }, abortController.signal);
+        setCachedTtsBlob(philosopherId, text, ttsBlob);
+      }
       if (readingRequestIdRef.current !== requestId) {
         return;
       }

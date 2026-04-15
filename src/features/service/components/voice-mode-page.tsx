@@ -10,6 +10,7 @@ import {
   synthesizeSpeech as synthesizeSpeechRequest,
   type ApiPhilosopher,
 } from "@/features/service/api/chat-api";
+import { getCachedTtsBlob, setCachedTtsBlob } from "@/features/service/lib/tts-audio-cache";
 
 type VoiceModePageProps = {
   conversationId: string | null;
@@ -145,10 +146,15 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
   }, []);
 
   const speakAssistantText = useCallback(async (text: string) => {
-    const ttsBlob = await synthesizeSpeechRequest(accessToken, {
-      philosopher_id: toApiPhilosopherId(philosopherId),
-      text,
-    });
+    const apiPhilosopherId = toApiPhilosopherId(philosopherId);
+    let ttsBlob = getCachedTtsBlob(apiPhilosopherId, text);
+    if (!ttsBlob) {
+      ttsBlob = await synthesizeSpeechRequest(accessToken, {
+        philosopher_id: apiPhilosopherId,
+        text,
+      });
+      setCachedTtsBlob(apiPhilosopherId, text, ttsBlob);
+    }
     const audioUrl = URL.createObjectURL(ttsBlob);
     stopAudioPlayback();
     audioUrlRef.current = audioUrl;
