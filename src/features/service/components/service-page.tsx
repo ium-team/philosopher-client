@@ -2172,7 +2172,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div>
                   <p className="mb-2 text-sm font-medium text-[#1f2937]">지침</p>
                   <p className="mb-2 text-sm text-[#9ca3af]">
-                    컨텍스트를 설정하고 프로젝트 내에서 ChatGPT가 응답하는 방식을 맞춤 설정하세요.
+                    컨텍스트를 설정하고 프로젝트 내에서 철학자가 응답하는 방식을 맞춤 설정하세요.
                   </p>
                   <textarea
                     value={projectSettingsGuideline}

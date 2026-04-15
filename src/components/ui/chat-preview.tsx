@@ -34,7 +34,7 @@ export function ChatPreview() {
         <div className="flex items-center justify-between gap-4 border-b border-stone-200 pb-5">
           <div>
             <p className="text-xs tracking-[0.24em] text-stone-500 uppercase">
-              ChatGPT
+              Philosopher
             </p>
             <h3 className="mt-2 text-xl font-semibold text-stone-900">
               Nietzsche
