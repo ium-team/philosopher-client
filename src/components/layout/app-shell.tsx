@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type AppShellProps = {
   children: React.ReactNode;
 };
@@ -11,9 +13,7 @@ export function AppShell({ children }: AppShellProps) {
       />
       <header className="flex items-center justify-between border-b border-stone-200 px-2 pb-3">
         <div className="flex items-center gap-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-sm font-semibold text-white">
-            Φ
-          </div>
+          <Image src="/logo.svg" alt="Philosopher logo" width={36} height={36} className="h-9 w-9 rounded-lg" />
           <div>
             <p className="text-[11px] tracking-[0.24em] text-stone-500 uppercase">
               Philosopher

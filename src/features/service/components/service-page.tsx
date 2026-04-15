@@ -1751,7 +1751,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           className="relative z-10 mx-auto h-full w-full object-contain object-bottom px-3 py-2 drop-shadow-[0_12px_20px_rgba(17,24,39,0.25)] transition duration-300 group-hover:scale-105"
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                         />
-                        <div className="absolute inset-x-4 bottom-3 z-30">
+                        <div className="absolute inset-0 z-30 bg-[#0f172a]/78 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-active:opacity-100" />
+                        <div className="absolute inset-0 z-40 flex flex-col justify-end p-4 text-[#f8fafc] opacity-0 transition duration-300 group-hover:opacity-100 group-active:opacity-100">
+                          <p className="text-[11px] tracking-[0.14em] text-[#cbd5e1] uppercase">철학자 소개</p>
+                          <p className="mt-2 text-sm leading-6">{philosopher.summary}</p>
+                          <p className="mt-3 text-[11px] tracking-[0.14em] text-[#cbd5e1] uppercase">대화 톤</p>
+                          <p className="mt-1 text-sm leading-6">{philosopher.tone}</p>
+                        </div>
+                        <div className="absolute inset-x-4 bottom-3 z-30 transition-opacity duration-200 group-hover:opacity-0 group-active:opacity-0">
                           <h2 className="text-[22px] font-semibold tracking-tight text-white">{philosopher.name}</h2>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <span className="inline-flex rounded-full border border-white/20 bg-black/20 px-2.5 py-1 text-[11px] text-white/90 backdrop-blur-sm">

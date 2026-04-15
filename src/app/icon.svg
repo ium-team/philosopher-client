@@ -1,0 +1,17 @@
+<svg width="864" height="864" viewBox="0 0 864 864" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="864" height="864" fill="black"/>
+<g filter="url(#filter0_g_5038_5800)">
+<path d="M650 430L628.5 453H609.5L600.5 478L588 464L580.5 386L561.5 368.5L541 383.5L544 435L541 498.5L531 501.5L516 482.5L531 490L533.5 448L508.5 366L482.5 363L473.5 375.5H461L479.5 448L473.5 506L459 509.5L454 498.5L461 475L445.5 386L415 363L395.5 375.5L382 373L360.5 347H346.5L379.5 410.5L386.5 482.5L382 506L360.5 494.5L358 420.5L330.5 370.5H302.5L322 445.5V509.5L299.5 519M299.5 519L291 509.5L294 461.5L284 386L256.5 344H214V519H299.5Z" stroke="#FF8080" stroke-width="34"/>
+</g>
+<defs>
+<filter id="filter0_g_5038_5800" x="191.8" y="321.8" width="475.818" height="219.4" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feTurbulence type="fractalNoise" baseFrequency="0.033222589641809464 0.033222589641809464" numOctaves="3" seed="452" />
+<feDisplacementMap in="shape" scale="10.399999618530273" xChannelSelector="R" yChannelSelector="G" result="displacedImage" width="100%" height="100%" />
+<feMerge result="effect1_texture_5038_5800">
+<feMergeNode in="displacedImage"/>
+</feMerge>
+</filter>
+</defs>
+</svg>
