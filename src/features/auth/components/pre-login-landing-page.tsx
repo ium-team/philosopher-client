@@ -9,7 +9,7 @@ type PreLoginLandingPageProps = {
   onSignIn: () => Promise<void>;
 };
 
-const heroPhilosophers = ["socrates", "plato", "nietzsche", "simone_de_beauvoir"];
+const heroPhilosophers = ["socrates", "nietzsche"];
 
 const keyPoints = [
   "철학자별 고유한 말투와 사고 방식",
@@ -20,7 +20,6 @@ const keyPoints = [
 const flowItems = [
   { number: "01", title: "철학자 선택" },
   { number: "02", title: "질문 시작" },
-  { number: "03", title: "생각 확장" },
 ] as const;
 
 export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPageProps) {
@@ -91,13 +90,13 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
 
           <div className="rounded-2xl border border-[#eadfce] bg-[linear-gradient(180deg,#fffaf3_0%,#f9f1e6_100%)] p-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {selectedPhilosophers.map((philosopher) => (
                 <article
                   key={philosopher.id}
                   className="group overflow-hidden rounded-2xl border border-[#ebdecf] bg-white p-3 transition duration-200 hover:-translate-y-1 hover:shadow-[0_12px_20px_rgba(84,54,24,0.14)]"
                 >
-                  <div className="relative h-40 md:h-44">
+                  <div className="relative h-52 md:h-56">
                     <Image
                       src={philosopher.imageSrc}
                       alt={`${philosopher.name} portrait`}
@@ -118,7 +117,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
 
         <section className="rounded-2xl border border-[#eadccc] bg-white/95 p-6 md:p-8">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">How It Works</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
             {flowItems.map((item) => (
               <article key={item.number} className="relative rounded-xl border border-[#efe2d4] bg-[#fffaf4] p-4 text-center">
                 <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
