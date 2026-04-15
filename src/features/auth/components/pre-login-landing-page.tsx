@@ -44,8 +44,8 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 py-16 md:px-10 md:py-24">
-        <section className="px-1 py-12 md:px-2 md:py-16">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 py-12 md:px-10 md:py-20">
+        <section className="px-1 py-10 md:px-2 md:py-14">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
             <h1 className="mt-7 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
