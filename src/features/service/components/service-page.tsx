@@ -238,15 +238,6 @@ function IconEdit() {
   );
 }
 
-function IconSpeaker() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 14h4l5 4V6L8 10H4z" strokeLinejoin="round" />
-      <path d="M16 9a5 5 0 0 1 0 6M18.8 6.5a8.5 8.5 0 0 1 0 11" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function IconFolderPlus() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -380,6 +371,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const messageLoadRequestIdRef = useRef(0);
   const readingAudioRef = useRef<HTMLAudioElement | null>(null);
   const readingAudioUrlRef = useRef<string | null>(null);
+  const readingRequestIdRef = useRef(0);
   const accessToken = session?.access_token ?? "";
 
   const activeConversation = useMemo(() => {
@@ -791,6 +783,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   }, []);
 
   const stopReadingAudio = useCallback(() => {
+    readingRequestIdRef.current += 1;
     if (readingAudioRef.current) {
       readingAudioRef.current.pause();
       readingAudioRef.current.src = "";
@@ -812,6 +805,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   useEffect(() => {
     stopReadingAudio();
   }, [activeConversationId, stopReadingAudio]);
+
+  useEffect(() => {
+    stopReadingAudio();
+  }, [pathname, searchParams, stopReadingAudio]);
 
   const clearVoiceSilenceTimeout = useCallback(() => {
     if (voiceSilenceTimeoutRef.current === null) {
@@ -1080,12 +1077,17 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     stopReadingAudio();
     setLoadError(null);
     setReadingMessageId(messageId);
+    const requestId = readingRequestIdRef.current + 1;
+    readingRequestIdRef.current = requestId;
 
     try {
       const ttsBlob = await synthesizeSpeechRequest(accessToken, {
         philosopher_id: toApiPhilosopherId(activeConversation.philosopherId),
         text,
       });
+      if (readingRequestIdRef.current !== requestId) {
+        return;
+      }
       const audioUrl = URL.createObjectURL(ttsBlob);
       readingAudioUrlRef.current = audioUrl;
 
@@ -1857,20 +1859,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           <button
                             type="button"
                             onClick={() => copyMessage(message.text)}
-                            className="rounded-md p-1.5 hover:bg-[#fff3e0]"
+                            className="rounded-md border border-[#e5e7eb] px-2.5 py-1 text-xs text-[#6b7280] hover:bg-[#fff3e0]"
                             aria-label="copy assistant message"
                           >
-                            <IconCopy />
+                            복사
                           </button>
                           <button
                             type="button"
                             onClick={() => void readAssistantMessage(message.id, message.text)}
-                            className={`rounded-md p-1.5 hover:bg-[#fff3e0] ${
-                              readingMessageId === message.id ? "bg-[#fff3e0] text-[#ff6d00]" : ""
+                            className={`rounded-md border px-2.5 py-1 text-xs ${
+                              readingMessageId === message.id
+                                ? "border-[#fecaca] bg-[#fff1f2] text-[#b91c1c] hover:bg-[#ffe4e6]"
+                                : "border-[#e5e7eb] text-[#6b7280] hover:bg-[#fff3e0]"
                             }`}
                             aria-label={readingMessageId === message.id ? "stop reading assistant message" : "read assistant message aloud"}
                           >
-                            <IconSpeaker />
+                            {readingMessageId === message.id ? "취소" : "소리내기"}
                           </button>
                         </div>
                       </div>
