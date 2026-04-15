@@ -1,8 +1,8 @@
 "use client";
 
-import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
 import { philosophers, type PhilosopherProfile } from "@/data/philosophers";
 import {
@@ -289,6 +289,8 @@ function IconFolderMove() {
 
 export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { session, signOut } = useAuthSession();
 
   const profileName = useMemo(() => {
@@ -329,6 +331,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [conversations, setConversations] = useState(initialConversations);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isHydrating, setIsHydrating] = useState(false);
+  const [isConversationHydrating, setIsConversationHydrating] = useState(false);
+  const [isRouteLoading, setIsRouteLoading] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeConversationId, setActiveConversationId] = useState("");
   const [draft, setDraft] = useState("");
@@ -361,6 +365,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     async () => Promise.resolve(),
   );
   const [isListening, setIsListening] = useState(false);
+  const [isRoutePending, startRouteTransition] = useTransition();
+  const messageLoadRequestIdRef = useRef(0);
   const accessToken = session?.access_token ?? "";
 
   const activeConversation = useMemo(() => {
@@ -494,6 +500,17 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     void hydrateChatData();
   }, [hydrateChatData]);
 
+  useEffect(() => {
+    setIsRouteLoading(false);
+  }, [pathname, searchParams]);
+
+  const navigateWithLoading = useCallback((navigate: () => void) => {
+    setIsRouteLoading(true);
+    startRouteTransition(() => {
+      navigate();
+    });
+  }, [startRouteTransition]);
+
   const startConversationWith = useCallback(async (philosopher: PhilosopherProfile) => {
     if (!accessToken) {
       setLoadError("로그인 정보가 없어 대화를 시작할 수 없습니다.");
@@ -517,12 +534,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       setActiveProjectId(isProjectConversation ? activeProjectId : null);
       setDraft("");
       setIsSelectingPhilosopher(false);
-      router.replace(`/service?conversation=${createdConversation.id}`);
+      navigateWithLoading(() => {
+        router.replace(`/service?conversation=${createdConversation.id}`);
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "대화를 시작하지 못했습니다.";
       setLoadError(message);
     }
-  }, [accessToken, activeProjectId, router]);
+  }, [accessToken, activeProjectId, navigateWithLoading, router]);
 
   const createProject = async () => {
     const defaultName = `프로젝트 ${projects.length + 1}`;
@@ -685,6 +704,9 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     }
 
     let cancelled = false;
+    const requestId = messageLoadRequestIdRef.current + 1;
+    messageLoadRequestIdRef.current = requestId;
+    setIsConversationHydrating(true);
 
     void listMessages(accessToken, activeConversationId)
       .then((messages) => {
@@ -734,6 +756,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       })
       .catch(() => {
         // no-op: keep existing local state when refresh fails
+      })
+      .finally(() => {
+        if (!cancelled && messageLoadRequestIdRef.current === requestId) {
+          setIsConversationHydrating(false);
+        }
       });
 
     return () => {
@@ -1132,8 +1159,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       conversation: activeConversation.id,
       philosopher: activeConversation.philosopherId,
     });
-    router.push(`/service/voice?${query.toString()}`);
-  }, [activeConversation, isResponding, isSelectingPhilosopher, router]);
+    navigateWithLoading(() => {
+      router.push(`/service/voice?${query.toString()}`);
+    });
+  }, [activeConversation, isResponding, isSelectingPhilosopher, navigateWithLoading, router]);
 
   const handlePrimaryComposerAction = () => {
     if (hasDraft) {
@@ -1554,9 +1583,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
         <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div className="mx-auto w-full max-w-[920px] px-5 pb-36 pt-8 md:px-8">
             {isHydrating ? (
-              <div className="mb-4 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 py-3 text-sm text-[#6b7280]">
-                대화 데이터를 불러오는 중입니다...
-              </div>
+              <div className="sr-only">대화 데이터를 불러오는 중입니다...</div>
             ) : null}
             {loadError ? (
               <div className="mb-4 rounded-xl border border-[#fecaca] bg-[#fff1f2] px-4 py-3 text-sm text-[#b91c1c]">
@@ -1909,6 +1936,20 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   삭제
                 </button>
               </div>
+            </div>
+          </div>
+        ) : null}
+        {isHydrating || isConversationHydrating ? (
+          <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center bg-white/80 backdrop-blur-[1px]">
+            <div className="rounded-xl border border-[#e5e7eb] bg-white px-5 py-3 text-sm text-[#4b5563] shadow-[0_10px_24px_rgba(17,24,39,0.12)]">
+              대화를 불러오는 중입니다...
+            </div>
+          </div>
+        ) : null}
+        {isRouteLoading || isRoutePending ? (
+          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/35 backdrop-blur-[2px]">
+            <div className="rounded-xl border border-white/50 bg-white px-5 py-3 text-sm font-medium text-[#374151] shadow-[0_16px_30px_rgba(17,24,39,0.2)]">
+              페이지를 이동하는 중입니다...
             </div>
           </div>
         ) : null}
