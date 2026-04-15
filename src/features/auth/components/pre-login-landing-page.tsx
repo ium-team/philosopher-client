@@ -69,11 +69,8 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
                 onClick={onSignIn}
                 className="rounded-full border border-[#d8be98] bg-[#b28646] px-7 py-3 text-sm font-semibold tracking-wide text-white transition hover:bg-[#9a723c]"
               >
-                START EXPLORING
+                구글 로그인으로 시작
               </button>
-              <span className="px-2 py-1 text-xs tracking-[0.12em] text-[#8a6a3c]">
-                GOOGLE LOGIN REQUIRED
-              </span>
             </div>
           </div>
         </section>
