@@ -29,7 +29,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
       <header className="sticky top-0 z-30 bg-transparent">
         <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-6 py-3 md:px-10 md:py-4">
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-7 items-center px-1 text-[11px] font-semibold tracking-[0.16em] text-[#8b6b3f]">
+            <span className="inline-flex h-7 items-center px-1 text-[11px] font-semibold tracking-[0.16em] text-[#ea5b0c]">
               PHILOSOPHER
             </span>
             <p className="text-sm tracking-tight text-[#4d3e2f] md:text-base">AI 철학 인터페이스</p>
@@ -37,7 +37,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           <button
             type="button"
             onClick={onSignIn}
-            className="rounded-full border border-[#dcc7a7] bg-[#fffaf1] px-4 py-2 text-sm font-semibold text-[#7c5a2e] transition hover:bg-[#fff3e2]"
+            className="rounded-full border border-[#f0b28d] bg-[#fff7f2] px-4 py-2 text-sm font-semibold text-[#c44708] transition hover:bg-[#ffefe5]"
           >
             Google 로그인
           </button>
@@ -47,11 +47,11 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 pt-12 pb-0 md:px-10 md:pt-20 md:pb-0">
         <section className="px-1 py-10 md:px-2 md:py-14">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
+            <p className="text-xs tracking-[0.22em] text-[#d45a1d] uppercase">Socratic Interface</p>
             <h1 className="mt-7 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
               Philosopher
               <br />
-              <span className="text-[#b28646]">Dialogue</span>
+              <span className="text-[#ea5b0c]">Dialogue</span>
             </h1>
             <p className="mx-auto mt-10 max-w-4xl text-lg leading-8 text-[#5f5143] md:text-xl md:leading-9">
               {siteConfig.description} 질문하고, 반박하고, 재구성하며 사고를 명확하게 만드는 대화형 철학 도구입니다.
@@ -60,7 +60,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
               <button
                 type="button"
                 onClick={onSignIn}
-                className="rounded-full border border-[#d8be98] bg-[#b28646] px-7 py-3 text-sm font-semibold tracking-wide text-white transition hover:bg-[#9a723c]"
+                className="rounded-full border border-[#f0b28d] bg-[#ea5b0c] px-7 py-3 text-sm font-semibold tracking-wide text-white transition hover:bg-[#cf4e08]"
               >
                 구글 로그인으로 시작
               </button>
@@ -74,7 +74,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
             <ul className="mt-8 space-y-4">
               {keyPoints.map((point) => (
                 <li key={point} className="border-b border-[#eee2d3] py-4 text-base text-[#4c4034]">
-                  <span className="font-semibold text-[#a0763d]">•</span> {point}
+                  <span className="font-semibold text-[#ea5b0c]">•</span> {point}
                 </li>
               ))}
             </ul>
