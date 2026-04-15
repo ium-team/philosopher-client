@@ -131,6 +131,28 @@ function mapMessage(message: ApiMessage): Message {
   };
 }
 
+function mapMessagesInDisplayOrder(messages: ApiMessage[]): Message[] {
+  return messages
+    .map((message, index) => ({ message, index }))
+    .sort((left, right) => {
+      const leftTime = Date.parse(left.message.created_at);
+      const rightTime = Date.parse(right.message.created_at);
+      const leftTimestamp = Number.isNaN(leftTime) ? 0 : leftTime;
+      const rightTimestamp = Number.isNaN(rightTime) ? 0 : rightTime;
+
+      if (leftTimestamp !== rightTimestamp) {
+        return leftTimestamp - rightTimestamp;
+      }
+
+      if (left.message.role !== right.message.role) {
+        return left.message.role === "user" ? -1 : 1;
+      }
+
+      return left.index - right.index;
+    })
+    .map(({ message }) => mapMessage(message));
+}
+
 function mapConversation(
   conversation: ApiConversation,
   messages: ApiMessage[],
@@ -146,7 +168,7 @@ function mapConversation(
     philosopherId: localPhilosopherId,
     projectId: conversation.project_id,
     recent: true,
-    messages: messages.map(mapMessage),
+    messages: mapMessagesInDisplayOrder(messages),
   };
 }
 
@@ -737,7 +759,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           return;
         }
 
-        const mappedMessages = messages.map(mapMessage);
+        const mappedMessages = mapMessagesInDisplayOrder(messages);
         const firstUserMessage = mappedMessages.find((message) => message.role === "user");
 
         setConversations((previous) => {
