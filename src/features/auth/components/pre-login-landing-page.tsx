@@ -52,7 +52,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
       </header>
 
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-9 px-5 py-8 md:px-8 md:py-12">
-        <section className="rounded-3xl border border-[#eadfce] bg-white/88 px-6 py-9 shadow-[0_20px_44px_rgba(84,62,32,0.08)] md:px-12 md:py-12">
+        <section className="px-1 py-6 md:px-2 md:py-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-xs tracking-[0.22em] text-[#9f8562] uppercase">Socratic Interface</p>
             <h1 className="mt-4 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
@@ -71,7 +71,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
               >
                 START EXPLORING
               </button>
-              <span className="rounded-full border border-[#e5d7c0] bg-[#fffaf1] px-4 py-2 text-xs tracking-[0.12em] text-[#8a6a3c]">
+              <span className="px-2 py-1 text-xs tracking-[0.12em] text-[#8a6a3c]">
                 GOOGLE LOGIN REQUIRED
               </span>
             </div>
@@ -90,12 +90,12 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-[#eadfce] bg-[linear-gradient(180deg,#fffaf3_0%,#f9f1e6_100%)] p-3">
+          <div className="p-1">
             <div className="grid grid-cols-2 gap-3">
               {selectedPhilosophers.map((philosopher) => (
                 <article
                   key={philosopher.id}
-                  className="group overflow-hidden rounded-2xl border border-[#ebdecf] bg-white p-3 transition duration-200 hover:-translate-y-1 hover:shadow-[0_12px_20px_rgba(84,54,24,0.14)]"
+                  className="group overflow-hidden p-1"
                 >
                   <div className="relative h-40 md:h-44">
                     <Image
@@ -106,7 +106,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
                       sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   </div>
-                  <div className="rounded-xl border border-[#eadccb] bg-white px-3 py-2">
+                  <div className="px-1 py-1">
                     <p className="text-xs text-[#8f7b67]">{philosopher.era}</p>
                     <p className="mt-1 text-base font-semibold text-[#2f2720]">{philosopher.name}</p>
                   </div>
@@ -120,7 +120,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">How It Works</p>
           <div className="mt-5 grid gap-6 md:grid-cols-3">
             {flowItems.map((item) => (
-              <article key={item.number} className="relative text-center">
+              <article key={item.number} className="text-center">
                 <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
                 <h2 className="mt-2 text-xl font-bold tracking-tight text-[#2f2720]">{item.title}</h2>
                 <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#f4c59e]" />
