@@ -114,7 +114,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
 
       </div>
 
-      <footer className="relative mt-auto border-t border-[#eadccc] pt-7 pb-2">
+      <footer className="relative mt-10 border-t border-[#eadccc] pt-7 pb-2">
         <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 px-6 pb-4 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between md:px-10 md:pb-5">
           <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
           <div className="flex items-center gap-4">
