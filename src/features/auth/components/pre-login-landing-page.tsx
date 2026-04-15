@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { philosophers } from "@/data/philosophers";
 
@@ -122,12 +123,12 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 px-6 pb-4 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between md:px-10 md:pb-5">
           <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="transition hover:text-[#4f4031]">
+            <Link href="/terms" className="transition hover:text-[#4f4031]">
               이용약관
-            </a>
-            <a href="#" className="transition hover:text-[#4f4031]">
+            </Link>
+            <Link href="/privacy" className="transition hover:text-[#4f4031]">
               개인정보처리방침
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
