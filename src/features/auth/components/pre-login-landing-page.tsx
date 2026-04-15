@@ -143,6 +143,20 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
             </button>
           </div>
         </div>
+
+        <footer className="border-t border-[#eadccc] pt-6 pb-2">
+          <div className="flex flex-col gap-3 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between">
+            <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="transition hover:text-[#4f4031]">
+                이용약관
+              </a>
+              <a href="#" className="transition hover:text-[#4f4031]">
+                개인정보처리방침
+              </a>
+            </div>
+          </div>
+        </footer>
       </div>
     </main>
   );
