@@ -238,6 +238,22 @@ function IconEdit() {
   );
 }
 
+function IconPlay() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+      <path d="M8 6.2c0-1 1.1-1.6 2-1l8.1 5.8c.7.5.7 1.5 0 2l-8.1 5.8c-.9.6-2 .1-2-1z" />
+    </svg>
+  );
+}
+
+function IconStop() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+      <rect x="7" y="7" width="10" height="10" rx="1.5" />
+    </svg>
+  );
+}
+
 function IconFolderPlus() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -1869,22 +1885,22 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           <button
                             type="button"
                             onClick={() => copyMessage(message.text)}
-                            className="rounded-md border border-[#e5e7eb] px-2.5 py-1 text-xs text-[#6b7280] hover:bg-[#fff3e0]"
+                            className="rounded-md p-1.5 text-[#9ca3af] hover:bg-[#fff3e0] hover:text-[#6b7280]"
                             aria-label="copy assistant message"
                           >
-                            복사
+                            <IconCopy />
                           </button>
                           <button
                             type="button"
                             onClick={() => void readAssistantMessage(message.id, message.text)}
-                            className={`rounded-md border px-2.5 py-1 text-xs ${
+                            className={`rounded-md p-1.5 ${
                               readingMessageId === message.id
-                                ? "border-[#fecaca] bg-[#fff1f2] text-[#b91c1c] hover:bg-[#ffe4e6]"
-                                : "border-[#e5e7eb] text-[#6b7280] hover:bg-[#fff3e0]"
+                                ? "bg-[#fff1f2] text-[#b91c1c] hover:bg-[#ffe4e6]"
+                                : "text-[#9ca3af] hover:bg-[#fff3e0] hover:text-[#6b7280]"
                             }`}
                             aria-label={readingMessageId === message.id ? "stop reading assistant message" : "read assistant message aloud"}
                           >
-                            {readingMessageId === message.id ? "취소" : "소리내기"}
+                            {readingMessageId === message.id ? <IconStop /> : <IconPlay />}
                           </button>
                         </div>
                       </div>
