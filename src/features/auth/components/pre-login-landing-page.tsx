@@ -22,8 +22,12 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#fffdf8] text-[#211c16]">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-30%,rgba(195,140,44,0.1)_0%,rgba(255,253,248,0)_60%)]" />
-        <div className="absolute inset-0 opacity-[0.14] [background:repeating-linear-gradient(90deg,transparent,transparent_7px,rgba(96,74,40,0.08)_8px,transparent_9px)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#fffdf8_0%,#fffaf4_42%,#fffdf8_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(234,91,12,0.12)_0%,rgba(255,253,248,0)_34%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_22%,rgba(234,91,12,0.1)_0%,rgba(255,253,248,0)_36%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_105%,rgba(234,91,12,0.08)_0%,rgba(255,253,248,0)_46%)]" />
+        <div className="absolute inset-0 opacity-[0.18] [background:repeating-linear-gradient(90deg,transparent,transparent_11px,rgba(119,88,52,0.06)_12px,transparent_13px)]" />
+        <div className="absolute inset-0 opacity-[0.1] [background:repeating-linear-gradient(0deg,transparent,transparent_15px,rgba(119,88,52,0.05)_16px,transparent_17px)]" />
       </div>
 
       <header className="sticky top-0 z-30 bg-transparent">
