@@ -31,6 +31,14 @@ export function PhilosopherSelectPage() {
     return () => window.removeEventListener("resize", updateCardsPerPage);
   }, []);
 
+  useEffect(() => {
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, []);
+
   const filteredPhilosophers = useMemo(() => {
     const normalized = philosopherQuery.trim().toLowerCase();
     if (!normalized) {
@@ -59,7 +67,7 @@ export function PhilosopherSelectPage() {
   }, [totalPages]);
 
   return (
-    <main className="min-h-screen bg-[#fffcf8] px-5 py-10 text-[#2a241f] md:px-8">
+    <main className="h-screen overflow-hidden bg-[#fffcf8] px-5 py-10 text-[#2a241f] md:px-8">
       <div className="mx-auto w-full max-w-5xl">
         <button
           type="button"

@@ -506,6 +506,18 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setPhilosopherSelectPage((previous) => Math.min(previous, philosopherTotalPages - 1));
   }, [philosopherTotalPages]);
 
+  useEffect(() => {
+    if (!isSelectingPhilosopher) {
+      return;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [isSelectingPhilosopher]);
+
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
 
@@ -1760,7 +1772,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
           </div>
         </header>
 
-        <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <div
+          ref={scrollRef}
+          className={`flex min-h-0 flex-1 flex-col ${isSelectingPhilosopher ? "overflow-hidden" : "overflow-y-auto"}`}
+        >
           <div className="mx-auto w-full max-w-[920px] px-5 pb-36 pt-8 md:px-8">
             {isHydrating ? (
               <div className="sr-only">대화 데이터를 불러오는 중입니다...</div>
