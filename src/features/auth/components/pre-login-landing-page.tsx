@@ -29,15 +29,15 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
   return (
     <main className="min-h-screen bg-[#fffcf8] text-[#2a241f]">
       <header className="sticky top-0 z-30 border-b-2 border-[#e6d6c3] bg-[#fffaf4]/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-2.5 md:px-8 md:py-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#9b856d]">Philosopher</p>
-            <p className="mt-1 text-lg font-extrabold tracking-tight text-[#2f2720]">AI 철학 인터페이스</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#9b856d]">Philosopher</p>
+            <p className="mt-0.5 text-base font-bold tracking-tight text-[#2f2720]">AI 철학 인터페이스</p>
           </div>
           <button
             type="button"
             onClick={onSignIn}
-            className="rounded-xl bg-[#ea580c] px-5 py-3 text-base font-extrabold text-white transition hover:bg-[#c2410c]"
+            className="rounded-xl bg-[#ea580c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c2410c]"
           >
             Google 로그인
           </button>
@@ -47,17 +47,17 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-5 py-8 md:px-8 md:py-10">
         <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#a3917f]">Socratic Interface</p>
+            <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#a3917f]">Socratic Interface</p>
             <h1 className="mt-4 text-5xl font-extrabold leading-[1.08] tracking-tight text-[#2f2720] md:text-6xl">
               철학자와 대화하며
               <br />
               생각을 더 선명하게.
             </h1>
-            <p className="mt-5 max-w-xl text-lg font-semibold leading-8 text-[#5f554c]">{siteConfig.description}</p>
+            <p className="mt-5 max-w-xl text-lg leading-8 text-[#5f554c]">{siteConfig.description}</p>
 
             <ul className="mt-6 space-y-3">
               {keyPoints.map((point) => (
-                <li key={point} className="text-lg font-bold leading-8 text-[#3d332b]">
+                <li key={point} className="text-lg font-medium leading-8 text-[#3d332b]">
                   {point}
                 </li>
               ))}
@@ -66,7 +66,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
             <button
               type="button"
               onClick={onSignIn}
-              className="mt-8 rounded-xl bg-[#ea580c] px-6 py-3 text-lg font-extrabold text-white shadow-[0_12px_24px_rgba(194,65,12,0.24)] transition hover:bg-[#c2410c]"
+              className="mt-8 rounded-xl bg-[#ea580c] px-6 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(194,65,12,0.24)] transition hover:bg-[#c2410c]"
             >
               지금 시작하기
             </button>
@@ -85,8 +85,8 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
                   />
                 </div>
                 <div className="rounded-xl border border-[#eadccb] bg-white px-3 py-2">
-                  <p className="text-xs font-semibold text-[#8f7b67]">{philosopher.era}</p>
-                  <p className="mt-1 text-base font-extrabold text-[#2f2720]">{philosopher.name}</p>
+                  <p className="text-xs text-[#8f7b67]">{philosopher.era}</p>
+                  <p className="mt-1 text-base font-semibold text-[#2f2720]">{philosopher.name}</p>
                 </div>
               </article>
             ))}
@@ -94,17 +94,17 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </section>
 
         <section className="rounded-2xl border border-[#eadccc] bg-white p-6 md:p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#a3917f]">How It Works</p>
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-[#a3917f]">How It Works</p>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {flowItems.map((item) => (
               <article key={item.number} className="rounded-xl border border-[#efe2d4] bg-[#fffaf4] p-4">
-                <p className="text-sm font-extrabold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
-                <h2 className="mt-2 text-xl font-extrabold tracking-tight text-[#2f2720]">{item.title}</h2>
+                <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
+                <h2 className="mt-2 text-xl font-bold tracking-tight text-[#2f2720]">{item.title}</h2>
               </article>
             ))}
           </div>
           {authError ? (
-            <p className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">{authError}</p>
+            <p className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{authError}</p>
           ) : null}
         </section>
       </div>
