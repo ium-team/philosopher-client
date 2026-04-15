@@ -17,12 +17,6 @@ const keyPoints = [
   "대화 기록을 프로젝트 단위로 정리",
 ] as const;
 
-const flowItems = [
-  { number: "01", title: "철학자 선택" },
-  { number: "02", title: "질문 시작" },
-  { number: "03", title: "생각 확장" },
-] as const;
-
 export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPageProps) {
   const selectedPhilosophers = philosophers.filter((philosopher) => heroPhilosophers.includes(philosopher.id));
 
@@ -113,36 +107,11 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </section>
 
-        <section className="p-1 md:p-2">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#a3917f]">How It Works</p>
-          <div className="mt-10 grid gap-12 md:grid-cols-3">
-            {flowItems.map((item) => (
-              <article key={item.number} className="text-center">
-                <p className="text-sm font-semibold tracking-[0.12em] text-[#b27a4d]">{item.number}</p>
-                <h2 className="mt-2 text-xl font-bold tracking-tight text-[#2f2720]">{item.title}</h2>
-                <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-[#f4c59e]" />
-              </article>
-            ))}
-          </div>
-          {authError ? (
-            <p className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{authError}</p>
-          ) : null}
-        </section>
-
-        <div className="border-t border-[#eadccc] pt-10">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <p className="text-base leading-7 text-[#5d5147]">
-              대화는 단순한 Q&A가 아니라, <span className="font-semibold text-[#332821]">사고를 확장하는 훈련</span>입니다.
-            </p>
-            <button
-              type="button"
-              onClick={onSignIn}
-              className="rounded-full border border-[#d7c2a1] bg-white px-5 py-2.5 text-sm font-semibold text-[#7c5a2e] transition hover:bg-[#fff2e5]"
-            >
-              Google로 계속하기
-            </button>
-          </div>
-        </div>
+        {authError ? (
+          <section>
+            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{authError}</p>
+          </section>
+        ) : null}
 
         <footer className="mt-auto border-t border-[#eadccc] pt-10 pb-6">
           <div className="flex flex-col gap-3 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between">
