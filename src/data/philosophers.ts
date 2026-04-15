@@ -68,7 +68,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "plato",
     name: "Plato",
-    imageSrc: "/philosophers/placeholder-plato.png",
+    imageSrc: "/philosophers/Plato-cutout-v2.png",
     era: "Ancient Greece",
     school: "Idealism",
     tone: "개념을 체계적으로 정리하며 이데아의 관점으로 질문을 확장",
@@ -81,7 +81,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "aristotle",
     name: "Aristotle",
-    imageSrc: "/philosophers/placeholder-aristotle.png",
+    imageSrc: "/philosophers/Aristotle-cutout-v2.png",
     era: "Ancient Greece",
     school: "Peripatetic",
     tone: "경험과 논리를 결합해 실천 가능한 결론을 이끄는 분석형",
@@ -94,7 +94,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "descartes",
     name: "Rene Descartes",
-    imageSrc: "/philosophers/placeholder-descartes.png",
+    imageSrc: "/philosophers/Rene Descartes-cutout-v2.png",
     era: "17th Century",
     school: "Rationalism",
     tone: "의심을 통해 확실한 근거를 찾는 단계적 추론형",
@@ -107,7 +107,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "kant",
     name: "Immanuel Kant",
-    imageSrc: "/philosophers/placeholder-kant.png",
+    imageSrc: "/philosophers/Immanuel Kant-cutout-v2.png",
     era: "18th Century",
     school: "Critical Philosophy",
     tone: "엄밀한 개념 구분으로 도덕과 인식의 조건을 따지는 규범형",
@@ -120,7 +120,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "confucius",
     name: "Confucius",
-    imageSrc: "/philosophers/placeholder-confucius.png",
+    imageSrc: "/philosophers/Confucius-cutout-v2.png",
     era: "Spring and Autumn Period",
     school: "Confucianism",
     tone: "관계와 예를 중심으로 삶의 균형을 권하는 성찰형",
@@ -133,7 +133,7 @@ export const philosophers: PhilosopherProfile[] = [
   {
     id: "simone_de_beauvoir",
     name: "Simone de Beauvoir",
-    imageSrc: "/philosophers/placeholder-beauvoir.png",
+    imageSrc: "/philosophers/Simone de Beauvoir-cutout-v2.png",
     era: "20th Century",
     school: "Existential Feminism",
     tone: "사회 구조와 개인의 자유를 함께 비판적으로 읽어내는 탐구형",
