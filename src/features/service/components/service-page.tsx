@@ -16,6 +16,7 @@ import {
   listProjects,
   moveConversationProject as moveConversationProjectRequest,
   sendMessage as sendMessageRequest,
+  synthesizeSpeech as synthesizeSpeechRequest,
   updateProjectSettings as updateProjectSettingsRequest,
   type ApiConversation,
   type ApiMessage,
@@ -237,6 +238,15 @@ function IconEdit() {
   );
 }
 
+function IconSpeaker() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 14h4l5 4V6L8 10H4z" strokeLinejoin="round" />
+      <path d="M16 9a5 5 0 0 1 0 6M18.8 6.5a8.5 8.5 0 0 1 0 11" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function IconFolderPlus() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -365,8 +375,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     async () => Promise.resolve(),
   );
   const [isListening, setIsListening] = useState(false);
+  const [readingMessageId, setReadingMessageId] = useState<string | null>(null);
   const [isRoutePending, startRouteTransition] = useTransition();
   const messageLoadRequestIdRef = useRef(0);
+  const readingAudioRef = useRef<HTMLAudioElement | null>(null);
+  const readingAudioUrlRef = useRef<string | null>(null);
   const accessToken = session?.access_token ?? "";
 
   const activeConversation = useMemo(() => {
@@ -777,6 +790,29 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     };
   }, []);
 
+  const stopReadingAudio = useCallback(() => {
+    if (readingAudioRef.current) {
+      readingAudioRef.current.pause();
+      readingAudioRef.current.src = "";
+      readingAudioRef.current = null;
+    }
+    if (readingAudioUrlRef.current) {
+      URL.revokeObjectURL(readingAudioUrlRef.current);
+      readingAudioUrlRef.current = null;
+    }
+    setReadingMessageId(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopReadingAudio();
+    };
+  }, [stopReadingAudio]);
+
+  useEffect(() => {
+    stopReadingAudio();
+  }, [activeConversationId, stopReadingAudio]);
+
   const clearVoiceSilenceTimeout = useCallback(() => {
     if (voiceSilenceTimeoutRef.current === null) {
       return;
@@ -1030,6 +1066,46 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       // Ignore clipboard failures in restricted browser contexts.
     }
   };
+
+  const readAssistantMessage = useCallback(async (messageId: string, text: string) => {
+    if (!activeConversation || !accessToken) {
+      return;
+    }
+
+    if (readingMessageId === messageId) {
+      stopReadingAudio();
+      return;
+    }
+
+    stopReadingAudio();
+    setLoadError(null);
+    setReadingMessageId(messageId);
+
+    try {
+      const ttsBlob = await synthesizeSpeechRequest(accessToken, {
+        philosopher_id: toApiPhilosopherId(activeConversation.philosopherId),
+        text,
+      });
+      const audioUrl = URL.createObjectURL(ttsBlob);
+      readingAudioUrlRef.current = audioUrl;
+
+      const audio = new Audio(audioUrl);
+      readingAudioRef.current = audio;
+      audio.onended = () => {
+        stopReadingAudio();
+      };
+      audio.onerror = () => {
+        stopReadingAudio();
+        setLoadError("답변 음성 재생에 실패했습니다.");
+      };
+
+      await audio.play();
+    } catch (error) {
+      stopReadingAudio();
+      const message = error instanceof Error ? error.message : "답변 음성 재생에 실패했습니다.";
+      setLoadError(message);
+    }
+  }, [accessToken, activeConversation, readingMessageId, stopReadingAudio]);
 
   const handleVoiceInput = useCallback(() => {
     if (isSelectingPhilosopher) {
@@ -1777,6 +1853,26 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           {activePhilosopher?.name ?? "Philosopher"}
                         </div>
                         <div className="whitespace-pre-line text-[17px] leading-8 text-[#111827]">{message.text}</div>
+                        <div className="mt-2 flex items-center gap-2 text-[#9ca3af]">
+                          <button
+                            type="button"
+                            onClick={() => copyMessage(message.text)}
+                            className="rounded-md p-1.5 hover:bg-[#fff3e0]"
+                            aria-label="copy assistant message"
+                          >
+                            <IconCopy />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void readAssistantMessage(message.id, message.text)}
+                            className={`rounded-md p-1.5 hover:bg-[#fff3e0] ${
+                              readingMessageId === message.id ? "bg-[#fff3e0] text-[#ff6d00]" : ""
+                            }`}
+                            aria-label={readingMessageId === message.id ? "stop reading assistant message" : "read assistant message aloud"}
+                          >
+                            <IconSpeaker />
+                          </button>
+                        </div>
                       </div>
                     )}
                   </article>
