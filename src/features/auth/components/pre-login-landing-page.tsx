@@ -33,10 +33,10 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         <div className="absolute inset-0 opacity-[0.14] [background:repeating-linear-gradient(90deg,transparent,transparent_7px,rgba(96,74,40,0.08)_8px,transparent_9px)]" />
       </div>
 
-      <header className="sticky top-0 z-30 border-b border-[#eadfce] bg-[#fffdf8]/95 backdrop-blur-lg">
+      <header className="sticky top-0 z-30 bg-transparent">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-2.5 md:px-8 md:py-3">
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-7 items-center rounded-full border border-[#dfceb5] bg-white px-3 text-[11px] font-semibold tracking-[0.16em] text-[#8b6b3f]">
+            <span className="inline-flex h-7 items-center px-1 text-[11px] font-semibold tracking-[0.16em] text-[#8b6b3f]">
               PHILOSOPHER
             </span>
             <p className="text-sm tracking-tight text-[#4d3e2f] md:text-base">AI 철학 인터페이스</p>
@@ -44,7 +44,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           <button
             type="button"
             onClick={onSignIn}
-            className="rounded-full border border-[#d7c2a1] bg-white px-4 py-2 text-sm font-semibold text-[#7c5a2e] transition hover:bg-[#fff7ea]"
+            className="rounded-full border border-[#dcc7a7] bg-[#fffaf1] px-4 py-2 text-sm font-semibold text-[#7c5a2e] transition hover:bg-[#fff3e2]"
           >
             Google 로그인
           </button>
