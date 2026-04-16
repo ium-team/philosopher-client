@@ -49,16 +49,16 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-20 px-6 pt-12 pb-0 md:px-10 md:pt-20 md:pb-0">
-        <section className="px-1 py-10 md:px-2 md:py-14">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-14 px-4 pt-8 pb-0 sm:px-6 md:gap-20 md:px-10 md:pt-20 md:pb-0">
+        <section className="px-1 py-8 md:px-2 md:py-14">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-xs tracking-[0.22em] text-[#d45a1d] uppercase">Socratic Interface</p>
-            <h1 className="mt-7 font-serif text-5xl font-bold leading-[1.04] tracking-tight text-[#2a231b] md:text-7xl">
+            <h1 className="mt-7 font-serif text-4xl font-bold leading-[1.04] tracking-tight text-[#2a231b] sm:text-5xl md:text-7xl">
               Philosopher
               <br />
               <span className="text-[#ea5b0c]">Dialogue</span>
             </h1>
-            <p className="mx-auto mt-10 max-w-4xl text-lg leading-8 text-[#5f5143] md:text-xl md:leading-9">
+            <p className="mx-auto mt-8 max-w-4xl text-base leading-7 text-[#5f5143] sm:text-lg sm:leading-8 md:mt-10 md:text-xl md:leading-9">
               {siteConfig.description} 질문하고, 반박하고, 재구성하며 사고를 명확하게 만드는 대화형 철학 도구입니다.
             </p>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
@@ -73,9 +73,9 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
         </section>
 
-        <section className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:items-start">
+        <section className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="p-1 md:p-2">
-            <h2 className="font-serif text-3xl font-semibold tracking-tight text-[#2a231b] md:text-4xl">What You Get</h2>
+            <h2 className="font-serif text-2xl font-semibold tracking-tight text-[#2a231b] sm:text-3xl md:text-4xl">What You Get</h2>
             <ul className="mt-8 space-y-4">
               {keyPoints.map((point) => (
                 <li key={point} className="border-b border-[#eee2d3] py-4 text-base text-[#4c4034]">
@@ -86,13 +86,13 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
           </div>
 
           <div className="p-1">
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6">
               {selectedPhilosophers.map((philosopher) => (
                 <article
                   key={philosopher.id}
                   className="group overflow-hidden p-1"
                 >
-                  <div className="relative h-48 md:h-56">
+                  <div className="relative h-40 sm:h-48 md:h-56">
                     <Image
                       src={philosopher.imageSrc}
                       alt={`${philosopher.name} portrait`}
@@ -120,7 +120,7 @@ export function PreLoginLandingPage({ authError, onSignIn }: PreLoginLandingPage
       </div>
 
       <footer className="relative mt-10 border-t border-[#eadccc] pt-7 pb-2">
-        <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 px-6 pb-4 text-sm text-[#7a6b5b] md:flex-row md:items-center md:justify-between md:px-10 md:pb-5">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 px-4 pb-4 text-sm text-[#7a6b5b] sm:px-6 md:flex-row md:items-center md:justify-between md:px-10 md:pb-5">
           <p>© {new Date().getFullYear()} Philosopher. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/terms" className="transition hover:text-[#4f4031]">
