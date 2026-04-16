@@ -402,6 +402,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [philosopherSelectPage, setPhilosopherSelectPage] = useState(0);
   const [philosopherCardsPerPage, setPhilosopherCardsPerPage] = useState(6);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isResponding, setIsResponding] = useState(false);
   const [isSelectingPhilosopher, setIsSelectingPhilosopher] = useState(startInSelection);
   const [isMoveMenuOpen, setIsMoveMenuOpen] = useState(false);
@@ -502,12 +504,21 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   useEffect(() => {
     const updateCardsPerPage = () => {
+      const isMobile = window.innerWidth < 768;
       setPhilosopherCardsPerPage(getPhilosopherCardsPerPage(window.innerWidth));
+      setIsMobileViewport(isMobile);
+      if (!isMobile) {
+        setIsMobileSidebarOpen(false);
+      }
     };
 
     updateCardsPerPage();
     window.addEventListener("resize", updateCardsPerPage);
     return () => window.removeEventListener("resize", updateCardsPerPage);
+  }, []);
+
+  const closeMobileSidebar = useCallback(() => {
+    setIsMobileSidebarOpen(false);
   }, []);
 
   useEffect(() => {
@@ -607,6 +618,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
   useEffect(() => {
     setIsRouteLoading(false);
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
   }, [pathname, searchParams]);
 
   const navigateWithLoading = useCallback((navigate: () => void) => {
@@ -1068,6 +1083,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     setActiveProjectId(null);
     setActiveConversationId("");
     setIsSelectingPhilosopher(true);
+    closeMobileSidebar();
   };
   const createProjectConversation = () => {
     if (!activeProjectId) {
@@ -1374,25 +1390,46 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     openVoiceMode();
   };
 
+  const showExpandedSidebar = isMobileViewport || isSidebarOpen;
+  const showMobileSidebar = isMobileViewport && isMobileSidebarOpen;
+
   return (
-    <main className="flex h-screen w-full overflow-hidden bg-[#ffffff] text-[#111827]">
-      <aside>
+    <main className="relative flex h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-[#ffffff] text-[#111827]">
+      {showMobileSidebar ? (
+        <button
+          type="button"
+          aria-label="close sidebar overlay"
+          onClick={closeMobileSidebar}
+          className="absolute inset-0 z-30 bg-black/35 md:hidden"
+        />
+      ) : null}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 transition-transform duration-200 md:static md:translate-x-0 ${
+          showMobileSidebar ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div
-          className={`flex h-full flex-col border-r border-[#e5e7eb] bg-[#ffffff] transition-all duration-200 ${
-            isSidebarOpen ? "w-[290px]" : "w-[72px]"
+          className={`flex h-full w-[290px] flex-col border-r border-[#e5e7eb] bg-[#ffffff] transition-all duration-200 ${
+            showExpandedSidebar ? "md:w-[290px]" : "md:w-[72px]"
           }`}
         >
           <div className="flex h-14 items-center justify-between px-4">
             <button
               type="button"
               aria-label="toggle sidebar"
-              onClick={() => setIsSidebarOpen((value) => !value)}
+              onClick={() => {
+                if (isMobileViewport) {
+                  closeMobileSidebar();
+                  return;
+                }
+                setIsSidebarOpen((value) => !value);
+              }}
               className="rounded-md p-2 text-[#4b5563] transition hover:bg-[#fff3e0]"
             >
               <IconHamburger />
             </button>
 
-            {isSidebarOpen ? (
+            {showExpandedSidebar ? (
               <button
                 type="button"
                 onClick={createConversation}
@@ -1404,7 +1441,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
             ) : null}
           </div>
 
-          {isSidebarOpen ? (
+          {showExpandedSidebar ? (
             <>
               <div className="px-3">
                 <button
@@ -1449,6 +1486,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           setActiveProjectId(project.id);
                           setActiveConversationId("");
                           setIsSelectingPhilosopher(false);
+                          closeMobileSidebar();
                         }}
                         className={`mb-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[#1f2937] transition ${
                           isActive ? "bg-[#fff3e0]" : "hover:bg-[#f3f4f6]"
@@ -1470,7 +1508,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <div className="mt-3 border-t border-[#e5e7eb] pt-3">
                 <button
                   type="button"
-                  onClick={() => setActiveProjectId(null)}
+                  onClick={() => {
+                    setActiveProjectId(null);
+                    closeMobileSidebar();
+                  }}
                   className={`px-6 text-xs transition ${
                     activeProjectId === null ? "text-[#ff6d00]" : "text-[#9ca3af] hover:text-[#6b7280]"
                   }`}
@@ -1492,6 +1533,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           setActiveProjectId(null);
                           setActiveConversationId(conversation.id);
                           setIsSelectingPhilosopher(false);
+                          closeMobileSidebar();
                         }}
                         className={`mb-0.5 block w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
                           isActive ? "bg-[#fff3e0] text-[#ff6d00]" : "text-[#374151] hover:bg-[#fff3e0]"
@@ -1605,27 +1647,38 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       </aside>
 
       <section className="relative flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-[#e5e7eb] bg-[#ffffff] px-4 md:px-6">
-          <button
-            type="button"
-            onClick={() => setIsSelectingPhilosopher(true)}
-            className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-[#111827]"
-          >
-            {activePhilosopher ? (
-              <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
-                <Image
-                  src={activePhilosopher.imageSrc}
-                  alt={`${activePhilosopher.name} portrait`}
-                  width={40}
-                  height={40}
-                  className="h-full w-full scale-125 object-contain object-bottom"
-                />
-              </span>
-            ) : (
-              <span className="h-8 w-8 rounded-full bg-[#f3f4f6]" />
-            )}
-            {activePhilosopher?.name ?? "철학자 선택"} <span className="ml-1 text-sm text-[#ff7f11]">▾</span>
-          </button>
+        <header className="flex h-14 items-center justify-between border-b border-[#e5e7eb] bg-[#ffffff] px-3 md:px-6">
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="rounded-md p-2 text-[#4b5563] transition hover:bg-[#fff3e0] md:hidden"
+              aria-label="open sidebar"
+            >
+              <IconHamburger />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSelectingPhilosopher(true)}
+              className="flex min-w-0 items-center gap-2 text-left text-base font-semibold tracking-tight text-[#111827] md:text-[18px]"
+            >
+              {activePhilosopher ? (
+                <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#eadfd2] bg-[#fbf5ec]">
+                  <Image
+                    src={activePhilosopher.imageSrc}
+                    alt={`${activePhilosopher.name} portrait`}
+                    width={40}
+                    height={40}
+                    className="h-full w-full scale-125 object-contain object-bottom"
+                  />
+                </span>
+              ) : (
+                <span className="h-8 w-8 rounded-full bg-[#f3f4f6]" />
+              )}
+              <span className="truncate">{activePhilosopher?.name ?? "철학자 선택"}</span>
+              <span className="ml-0.5 shrink-0 text-sm text-[#ff7f11]">▾</span>
+            </button>
+          </div>
 
           <div className="flex items-center gap-3">
             {(activeConversation || isProjectHome) ? (
@@ -1787,7 +1840,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
 
         <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div
-            className={`mx-auto w-full max-w-[920px] px-5 ${isSelectingPhilosopher ? "pb-12 pt-6" : "pb-36 pt-8"} md:px-8`}
+            className={`mx-auto w-full max-w-[920px] px-4 ${isSelectingPhilosopher ? "pb-12 pt-5" : "pb-36 pt-6"} sm:px-5 md:px-8`}
           >
             {isHydrating ? (
               <div className="sr-only">대화 데이터를 불러오는 중입니다...</div>
@@ -1801,7 +1854,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               <>
                 <header className="mb-5">
                   <p className="text-xs tracking-[0.18em] text-[#9ca3af] uppercase">New Conversation</p>
-                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#111827]">대화할 철학자를 선택하세요</h1>
+                  <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#111827] md:text-3xl">대화할 철학자를 선택하세요</h1>
                   <p className="mt-2 text-sm text-[#6b7280]">
                     선택 후 바로 같은 화면에서 대화가 시작됩니다.
                     {activeProject ? ` 현재 프로젝트: ${activeProject.name}` : ""}
@@ -1909,11 +1962,11 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                 <div className="py-4">
                   <div>
                     <div className="mb-6 flex items-center justify-between gap-5">
-                      <div className="flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#111827]">
+                      <div className="flex min-w-0 items-center gap-3 text-2xl font-semibold tracking-tight text-[#111827] md:text-3xl">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3f4f6] text-[#9ca3af]">
                           <IconFolder className="h-5 w-5" />
                         </span>
-                        {activeProject.name}
+                        <span className="truncate">{activeProject.name}</span>
                       </div>
                       <button
                         type="button"
@@ -1979,7 +2032,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
               ? activeConversation && activeConversation.messages.length === 0
                 ? (
                   <div className="mb-10 flex flex-col items-center px-3 py-2 text-center">
-                    <p className="text-2xl font-semibold tracking-tight text-[#9a3412]">{initialGuideTitle}</p>
+                    <p className="text-xl font-semibold tracking-tight text-[#9a3412] md:text-2xl">{initialGuideTitle}</p>
                     <p className="mt-3 max-w-[560px] text-sm leading-7 text-[#7c4a2b]">{initialGuideSummary}</p>
                   </div>
                 )
@@ -1994,7 +2047,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                   >
                     {message.role === "user" ? (
                       <>
-                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff3e0] px-5 py-4 text-[15px] leading-7 text-[#c2410c]">
+                        <div className="ml-auto max-w-[620px] rounded-3xl bg-[#fff3e0] px-4 py-3 text-[15px] leading-7 text-[#c2410c] sm:px-5 sm:py-4">
                           {message.text}
                         </div>
                         <div className="mt-2 flex justify-end gap-2 text-[#9ca3af]">
@@ -2034,7 +2087,7 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                           )}
                           {activePhilosopher?.name ?? "Philosopher"}
                         </div>
-                        <div className="whitespace-pre-line text-[17px] leading-8 text-[#111827]">{message.text}</div>
+                        <div className="whitespace-pre-line text-base leading-7 text-[#111827] md:text-[17px] md:leading-8">{message.text}</div>
                         <div className="mt-2 flex items-center gap-2 text-[#9ca3af]">
                           <button
                             type="button"
