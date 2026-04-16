@@ -18,18 +18,8 @@ function getCardsPerPage(width: number): number {
 export function PhilosopherSelectPage() {
   const router = useRouter();
   const [philosopherQuery, setPhilosopherQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(6);
-
-  useEffect(() => {
-    const updateCardsPerPage = () => {
-      setCardsPerPage(getCardsPerPage(window.innerWidth));
-    };
-
-    updateCardsPerPage();
-    window.addEventListener("resize", updateCardsPerPage);
-    return () => window.removeEventListener("resize", updateCardsPerPage);
-  }, []);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const filteredPhilosophers = useMemo(() => {
     const normalized = philosopherQuery.trim().toLowerCase();
@@ -43,13 +33,22 @@ export function PhilosopherSelectPage() {
       ),
     );
   }, [philosopherQuery]);
-
   const totalPages = Math.max(1, Math.ceil(filteredPhilosophers.length / cardsPerPage));
   const safeCurrentPage = Math.min(currentPage, totalPages - 1);
   const pagedPhilosophers = useMemo(() => {
     const start = safeCurrentPage * cardsPerPage;
     return filteredPhilosophers.slice(start, start + cardsPerPage);
   }, [cardsPerPage, filteredPhilosophers, safeCurrentPage]);
+
+  useEffect(() => {
+    const updateCardsPerPage = () => {
+      setCardsPerPage(getCardsPerPage(window.innerWidth));
+    };
+
+    updateCardsPerPage();
+    window.addEventListener("resize", updateCardsPerPage);
+    return () => window.removeEventListener("resize", updateCardsPerPage);
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#fffcf8] px-4 py-5 text-[#2a241f] sm:px-5 sm:py-6 md:px-8 md:py-8">
@@ -85,7 +84,7 @@ export function PhilosopherSelectPage() {
           <div className="flex items-center gap-2 self-end md:self-auto">
             <button
               type="button"
-              onClick={() => setCurrentPage((previous) => Math.max(Math.min(previous, totalPages - 1) - 1, 0))}
+              onClick={() => setCurrentPage((previous) => Math.max(previous - 1, 0))}
               disabled={safeCurrentPage === 0}
               className="h-10 rounded-lg border border-[#e7ddcf] bg-white px-3 text-sm text-[#7b6958] transition hover:bg-[#f9f3ec] disabled:cursor-not-allowed disabled:opacity-40"
             >
@@ -96,7 +95,7 @@ export function PhilosopherSelectPage() {
             </p>
             <button
               type="button"
-              onClick={() => setCurrentPage((previous) => Math.min(Math.min(previous, totalPages - 1) + 1, totalPages - 1))}
+              onClick={() => setCurrentPage((previous) => Math.min(previous + 1, totalPages - 1))}
               disabled={safeCurrentPage >= totalPages - 1}
               className="h-10 rounded-lg border border-[#e7ddcf] bg-white px-3 text-sm text-[#7b6958] transition hover:bg-[#f9f3ec] disabled:cursor-not-allowed disabled:opacity-40"
             >
