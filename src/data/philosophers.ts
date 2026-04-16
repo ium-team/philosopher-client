@@ -14,7 +14,7 @@ export type PhilosopherProfile = {
 export const philosophers: PhilosopherProfile[] = [
   {
     id: "socrates",
-    name: "Socrates",
+    name: "소크라테스",
     imageSrc: "/philosophers/Socrates-cutout-v2.png",
     era: "Ancient Greece",
     school: "Dialectic",
@@ -30,7 +30,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "nietzsche",
-    name: "Nietzsche",
+    name: "니체",
     imageSrc: "/philosophers/Nietzsche-cutout-v2.png",
     era: "19th Century",
     school: "Existential Critique",
@@ -50,7 +50,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "arendt",
-    name: "Hannah Arendt",
+    name: "한나 아렌트",
     imageSrc: "/philosophers/Hannah Arendt-cutout-v2.png",
     era: "20th Century",
     school: "Political Thought",
@@ -66,7 +66,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "plato",
-    name: "Plato",
+    name: "플라톤",
     imageSrc: "/philosophers/Plato-cutout-v2.png",
     era: "Ancient Greece",
     school: "Idealism",
@@ -78,7 +78,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "aristotle",
-    name: "Aristotle",
+    name: "아리스토텔레스",
     imageSrc: "/philosophers/Aristotle-cutout-v2.png",
     era: "Ancient Greece",
     school: "Peripatetic",
@@ -90,7 +90,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "descartes",
-    name: "Rene Descartes",
+    name: "르네 데카르트",
     imageSrc: "/philosophers/Rene Descartes-cutout-v2.png",
     era: "17th Century",
     school: "Rationalism",
@@ -102,7 +102,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "kant",
-    name: "Immanuel Kant",
+    name: "임마누엘 칸트",
     imageSrc: "/philosophers/Immanuel Kant-cutout-v2.png",
     era: "18th Century",
     school: "Critical Philosophy",
@@ -114,7 +114,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "confucius",
-    name: "Confucius",
+    name: "공자",
     imageSrc: "/philosophers/Confucius-cutout-v2.png",
     era: "Spring and Autumn Period",
     school: "Confucianism",
@@ -126,7 +126,7 @@ export const philosophers: PhilosopherProfile[] = [
   },
   {
     id: "simone_de_beauvoir",
-    name: "Simone de Beauvoir",
+    name: "시몬 드 보부아르",
     imageSrc: "/philosophers/Simone de Beauvoir-cutout-v2.png",
     era: "20th Century",
     school: "Existential Feminism",
