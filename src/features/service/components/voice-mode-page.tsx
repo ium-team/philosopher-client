@@ -358,7 +358,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
               : "대화를 먼저 시작한 뒤 음성 모드를 사용하세요.";
 
   return (
-    <main className="relative flex min-h-screen flex-col bg-[#f8f8f7] text-[#111827]">
+    <main className="relative flex min-h-[100dvh] flex-col bg-[#f8f8f7] text-[#111827]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.9),rgba(248,248,247,0.94)_45%,rgba(244,245,247,1)_100%)]" />
 
       <div
@@ -371,9 +371,9 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
             toggleListening();
           }
         }}
-        className="relative flex min-h-screen flex-1 flex-col"
+        className="relative flex min-h-[100dvh] flex-1 flex-col"
       >
-        <div className="flex justify-end px-5 pt-5">
+        <div className="flex justify-end px-4 pt-4 sm:px-5 sm:pt-5">
           <button
             type="button"
             onClick={(event) => {
@@ -387,7 +387,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           </button>
         </div>
 
-        <div className="flex flex-1 items-center justify-center px-6">
+        <div className="flex flex-1 items-center justify-center px-4 sm:px-6">
           {activePhilosopher ? (
             <div>
               <Image
@@ -395,7 +395,7 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
                 alt={`${activePhilosopher.name} portrait`}
                 width={440}
                 height={440}
-                className={`h-[280px] w-[280px] object-contain object-bottom transition-all duration-300 md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px] ${
+                className={`h-[220px] w-[220px] object-contain object-bottom transition-all duration-300 sm:h-[280px] sm:w-[280px] md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px] ${
                   voiceStatus === "speaking"
                     ? "animate-[philosopher-speaking_900ms_ease-in-out_infinite]"
                     : "scale-100"
@@ -405,16 +405,16 @@ export function VoiceModePage({ conversationId, philosopherId }: VoiceModePagePr
           ) : null}
         </div>
 
-        <div className="px-6 pb-10">
+        <div className="px-4 pb-8 sm:px-6 sm:pb-10">
           <div className="text-center">
           <p
-            className={`text-base ${
+            className={`text-sm sm:text-base ${
               voiceStatus === "error" ? "text-[#b91c1c]" : "text-[#4b5563]"
             }`}
           >
             {statusText}
           </p>
-          {liveTranscript ? <p className="mt-2 text-sm text-[#6b7280]">{liveTranscript}</p> : null}
+          {liveTranscript ? <p className="mt-2 text-xs text-[#6b7280] sm:text-sm">{liveTranscript}</p> : null}
           </div>
         </div>
       </div>

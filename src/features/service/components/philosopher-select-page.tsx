@@ -45,21 +45,14 @@ export function PhilosopherSelectPage() {
   }, [philosopherQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filteredPhilosophers.length / cardsPerPage));
+  const safeCurrentPage = Math.min(currentPage, totalPages - 1);
   const pagedPhilosophers = useMemo(() => {
-    const start = currentPage * cardsPerPage;
+    const start = safeCurrentPage * cardsPerPage;
     return filteredPhilosophers.slice(start, start + cardsPerPage);
-  }, [cardsPerPage, currentPage, filteredPhilosophers]);
-
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [philosopherQuery, cardsPerPage]);
-
-  useEffect(() => {
-    setCurrentPage((previous) => Math.min(previous, totalPages - 1));
-  }, [totalPages]);
+  }, [cardsPerPage, filteredPhilosophers, safeCurrentPage]);
 
   return (
-    <main className="min-h-screen bg-[#fffcf8] px-5 py-6 text-[#2a241f] md:px-8 md:py-8">
+    <main className="min-h-screen bg-[#fffcf8] px-4 py-5 text-[#2a241f] sm:px-5 sm:py-6 md:px-8 md:py-8">
       <div className="mx-auto w-full max-w-5xl">
         <button
           type="button"
@@ -71,7 +64,7 @@ export function PhilosopherSelectPage() {
 
         <header className="mb-5">
           <p className="text-xs tracking-[0.18em] text-[#a3917f] uppercase">New Conversation</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#2f2720]">대화할 철학자를 선택하세요</h1>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#2f2720] md:text-3xl">대화할 철학자를 선택하세요</h1>
           <p className="mt-2 text-sm text-[#7f7369]">선택 후 `채팅하기`를 누르면 해당 철학자와의 대화가 시작됩니다.</p>
         </header>
 
@@ -81,7 +74,10 @@ export function PhilosopherSelectPage() {
             <input
               type="text"
               value={philosopherQuery}
-              onChange={(event) => setPhilosopherQuery(event.target.value)}
+              onChange={(event) => {
+                setPhilosopherQuery(event.target.value);
+                setCurrentPage(0);
+              }}
               placeholder="철학자 검색 (이름/시대/학파)"
               className="w-full rounded-xl border border-[#e7ddcf] bg-white px-4 py-2.5 text-sm text-[#2a241f] outline-none transition placeholder:text-[#aa9e91] focus:border-[#d7c5ae] focus:ring-2 focus:ring-[#f4e5d3]"
             />
@@ -89,19 +85,19 @@ export function PhilosopherSelectPage() {
           <div className="flex items-center gap-2 self-end md:self-auto">
             <button
               type="button"
-              onClick={() => setCurrentPage((previous) => Math.max(previous - 1, 0))}
-              disabled={currentPage === 0}
+              onClick={() => setCurrentPage((previous) => Math.max(Math.min(previous, totalPages - 1) - 1, 0))}
+              disabled={safeCurrentPage === 0}
               className="h-10 rounded-lg border border-[#e7ddcf] bg-white px-3 text-sm text-[#7b6958] transition hover:bg-[#f9f3ec] disabled:cursor-not-allowed disabled:opacity-40"
             >
               ←
             </button>
             <p className="min-w-24 text-center text-xs text-[#8a7a6c]">
-              {currentPage + 1} / {totalPages}
+              {safeCurrentPage + 1} / {totalPages}
             </p>
             <button
               type="button"
-              onClick={() => setCurrentPage((previous) => Math.min(previous + 1, totalPages - 1))}
-              disabled={currentPage >= totalPages - 1}
+              onClick={() => setCurrentPage((previous) => Math.min(Math.min(previous, totalPages - 1) + 1, totalPages - 1))}
+              disabled={safeCurrentPage >= totalPages - 1}
               className="h-10 rounded-lg border border-[#e7ddcf] bg-white px-3 text-sm text-[#7b6958] transition hover:bg-[#f9f3ec] disabled:cursor-not-allowed disabled:opacity-40"
             >
               →
