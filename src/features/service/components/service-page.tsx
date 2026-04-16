@@ -399,8 +399,8 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
   const [draft, setDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [philosopherSearchQuery, setPhilosopherSearchQuery] = useState("");
-  const [philosopherSelectPage, setPhilosopherSelectPage] = useState(0);
   const [philosopherCardsPerPage, setPhilosopherCardsPerPage] = useState(6);
+  const [philosopherSelectPage, setPhilosopherSelectPage] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -497,13 +497,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
     );
   }, [philosopherSearchQuery]);
   const philosopherTotalPages = Math.max(1, Math.ceil(filteredPhilosophers.length / philosopherCardsPerPage));
+  const safePhilosopherPage = Math.min(philosopherSelectPage, philosopherTotalPages - 1);
   const pagedPhilosophers = useMemo(() => {
-    const start = philosopherSelectPage * philosopherCardsPerPage;
+    const start = safePhilosopherPage * philosopherCardsPerPage;
     return filteredPhilosophers.slice(start, start + philosopherCardsPerPage);
-  }, [filteredPhilosophers, philosopherCardsPerPage, philosopherSelectPage]);
+  }, [filteredPhilosophers, philosopherCardsPerPage, safePhilosopherPage]);
 
   useEffect(() => {
-    const updateCardsPerPage = () => {
+    const updateResponsiveState = () => {
       const isMobile = window.innerWidth < 768;
       setPhilosopherCardsPerPage(getPhilosopherCardsPerPage(window.innerWidth));
       setIsMobileViewport(isMobile);
@@ -512,22 +513,14 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
       }
     };
 
-    updateCardsPerPage();
-    window.addEventListener("resize", updateCardsPerPage);
-    return () => window.removeEventListener("resize", updateCardsPerPage);
+    updateResponsiveState();
+    window.addEventListener("resize", updateResponsiveState);
+    return () => window.removeEventListener("resize", updateResponsiveState);
   }, []);
 
   const closeMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(false);
   }, []);
-
-  useEffect(() => {
-    setPhilosopherSelectPage(0);
-  }, [philosopherSearchQuery, philosopherCardsPerPage]);
-
-  useEffect(() => {
-    setPhilosopherSelectPage((previous) => Math.min(previous, philosopherTotalPages - 1));
-  }, [philosopherTotalPages]);
 
   const filteredRecentConversations = useMemo(() => {
     const normalized = searchQuery.trim().toLowerCase();
@@ -1867,7 +1860,10 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     <input
                       type="text"
                       value={philosopherSearchQuery}
-                      onChange={(event) => setPhilosopherSearchQuery(event.target.value)}
+                      onChange={(event) => {
+                        setPhilosopherSearchQuery(event.target.value);
+                        setPhilosopherSelectPage(0);
+                      }}
                       placeholder="철학자 검색 (이름/시대/학파)"
                       className="w-full rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm text-[#111827] outline-none transition placeholder:text-[#9ca3af] focus:border-[#cbd5e1] focus:ring-2 focus:ring-[#e2e8f0]"
                     />
@@ -1876,20 +1872,18 @@ export function ServicePage({ startInSelection = false }: ServicePageProps) {
                     <button
                       type="button"
                       onClick={() => setPhilosopherSelectPage((previous) => Math.max(previous - 1, 0))}
-                      disabled={philosopherSelectPage === 0}
+                      disabled={safePhilosopherPage === 0}
                       className="h-10 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#475569] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       ←
                     </button>
                     <p className="min-w-24 text-center text-xs text-[#6b7280]">
-                      {philosopherSelectPage + 1} / {philosopherTotalPages}
+                      {safePhilosopherPage + 1} / {philosopherTotalPages}
                     </p>
                     <button
                       type="button"
-                      onClick={() =>
-                        setPhilosopherSelectPage((previous) => Math.min(previous + 1, philosopherTotalPages - 1))
-                      }
-                      disabled={philosopherSelectPage >= philosopherTotalPages - 1}
+                      onClick={() => setPhilosopherSelectPage((previous) => Math.min(previous + 1, philosopherTotalPages - 1))}
+                      disabled={safePhilosopherPage >= philosopherTotalPages - 1}
                       className="h-10 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#475569] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       →
